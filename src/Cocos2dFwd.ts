@@ -1,4 +1,4 @@
-export namespace cc {
+namespace cc {
     export interface Object {
         _objFlags: number;
     }
