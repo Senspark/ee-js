@@ -1,0 +1,29 @@
+{
+  "name": "ee-js",
+  "version": "1.0.0",
+  "description": "ee library for cocos creator",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Senspark/ee-js.git"
+  },
+  "keywords": [
+    "cocos2d",
+    "js"
+  ],
+  "author": "enrevol",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Senspark/ee-js/issues"
+  },
+  "homepage": "https://github.com/Senspark/ee-js#readme",
+  "devDependencies": {
+    "typescript": "^2.9.2"
+  },
+  "dependencies": {
+    "typescript": "^2.9.2"
+  }
+}
