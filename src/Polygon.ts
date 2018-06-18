@@ -1,4 +1,4 @@
-export default class Polygon {
+export class Polygon {
     /** All vertices of the polygon. */
     private vertices: cc.Vec2[] = [];
 
