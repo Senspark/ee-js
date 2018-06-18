@@ -71,10 +71,8 @@ export class NestedPrefab extends cc.Component {
         // cc.log('instantiate view for prefab ' + this.prefab.name);
         assert(this.view === undefined);
         assert(this.prefab !== undefined);
-        this.prefab!.createNode((err, node) => {
-            this.view = node;
-            this.node.addChild(node);
-        });
+        this.view = cc.instantiate(this.prefab!);
+        this.node.addChild(this.view);
     };
 
     private setupView(): void {
