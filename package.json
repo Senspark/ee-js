@@ -12,10 +12,13 @@
   },
   "keywords": [
     "cocos2d",
-    "js"
+    "cocos",
+    "creator",
+    "utility",
+    "utils"
   ],
   "author": "enrevol",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Senspark/ee-js/issues"
   },
