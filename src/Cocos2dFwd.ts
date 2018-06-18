@@ -1,4 +1,4 @@
-namespace cc {
+declare module cc {
     export interface Object {
         _objFlags: number;
     }
