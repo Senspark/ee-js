@@ -1,4 +1,5 @@
 import assert = require('assert');
+import './Cocos2dFwd'
 import { StaticComponent } from './StaticComponent';
 
 const { ccclass, disallowMultiple, executeInEditMode, menu, property } = cc._decorator;

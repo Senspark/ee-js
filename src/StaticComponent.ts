@@ -1,3 +1,5 @@
+import './Cocos2dFwd'
+
 const { ccclass, disallowMultiple, executeInEditMode, menu } = cc._decorator;
 
 /** Used with NestedPrefab */
