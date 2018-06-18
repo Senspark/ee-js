@@ -1,5 +1,4 @@
 import assert = require('assert');
-import './Cocos2dFwd'
 import { StaticComponent } from './StaticComponent';
 
 const { ccclass, disallowMultiple, executeInEditMode, menu, property } = cc._decorator;
@@ -13,7 +12,7 @@ export class NestedPrefab extends cc.Component {
     private view?: cc.Node;
 
     @property(cc.Prefab)
-    private _prefab?: cc.Prefab;
+    private _prefab?: cc.Prefab = undefined;
 
     @property({ type: cc.Prefab })
     private get prefab() {

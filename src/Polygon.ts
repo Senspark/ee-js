@@ -1,5 +1,3 @@
-import './Cocos2dFwd'
-
 export class Polygon {
     /** All vertices of the polygon. */
     private vertices: cc.Vec2[] = [];
