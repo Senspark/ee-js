@@ -1,6 +1,6 @@
 {
-  "name": "ee-js",
-  "version": "1.0.1",
+  "name": "@enrevol/ee-js",
+  "version": "0.0.1",
   "description": "ee library for cocos creator",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
