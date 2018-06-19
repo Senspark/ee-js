@@ -1,7 +1,9 @@
 declare module cc {
+    type WebGLUniformLocation = number;
+
     export interface Object {
         _objFlags: number;
-    }
+    };
 
     export namespace Object {
         export enum Flags {
@@ -12,8 +14,96 @@ declare module cc {
             IsAnchorLocked /*  */ = 1 << 19,
             IsSizeLocked /*    */ = 1 << 20,
             IsPositionLocked /**/ = 1 << 21,
-        }
-    }
+        };
+    };
+
+    /** shaders */
+    export namespace gl {
+        /** Invalidates the GL state cache. */
+        export function invalidateStateCache(): void;
+
+        /** Uses the GL program in case program is different than the current one. */
+        export function useProgram(program: GLProgram): void;
+
+        /** Deletes the GL program. If it is the one that is being used, it invalidates it. */
+        export function deleteProgram(program: GLProgram): void;
+
+        /** Uses a blending function in case it is not already used. */
+        export function blendFunc(src: number, dst: number): void;
+
+        /** If the texture is not already bound, it binds it. */
+        export function bindTexture2D(texture: cc.Texture2D): void;
+
+        /** It will delete the given texture. If the texture was bound, it will invalidate the cached. */
+        export function deleteTexture2D(texture: cc.Texture2D): void;
+    };
+
+    class GLProgram {
+        constructor(vShaderFileName: string, fShaderFileName: string, glContext: any);
+
+        /** Destroys the program. */
+        destroyProgram(): void;
+
+        /** Initializes the GL program with a vertex and fragment with contents of filenames. */
+        init(vert: string, frag: string): boolean;
+
+        /** Initializes the GL program with a vertex and fragment with string. */
+        initWithString(vert: string, frag: string): boolean;
+
+        /** Adds a new attribute to the shader. */
+        addAttribute(attributeName: string, index: number): void;
+
+        /** Links the GL program. */
+        link(): boolean;
+
+        /** Calls gl.useProgram(). */
+        use(): void;
+
+        /** Creats 4 uniforms:
+         * cc.macro.UNIFORM_PMATRIX
+         * cc.macro.UNIFORM_MNMATRIX
+         * cc.macro.UNIFORM_MVPMATRIX
+         * cc.macro.UNIFORM_SAMPLER
+         */
+        updateUniforms(): void;
+
+        /** Retrieves the named unifrom location for this GL program. */
+        getUniformLocationForName(name: string): WebGLUniformLocation;
+
+        setUniformLocationWith1i(location: WebGLUniformLocation, i1: number);
+        setUniformLocationWith2i(location: WebGLUniformLocation, i1: number, i2: number);
+        setUniformLocationWith3i(location: WebGLUniformLocation, i1: number, i2: number, i3: number);
+        setUniformLocationWith4i(location: WebGLUniformLocation, i1: number, i2: number, i3: number, i4: number);
+        setUniformLocationWith2iv(location: WebGLUniformLocation, array: number[]);
+        setUniformLocationWith3iv(location: WebGLUniformLocation, array: number[]);
+        setUniformLocationWith4iv(location: WebGLUniformLocation, array: number[]);
+        setUniformLocationWith1f(location: WebGLUniformLocation, f1: number);
+        setUniformLocationWith2f(location: WebGLUniformLocation, f1: number, f2: number);
+        setUniformLocationWith3f(location: WebGLUniformLocation, f1: number, f2: number, f3: number);
+        setUniformLocationWith4f(location: WebGLUniformLocation, f1: number, f2: number, f3: number, f4: number);
+        setUniformLocationWith2fv(location: WebGLUniformLocation, array: number[]);
+        setUniformLocationWith3fv(location: WebGLUniformLocation, array: number[]);
+        setUniformLocationWith4fv(location: WebGLUniformLocation, array: number[]);
+        setUniformLocationWithMatrix3fv(location: WebGLUniformLocation, array: number[]);
+        setUniformLocationWithMatrix4fv(location: WebGLUniformLocation, array: number[]);
+
+        /** Updates the built-in uniforms if they are different than the previous call for this same GL program. */
+        setUniformsForBuilins(): void;
+
+        /** Reloads all shaders, designed for Android when OpenGL context lost. */
+        reset(): void;
+    };
+
+    class shaderCache {
+        /** Reloads the default shaders. */
+        static reloadDefaultShaders(): void;
+
+        /** Returns a GL program for the given key. */
+        static getProgram(key: string): GLProgram;
+
+        /** Adds a GL program to the cache for the given key. */
+        static addProgram(program: GLProgram, key: string): void;
+    };
 
     /** kazmath */
     export namespace math {
@@ -21,6 +111,9 @@ declare module cc {
 
         export class Vec3 {
             static zero: Vec3;
+            x: number;
+            y: number;
+            z: number;
             constructor(x: number | Vec3, y?: number, z?: number);
             fill(x: number | Vec3, y?: number, z?: number);
             length(): number;
@@ -39,12 +132,16 @@ declare module cc {
             inverseTransformNormal(matrix: Matrix4): this;
             assignFrom(vec: Vec3): this;
             toTypeArray(): number[];
-        }
+        };
 
         export class Quaternion {
             static rotationMatrix(matrix: Matrix3): Quaternion;
             static rotationYawPitchRoll(yaw: number, pitch: number, roll: number): Quaternion;
             static slerp(quaternion: Quaternion, t: number): Quaternion;
+            x: number;
+            y: number;
+            z: number;
+            w: number;
             constructor(x: number | Quaternion, y?: number, z?: number, w?: number);
             conjugate(quaternion: Quaternion): this;
             dot(quaternion: Quaternion): number;
@@ -60,7 +157,7 @@ declare module cc {
             assignFrom(quaternion: Quaternion): this;
             add(quaternion: Quaternion): this;
             multiplyVec3(vec: Vec3): Vec3;
-        }
+        };
 
         export class Matrix3 {
             static createByRotationX(radians: number): Matrix3;
@@ -70,6 +167,7 @@ declare module cc {
             static createByScale(x: number, y: number): Matrix3;
             static createByTranslation(x: number, y: number): Matrix3;
             static createByQuaternion(quaternion: Quaternion): Matrix3;
+            mat: Float32Array;
             constructor(matrix?: Matrix3);
             fill(arr: number[]): this;
             adjugate(): this;
@@ -82,7 +180,7 @@ declare module cc {
             multiplyScalar(factor: number): this;
             assignFrom(matrix: Matrix3): this;
             equals(matrix: Matrix3): boolean;
-        }
+        };
 
         /** Sets matrix to an identity matrix. */
         export function mat4Identity(matrix: Matrix4): Matrix4;
@@ -124,6 +222,8 @@ declare module cc {
             /** Builds a translation matrix. */
             static createByTranslation(x: number, y: number, z: number, matrix?: Matrix4): Matrix4;
 
+            mat: Float32Array;
+
             constructor(matrix?: Matrix4);
 
             /** Fills this matrix stucture with the values from a 16-element array of floats. */
@@ -156,6 +256,6 @@ declare module cc {
 
             /** Checks whether the current matrix equal to the specified matrix (approximately). */
             equals(matrix: Matrix4): boolean;
-        }
-    }
+        };
+    };
 };
