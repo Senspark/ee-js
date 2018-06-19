@@ -1,7 +1,7 @@
 {
-  "name": "@enrevol/ee-js",
+  "name": "@senspark/ee-js",
   "version": "0.0.8",
-  "description": "ee library for cocos creator",
+  "description": "utility library for cocos creator",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -18,7 +18,7 @@
     "utility",
     "utils"
   ],
-  "author": "enrevol",
+  "author": "senspark",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Senspark/ee-js/issues"
