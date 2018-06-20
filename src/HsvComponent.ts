@@ -83,6 +83,8 @@ export class HsvComponent extends cc.Component {
         this.contrastMatrixDirty = true;
     };
 
+    private renderingNode?: _ccsg.Node;
+
     private program?: cc.GLProgram;
     private oldProgram?: cc.GLProgram;
 
@@ -132,37 +134,23 @@ export class HsvComponent extends cc.Component {
         if (!this.isSupported()) {
             return;
         }
-        let node = this.getRenderingNode();
-        if (node === undefined) {
-            return;
-        }
-        if (cc.sys.isNative) {
-            this.oldProgramState = node.getGLProgramState();
-            node.setGLProgramState(this.programState!);
-        } else {
-            this.oldProgram = node.getShaderProgram();
-            node.setShaderProgram(this.program!);
-        }
+        this.setRenderingNode(this.getRenderingNode());
     };
 
-    public onDisable() {
+    public onDisable(): void {
         if (!this.isSupported()) {
             return;
         }
-        let node = this.getRenderingNode();
-        if (node === undefined) {
-            return;
-        }
-        if (cc.sys.isNative) {
-            node.setGLProgramState(this.oldProgramState!);
-        } else {
-            node.setShaderProgram(this.oldProgram!);
-        }
+        this.setRenderingNode(undefined);
     };
 
     public update(delta: number): void {
         if (!this.isSupported()) {
             return;
+        }
+        if (this.enabled) {
+            // Constantly update the current rendering node.
+            this.setRenderingNode(this.getRenderingNode());
         }
         if (!this.updateMatrix()) {
             return;
@@ -192,7 +180,32 @@ export class HsvComponent extends cc.Component {
             }
         }
         return undefined;
-    }
+    };
+
+    private setRenderingNode(node: _ccsg.Node | undefined) {
+        if (node === this.renderingNode) {
+            return;
+        }
+        if (this.renderingNode !== undefined) {
+            // Restore old program.
+            if (cc.sys.isNative) {
+                this.renderingNode.setGLProgramState(this.oldProgramState!);
+            } else {
+                this.renderingNode.setShaderProgram(this.oldProgram!);
+            }
+        }
+        this.renderingNode = node;
+        if (this.renderingNode !== undefined) {
+            // Apply custom program.
+            if (cc.sys.isNative) {
+                this.oldProgramState = this.renderingNode.getGLProgramState();
+                this.renderingNode.setGLProgramState(this.programState!);
+            } else {
+                this.oldProgram = this.renderingNode.getShaderProgram();
+                this.renderingNode.setShaderProgram(this.program!);
+            }
+        }
+    };
 
     private updateMatrix(): boolean {
         let dirty = false;
