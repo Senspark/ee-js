@@ -4,17 +4,17 @@ const bwgt = 0.0820;
 
 function transformRGB(m: cc.math.Matrix4, r: number, g: number, b: number): [number, number, number] {
     return [
-        r * m.get(0, 0) + g * m.get(1, 0) + b * m.get(2, 0) + m.get(3, 0),
-        r * m.get(0, 1) + g * m.get(1, 1) + b * m.get(2, 1) + m.get(3, 1),
-        r * m.get(0, 2) + g * m.get(1, 2) + b * m.get(2, 2) + m.get(3, 2),
+        r * m.get(0, 0) + g * m.get(0, 1) + b * m.get(0, 2) + m.get(0, 3),
+        r * m.get(1, 0) + g * m.get(1, 1) + b * m.get(1, 2) + m.get(1, 3),
+        r * m.get(2, 0) + g * m.get(2, 1) + b * m.get(2, 2) + m.get(2, 3),
     ];
 };
 
 function createShearZMatrix(x: number, y: number): cc.math.Matrix4 {
     let matrix = new cc.math.Matrix4();
     matrix.identity();
-    matrix.set(0, 2, x);
-    matrix.set(1, 2, y);
+    matrix.set(2, 0, x);
+    matrix.set(2, 1, y);
     return matrix;
 };
 
@@ -58,15 +58,15 @@ export function createHueMatrix(degrees: number): cc.math.Matrix4 {
 export function createSaturationMatrix(s: number): cc.math.Matrix4 {
     let m = new cc.math.Matrix4();
     m.set(0, 0, (1 - s) * rwgt + s);
-    m.set(0, 1, (1 - s) * rwgt);
-    m.set(0, 2, (1 - s) * rwgt);
+    m.set(1, 0, (1 - s) * rwgt);
+    m.set(2, 0, (1 - s) * rwgt);
 
-    m.set(1, 0, (1 - s) * gwgt);
+    m.set(0, 1, (1 - s) * gwgt);
     m.set(1, 1, (1 - s) * gwgt + s);
-    m.set(1, 2, (1 - s) * gwgt);
+    m.set(2, 1, (1 - s) * gwgt);
 
-    m.set(2, 0, (1 - s) * bwgt);
-    m.set(2, 1, (1 - s) * bwgt);
+    m.set(0, 2, (1 - s) * bwgt);
+    m.set(1, 2, (1 - s) * bwgt);
     m.set(2, 2, (1 - s) * bwgt + s);
 
     m.set(3, 3, 1.0);

@@ -1,5 +1,20 @@
+declare module _ccsg {
+    export class Node {
+        getShaderProgram(): cc.GLProgram;
+        setShaderProgram(program: cc.GLProgram): void;
+
+        /** For native. */
+        getGLProgramState(): cc.GLProgramState;
+        setGLProgramState(state: cc.GLProgramState): void;
+    };
+};
+
 declare module cc {
     type WebGLUniformLocation = number;
+
+    export class macro {
+        static ATTRIBUTE_NAME_POSITION_: string;
+    };
 
     export interface Object {
         _objFlags: number;
@@ -15,6 +30,45 @@ declare module cc {
             IsSizeLocked /*    */ = 1 << 20,
             IsPositionLocked /**/ = 1 << 21,
         };
+    };
+
+    export interface Sprite {
+        _sgNode: Scale9Sprite;
+    };
+
+
+    export class Scale9Sprite extends _ccsg.Node {
+        loaded(): boolean;
+
+        /** Changes the texture file of 9 slice sprite. */
+        setTexture(textureOrTextureFile: string | cc.Texture2D): void;
+
+        /** Changes the sprite frame of 9 slice sprite. */
+        setSpriteFrame(spriteFrame: cc.SpriteFrame): void;
+
+        /** Returns the blending function that is currently being used. */
+        getBlendFunc(): cc.BlendFunc;
+
+        /** Sets the source blending function. */
+        setBlendFunc(blendFunc: number | cc.BlendFunc, dst: number): void;
+
+        enableTrimmedContentSize(isTrimmed: boolean): void;
+
+        getInsetLeft(): number;
+        setInsetLeft(inset: number): void;
+
+        getInsetTop(): number;
+        setInsetTop(inset: number): void;
+
+        getInsetRight(): number;
+        setInsetRight(inset: number): void;
+
+        getInsetBottom(): number;
+        setInsetBottom(inset: number): void;
+    };
+
+    export interface Node {
+        _sgNode: _ccsg.Node;
     };
 
     /** shaders */
@@ -38,8 +92,8 @@ declare module cc {
         export function deleteTexture2D(texture: cc.Texture2D): void;
     };
 
-    class GLProgram {
-        constructor(vShaderFileName: string, fShaderFileName: string, glContext: any);
+    export class GLProgram {
+        constructor(vShaderFileName?: string, fShaderFileName?: string, glContext?: any);
 
         /** Destroys the program. */
         destroyProgram(): void;
@@ -70,22 +124,22 @@ declare module cc {
         /** Retrieves the named unifrom location for this GL program. */
         getUniformLocationForName(name: string): WebGLUniformLocation;
 
-        setUniformLocationWith1i(location: WebGLUniformLocation, i1: number);
-        setUniformLocationWith2i(location: WebGLUniformLocation, i1: number, i2: number);
-        setUniformLocationWith3i(location: WebGLUniformLocation, i1: number, i2: number, i3: number);
-        setUniformLocationWith4i(location: WebGLUniformLocation, i1: number, i2: number, i3: number, i4: number);
-        setUniformLocationWith2iv(location: WebGLUniformLocation, array: number[]);
-        setUniformLocationWith3iv(location: WebGLUniformLocation, array: number[]);
-        setUniformLocationWith4iv(location: WebGLUniformLocation, array: number[]);
-        setUniformLocationWith1f(location: WebGLUniformLocation, f1: number);
-        setUniformLocationWith2f(location: WebGLUniformLocation, f1: number, f2: number);
-        setUniformLocationWith3f(location: WebGLUniformLocation, f1: number, f2: number, f3: number);
-        setUniformLocationWith4f(location: WebGLUniformLocation, f1: number, f2: number, f3: number, f4: number);
-        setUniformLocationWith2fv(location: WebGLUniformLocation, array: number[]);
-        setUniformLocationWith3fv(location: WebGLUniformLocation, array: number[]);
-        setUniformLocationWith4fv(location: WebGLUniformLocation, array: number[]);
-        setUniformLocationWithMatrix3fv(location: WebGLUniformLocation, array: number[]);
-        setUniformLocationWithMatrix4fv(location: WebGLUniformLocation, array: number[]);
+        setUniformLocationWith1i(location: WebGLUniformLocation, i1: number): void;
+        setUniformLocationWith2i(location: WebGLUniformLocation, i1: number, i2: number): void;
+        setUniformLocationWith3i(location: WebGLUniformLocation, i1: number, i2: number, i3: number): void;
+        setUniformLocationWith4i(location: WebGLUniformLocation, i1: number, i2: number, i3: number, i4: number): void;
+        setUniformLocationWith2iv(location: WebGLUniformLocation, array: number[]): void;
+        setUniformLocationWith3iv(location: WebGLUniformLocation, array: number[]): void;
+        setUniformLocationWith4iv(location: WebGLUniformLocation, array: number[]): void;
+        setUniformLocationWith1f(location: WebGLUniformLocation, f1: number): void;
+        setUniformLocationWith2f(location: WebGLUniformLocation, f1: number, f2: number): void;
+        setUniformLocationWith3f(location: WebGLUniformLocation, f1: number, f2: number, f3: number): void;
+        setUniformLocationWith4f(location: WebGLUniformLocation, f1: number, f2: number, f3: number, f4: number): void;
+        setUniformLocationWith2fv(location: WebGLUniformLocation, array: number[]): void;
+        setUniformLocationWith3fv(location: WebGLUniformLocation, array: number[]): void;
+        setUniformLocationWith4fv(location: WebGLUniformLocation, array: number[]): void;
+        setUniformLocationWithMatrix3fv(location: WebGLUniformLocation, array: number[]): void;
+        setUniformLocationWithMatrix4fv(location: WebGLUniformLocation, array: number[]): void;
 
         /** Updates the built-in uniforms if they are different than the previous call for this same GL program. */
         setUniformsForBuilins(): void;
@@ -94,7 +148,45 @@ declare module cc {
         reset(): void;
     };
 
-    class shaderCache {
+    /** For native. */
+    export class UniformValue {
+        constructor(uniform: any, program: GLProgram);
+        setFloat(value: number): void;
+        setInt(value: number): void;
+        setVec2(v1: number, v2: number): void;
+        setVec2v(value: number[]): void;
+        setVec3(v1: number, v2: number, v3: number): void;
+        setVec3v(value: number[]): void;
+        setVec4(v1: number, v2: number, v3: number, v4: number): void;
+        setVec4v(value: number[]): void;
+        setMat4(matrix: number[]): void;
+        setCallback(callback: any): void;
+        setTexture(textureId: number, textureUnit: Texture2D): void;
+        apply(): void;
+    };
+
+    /** For native. */
+    export class GLProgramState {
+        static getOrCreateWithGLProgram(program: GLProgram): GLProgramState;
+        constructor(program: GLProgram);
+        getGLProgram(): GLProgram;
+        setGLProgram(program: GLProgram): void;
+        getUniformCount(): number;
+        getUniformValue(name: string): UniformValue;
+        setUniformInt(name: string, value: number): void;
+        setUniformFloat(name: string, value: number): void;
+        setUniformVec2(name: string, v1: number, v2: number): void;
+        setUniformVec2v(name: string, value: number[]): void;
+        setUniformVec3(name: string, v1: number, v2: number, v3: number): void;
+        setUniformVec3v(name: string, value: number[]): void;
+        setUniformVec4(name: string, v1: number, v2: number, v3: number, v4: number): void;
+        setUniformVec4v(name: string, value: number[]): void;
+        setUniformMat4(name: string, value: number[]): void;
+        setUniformCallback(name: string, callback: any): void;
+        setUniformTexture(name: string, textureId: number): void;
+    };
+
+    export class shaderCache {
         /** Reloads the default shaders. */
         static reloadDefaultShaders(): void;
 
@@ -257,5 +349,36 @@ declare module cc {
             /** Checks whether the current matrix equal to the specified matrix (approximately). */
             equals(matrix: Matrix4): boolean;
         };
+    };
+};
+
+declare module sp {
+    export class _SGSkeleton extends _ccsg.Node {
+        constructor(skeletonDataFile?: string, atlasFile?: string, scale?: number);
+
+        /** Sets whether open debug slots. */
+        setDebugSlotsEnabled(enabled: boolean): void;
+
+        /** Gets whether open debug slots. */
+        getDebugSlotsEnabled(): boolean;
+
+        /** Sets whether open debug bones. */
+        setDebugBonesEnabled(enableD: boolean): void;
+
+        /** Gets whether open debug bones. */
+        getDebugBonesEnabled(): boolean;
+
+        /** Sets the time scale of skeleton. */
+        setTimeScale(scale: number): void;
+
+        /** Gets the time scale of skeleton. */
+        getTimeScale(): number;
+    };
+
+    export class _SGSkeletonAnimation extends _SGSkeleton {
+    };
+
+    export interface Skeleton {
+        _sgNode: _SGSkeletonAnimation | null;
     };
 };
