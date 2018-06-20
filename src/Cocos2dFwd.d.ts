@@ -12,10 +12,6 @@ declare module _ccsg {
 declare module cc {
     type WebGLUniformLocation = number;
 
-    export class macro {
-        static ATTRIBUTE_NAME_POSITION_: string;
-    };
-
     export interface Object {
         _objFlags: number;
     };
