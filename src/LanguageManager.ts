@@ -1,3 +1,5 @@
+import Polyglot = require('node-polyglot');
+
 export class LanguageManager {
     private static sharedInstance?: LanguageManager;
 
@@ -6,7 +8,8 @@ export class LanguageManager {
 
     private currentLanguage?: string;
     private configDir?: string;
-    private configs: { [index: string]: { [key: string]: string } };
+    private configs: { [index: string]: { [key: string]: string } | undefined };
+    private polyglot: Polyglot;
 
     /** Gets the singleton. */
     static getInstance(): LanguageManager {
@@ -16,6 +19,7 @@ export class LanguageManager {
     private constructor() {
         // Hide construction.
         this.configs = {};
+        this.polyglot = new Polyglot();
     };
 
     /** 
@@ -55,6 +59,7 @@ export class LanguageManager {
             this.profile!.data.config_dir = path;
             this.profile!.save();
             this.updateConfigs();
+            this.updateLanguage();
         }
     };
 
@@ -71,6 +76,7 @@ export class LanguageManager {
     private updateConfigs(): void {
         this.configs = {};
         if (this.configDir === undefined) {
+            this.updateLanguage();
             return;
         }
         Editor.assetdb.queryUrlByUuid(this.configDir, (err, url) => {
@@ -80,10 +86,21 @@ export class LanguageManager {
                     import(item.path).then(config => {
                         let language = this.parseLanguage(item.path);
                         this.configs[language] = config;
+                        this.updateLanguage();
                     });
                 });
             });
         });
+    };
+
+    private updateLanguage(): void {
+        this.polyglot.clear();
+        if (this.currentLanguage !== undefined) {
+            let config = this.configs[this.currentLanguage];
+            if (config !== undefined) {
+                this.polyglot.extend(config);
+            }
+        }
     };
 
     /** Gets the active language. */
@@ -98,18 +115,15 @@ export class LanguageManager {
             this.profile!.data.current_language = language;
             this.profile!.save();
         }
+        this.updateLanguage();
     };
 
-    /** Gets the language format */
-    public getFormat(language: string, key: string): string | undefined {
-        if (!(language in this.configs)) {
-            return undefined;
+    /** Gets the language format in the current language. */
+    public getFormat(key: string): string | undefined {
+        if (this.polyglot.has(key)) {
+            return this.polyglot.t(key);
         }
-        let config = this.configs[language];
-        if (!(key in config)) {
-            return undefined;
-        }
-        return config[key];
+        return undefined;
     };
 
     private parseLanguage(path: string): string {
