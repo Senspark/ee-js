@@ -1,0 +1,11 @@
+{
+    "author": "Senspark",
+    "runtime-resource": {
+        "path": "runtime-scripts",
+        "name": "plugin"
+    },
+    "main": "main.js",
+    "description": "ee packages",
+    "version": "0.0.1",
+    "name": "ee"
+}

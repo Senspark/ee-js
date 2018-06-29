@@ -7,7 +7,7 @@ const { ccclass, disallowMultiple, executeInEditMode, menu, property } = cc._dec
 @ccclass
 @disallowMultiple
 @executeInEditMode
-@menu('ee/utils/HsvComponent')
+@menu('ee/HsvComponent')
 export class HsvComponent extends cc.Component {
     @property(cc.Integer)
     private _hue: number = 0;

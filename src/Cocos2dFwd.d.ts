@@ -1,3 +1,25 @@
+class AssetDB {
+    queryPathByUuid(uuid: string, callback: (error?: string, result: string) => void): void;
+    queryUrlByUuid(uuid: string, callback: (error?: string, result: string) => void): void;
+    queryInfoByUuid(uuid: string, callback: (error?: string, result: {}) => void): void;
+    queryMetaInfoByUuid(uuid: string, callback: (error?: string, result: {}) => void): void;
+    queryAssets(pattern: string, type: string, callback: (error?: string, result) => void): void;
+};
+
+class Profile {
+    data: any;
+    save();
+};
+
+class ProfileDB {
+    load(path: string, callback: (err?: string, profile?: ElectionProfile) => void): void;
+};
+
+class Editor {
+    static assetdb: AssetDB;
+    static Profile: ProfileDB;
+};
+
 declare module _ccsg {
     export class Node {
         getShaderProgram(): cc.GLProgram;
@@ -11,6 +33,17 @@ declare module _ccsg {
 
 declare module cc {
     type WebGLUniformLocation = number;
+
+    export class macro {
+        static ATTRIBUTE_NAME_POSITION_: string;
+    };
+
+    export class AssetLibrary {
+        static loadAsset(uuid: string, callback: (error?: string, asset?: string) => void, options?: {}): void;
+        static getLibUrlNoExt(uuid: string): string;
+        static queryAssetInfo(uuid: string, callback: (error?: string, url?: string, raw: boolean) => void): void;
+        static getAssetByUuid(uuid: string): Asset | null;
+    };
 
     export interface Object {
         _objFlags: number;

@@ -4,7 +4,7 @@ const { ccclass, disallowMultiple, executeInEditMode, menu } = cc._decorator;
 @ccclass
 @disallowMultiple
 @executeInEditMode
-@menu('ee/utils/StaticComponent')
+@menu('ee/StaticComponent')
 export class StaticComponent extends cc.Component {
     private originalPosition: cc.Vec2 = cc.Vec2.ZERO;
 

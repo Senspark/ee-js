@@ -6,7 +6,7 @@ const { ccclass, disallowMultiple, executeInEditMode, menu, property } = cc._dec
 @ccclass
 @disallowMultiple
 @executeInEditMode
-@menu('ee/utils/NestedPrefab')
+@menu('ee/NestedPrefab')
 export class NestedPrefab extends cc.Component {
     private instantiated: boolean = false;
     private view?: cc.Node;
