@@ -34,10 +34,6 @@ declare module _ccsg {
 declare module cc {
     type WebGLUniformLocation = number;
 
-    export class macro {
-        static ATTRIBUTE_NAME_POSITION_: string;
-    };
-
     export class AssetLibrary {
         static loadAsset(uuid: string, callback: (error?: string, asset?: string) => void, options?: {}): void;
         static getLibUrlNoExt(uuid: string): string;
