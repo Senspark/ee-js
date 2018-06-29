@@ -8,7 +8,7 @@ export class LanguageManager {
 
     private currentLanguage?: string;
     private configDir?: string;
-    private configs: { [index: string]: { [key: string]: string } | undefined };
+    private configs: { [index: string]: { [key: string]: string | undefined } | undefined };
     private polyglot: Polyglot;
 
     /** Gets the singleton. */
@@ -120,8 +120,19 @@ export class LanguageManager {
 
     /** Gets the language format in the current language. */
     public getFormat(key: string): string | undefined {
+        if (this.currentLanguage === undefined) {
+            return undefined;
+        }
+        let config = this.configs[this.currentLanguage];
+        if (config === undefined) {
+            return undefined;
+        }
+        return config[key];
+    };
+
+    public parseFormat(key: string, options?: Polyglot.InterpolationOptions): string | undefined {
         if (this.polyglot.has(key)) {
-            return this.polyglot.t(key);
+            return this.polyglot.t(key, options!);
         }
         return undefined;
     };

@@ -22,7 +22,7 @@ export class LanguageComponent extends cc.Component {
     })
     public get format() {
         let manager = LanguageManager.getInstance();
-        return manager.getFormat(manager.getCurrentLanguage() || '', this.key) || '';
+        return manager.getFormat(this.key) || '';
     };
 
     /** Gets the multilingual parameter keys. */
@@ -53,10 +53,11 @@ export class LanguageComponent extends cc.Component {
         readonly: true
     })
     public get string() {
-        if (this.paramKeys.length == 0) {
-            return '';
+        let options: any = {};
+        for (let i = 0; i < this.paramKeys.length; ++i) {
+            options[this.paramKeys[i]] = this.paramValues[i];
         }
-        return this.paramValues.join(',');
+        return LanguageManager.getInstance().parseFormat(this.key, options);
     };
 
     @property({ type: cc.String })
