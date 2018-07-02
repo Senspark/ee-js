@@ -5,14 +5,23 @@ type Observer = () => void;
 export class LanguageManager {
     private static sharedInstance?: LanguageManager;
 
-    /** Used in editor only. */
+    /** Current profile, used in editor only. */
     private profile?: Profile;
 
-    private currentLanguage?: string;
+    /**
+     * Current config directory.
+     * Actually UUID in editor mode and relative path in release mode.
+     */
     private configDir?: string;
+
+    /** Current active language. */
+    private currentLanguage?: string;
     private configs: { [index: string]: { [key: string]: string | undefined } | undefined };
+
+    /** Wrappee i18n manager. */
     private polyglot: Polyglot;
 
+    /** Observes language changing events. */
     private observers: { [index: string]: Observer | undefined };
 
     /** Gets the singleton. */
@@ -49,33 +58,36 @@ export class LanguageManager {
         return Object.keys(this.configs);
     };
 
-    /** Gets the config dir. */
+    /**
+     * Gets the config dir.
+     * Used in editor only.
+     */
     public getConfigDir(): string | undefined {
         return this.configDir;
     };
 
     /**
-     * Sets the config directory, used in editor.
+     * Sets the config directory.
      * @param path The directory path.
      */
     public setConfigDir(path: string): void {
+        this.configDir = path;
         if (CC_EDITOR) {
-            this.configDir = path;
             this.profile!.data.config_dir = path;
             this.profile!.save();
-            this.updateConfigs();
-            this.updateLanguage();
         }
+        this.updateConfigs();
+        this.updateLanguage();
     };
 
-    /** Clears the language directory, used in editor. */
+    /** Clears the language directory. */
     public resetConfigDir(): void {
+        this.configDir = undefined;
         if (CC_EDITOR) {
-            this.configDir = undefined;
             this.profile!.data.config_dir = this.configDir;
             this.profile!.save();
-            this.updateConfigs();
         }
+        this.updateConfigs();
     };
 
     private updateConfigs(): void {
@@ -84,18 +96,30 @@ export class LanguageManager {
             this.updateLanguage();
             return;
         }
-        Editor.assetdb.queryUrlByUuid(this.configDir, (err, url) => {
-            let pattern = url + '/*.json';
-            Editor.assetdb.queryAssets(pattern, 'text', (err, result) => {
-                result.forEach((item: any) => {
-                    import(item.path).then(config => {
-                        let language = this.parseLanguage(item.path);
-                        this.configs[language] = config;
-                        this.updateLanguage();
+        if (CC_EDITOR) {
+            Editor.assetdb.queryUrlByUuid(this.configDir, (err, url) => {
+                let pattern = url + '/*.json';
+                Editor.assetdb.queryAssets(pattern, 'text', (err, result) => {
+                    result.forEach((item: any) => {
+                        import(item.path).then(config => {
+                            let language = this.parseLanguage(item.path);
+                            this.configs[language] = config;
+                            this.updateLanguage();
+                        });
                     });
                 });
             });
-        });
+        } else {
+            cc.loader.loadResDir(this.configDir, (err: any, results: any[], urls: string[]) => {
+                for (let i = 0; i < urls.length; ++i) {
+                    let path = urls[i] + '.json'; // Suffixed with .json for regex matching.
+                    let content = results[i];
+                    let language = this.parseLanguage(path);
+                    this.configs[language] = content;
+                    this.updateLanguage();
+                }
+            });
+        }
     };
 
     private updateLanguage(): void {
@@ -146,6 +170,7 @@ export class LanguageManager {
         return undefined;
     };
 
+    /** Detects language for the config path. */
     private parseLanguage(path: string): string {
         const regex = /\/(\w+)\.\w+$/g;
         let match = regex.exec(path);
@@ -153,8 +178,9 @@ export class LanguageManager {
             return '';
         }
         return match[1];
-    }
+    };
 
+    /** Adds an observer whose the specified key. */
     public addObserver(key: string, observer: Observer): boolean {
         if (this.observers[key] !== undefined) {
             return false;
@@ -163,13 +189,14 @@ export class LanguageManager {
         return true;
     };
 
+    /** Removes an observer whose the specified key. */
     public removeObserver(key: string): boolean {
         if (this.observers[key] === undefined) {
             return false;
         }
         delete this.observers[key];
         return true;
-    }
+    };
 };
 
 if (CC_EDITOR) {
