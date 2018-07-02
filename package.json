@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@types/node": "^10.3.3",
-    "@types/node-polyglot": "^0.4.31"
+    "@types/node-polyglot": "^0.4.31",
+    "node-polyglot": "^2.2.2"
   }
 }

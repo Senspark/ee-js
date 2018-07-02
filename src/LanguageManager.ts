@@ -1,4 +1,4 @@
-import Polyglot = require('node-polyglot');
+import * as Polyglot from 'node-polyglot';
 
 type Observer = () => void;
 
