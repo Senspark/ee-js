@@ -1,5 +1,4 @@
 import Polyglot = require('node-polyglot');
-import { LanguageComponent } from '@libraries/ee/LanguageComponent';
 
 type Observer = () => void;
 
