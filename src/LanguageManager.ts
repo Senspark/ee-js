@@ -1,4 +1,7 @@
 import Polyglot = require('node-polyglot');
+import { LanguageComponent } from '@libraries/ee/LanguageComponent';
+
+type Observer = () => void;
 
 export class LanguageManager {
     private static sharedInstance?: LanguageManager;
@@ -11,6 +14,8 @@ export class LanguageManager {
     private configs: { [index: string]: { [key: string]: string | undefined } | undefined };
     private polyglot: Polyglot;
 
+    private observers: { [index: string]: Observer | undefined };
+
     /** Gets the singleton. */
     static getInstance(): LanguageManager {
         return this.sharedInstance || (this.sharedInstance = new this());
@@ -19,10 +24,11 @@ export class LanguageManager {
     private constructor() {
         // Hide construction.
         this.configs = {};
+        this.observers = {};
         this.polyglot = new Polyglot();
     };
 
-    /** 
+    /**
      * Sets the settings profile.
      * Used in editor only.
      * @param profile The settings profile to set.
@@ -101,6 +107,10 @@ export class LanguageManager {
                 this.polyglot.extend(config);
             }
         }
+        Object.keys(this.observers).forEach(key => {
+            let observer = this.observers[key];
+            observer!();
+        });
     };
 
     /** Gets the active language. */
@@ -144,6 +154,22 @@ export class LanguageManager {
             return '';
         }
         return match[1];
+    }
+
+    public addObserver(key: string, observer: Observer): boolean {
+        if (this.observers[key] !== undefined) {
+            return false;
+        }
+        this.observers[key] = observer;
+        return true;
+    };
+
+    public removeObserver(key: string): boolean {
+        if (this.observers[key] === undefined) {
+            return false;
+        }
+        delete this.observers[key];
+        return true;
     }
 };
 

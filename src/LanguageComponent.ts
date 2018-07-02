@@ -4,16 +4,23 @@ const { ccclass, disallowMultiple, executeInEditMode, inspector, menu, property 
 
 @ccclass
 @disallowMultiple
-// @executeInEditMode
+@executeInEditMode
 @inspector('packages://ee/inspector/LanguageInspector.js')
 @menu('ee/LanguageComponent')
 export class LanguageComponent extends cc.Component {
     /** Gets or sets the multilingual key. */
     @property(cc.String)
-    public key: string = '{null}';
+    public _key: string = '{null}';
 
-    @property([cc.String])
-    private _paramValues: string[] = ['', '', '', '', '', ''];
+    @property({ type: cc.String })
+    public get key(): string {
+        return this._key;
+    };
+
+    public set key(value) {
+        this._key = value;
+        this.updateText();
+    };
 
     /** Gets the multilingual format corresponding to the current key. */
     @property({
@@ -21,9 +28,11 @@ export class LanguageComponent extends cc.Component {
         readonly: true
     })
     public get format() {
-        let manager = LanguageManager.getInstance();
-        return manager.getFormat(this.key) || '';
+        return this.manager.getFormat(this.key) || '';
     };
+
+    @property([cc.String])
+    private _paramValues: string[] = [];
 
     /** Gets the multilingual parameter keys. */
     @property({
@@ -45,6 +54,7 @@ export class LanguageComponent extends cc.Component {
 
     public set paramValues(value) {
         this._paramValues = value;
+        this.updateText();
     };
 
     /** Gets the translated string. */
@@ -57,43 +67,79 @@ export class LanguageComponent extends cc.Component {
         for (let i = 0; i < this.paramKeys.length; ++i) {
             options[this.paramKeys[i]] = this.paramValues[i];
         }
-        return LanguageManager.getInstance().parseFormat(this.key, options);
+        return this.manager.parseFormat(this.key, options);
     };
 
     @property({ type: cc.String })
     private get config() {
-        return LanguageManager.getInstance().getConfigDir();
+        return this.manager.getConfigDir();
     };
 
     private set config(value) {
-        let manager = LanguageManager.getInstance();
         if (value !== undefined && value.length > 0 /* May be empty */) {
-            manager.setConfigDir(value);
+            this.manager.setConfigDir(value);
         } else {
-            manager.resetConfigDir();
+            this.manager.resetConfigDir();
         }
     };
 
     @property({ type: [cc.String] })
     private get languages() {
-        return LanguageManager.getInstance().getLanguages();
+        return this.manager.getLanguages();
     };
 
     @property({ type: cc.String })
     private get language() {
-        return LanguageManager.getInstance().getCurrentLanguage();
+        return this.manager.getCurrentLanguage();
     };
 
     private set language(value) {
-        LanguageManager.getInstance().setCurrentLanguage(value);
+        this.manager.setCurrentLanguage(value);
     };
+
+    static counter: number = 0;
+
+    /** Unique ID for each language component. */
+    private componentId: string;
+
+    /** Associated label component. */
+    private label: cc.Label | null = null;
+
+    private manager: LanguageManager;
 
     public constructor() {
         super();
+        this.componentId = (LanguageComponent.counter++).toString();
+        this.manager = LanguageManager.getInstance();
     };
 
-    public onLoad(): void {
-        let x = 1;
+    public onEnable(): void {
+        this.manager.addObserver(this.componentId, () => {
+            this.updateText();
+        });
+        this.updateText();
+    };
+
+    public onDisable(): void {
+        this.manager.removeObserver(this.componentId);
+    };
+
+    public update(): void {
+        if (CC_EDITOR) {
+            // Repeatedly update string when in editor mode.
+            this.updateText();
+        }
+    };
+
+    private updateText() {
+        if (this.label === null) {
+            this.label = this.getComponent(cc.Label);
+            if (this.label === null) {
+                // Component not found.
+                return;
+            }
+        }
+        this.label.string = this.string || '';
     };
 
     private parseParamKeys(format: string): string[] {
