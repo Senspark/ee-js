@@ -6,6 +6,11 @@ class AssetDB {
     queryAssets(pattern: string, type: string, callback: (error?: string, result) => void): void;
 };
 
+class AssetTable {
+    getUuid(path: string, type?: string): string;
+    getUuidArray(path: string, type?: string, out_urls?: string[]): string[];
+};
+
 class Profile {
     data: any;
     save();
@@ -41,6 +46,13 @@ declare module cc {
         static getAssetByUuid(uuid: string): Asset | null;
     };
 
+    export namespace loader {
+        const _resources: AssetTable;
+        export function _loadResUuids(uuids: string[],
+            progressCallback?: (completedCount: number, totalCount: number, item: any) => void,
+            completeCallback?: (error: Error, resource: any) => void): void;
+    };
+
     export interface Object {
         _objFlags: number;
     };
@@ -60,7 +72,6 @@ declare module cc {
     export interface Sprite {
         _sgNode: Scale9Sprite;
     };
-
 
     export class Scale9Sprite extends _ccsg.Node {
         loaded(): boolean;
