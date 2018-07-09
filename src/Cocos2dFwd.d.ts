@@ -51,7 +51,7 @@ declare module cc {
      * @param transOrY Transform matrix or y.
      * @param t Tranform matrix.
      */
-    export function pointApplyAffineTransform(point: Vec2 | number, transOrY: number | AffineTransform, t: AffineTransform): Vec2;
+    export function pointApplyAffineTransform(point: Vec2 | number, transOrY: number | AffineTransform, t?: AffineTransform): Vec2;
 
     /** Applies the affine transformation on a size. */
     export function sizeApplyAffineTransform(size: Size, t: AffineTransform): Size;

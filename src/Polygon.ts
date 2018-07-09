@@ -30,14 +30,14 @@ export class Polygon {
         this.vertices.push(vertex);
         if (this.aabb !== undefined /* Calculated, we need to update it */) {
             if (vertex.x < this.aabb.xMin) {
-                this.aabb.x = vertex.x;
+                this.aabb.xMin = vertex.x;
             } else if (vertex.x > this.aabb.xMax) {
-                this.aabb.width = vertex.x - this.aabb.xMin;
+                this.aabb.xMax = vertex.x;
             }
             if (vertex.y < this.aabb.yMin) {
-                this.aabb.y = vertex.y;
+                this.aabb.yMin = vertex.y;
             } else if (vertex.y > this.aabb.yMax) {
-                this.aabb.height = vertex.y - this.aabb.yMin;
+                this.aabb.yMax = vertex.y;
             }
         }
         return this;
@@ -54,7 +54,7 @@ export class Polygon {
      * @return The transformed polygon.
      */
     public transform(transform: cc.AffineTransform): Polygon {
-        let transformVertices = this.vertices.map(p => transform.pointApplyAffineTransform(p, transform, transform));
+        let transformVertices = this.vertices.map(p => cc.pointApplyAffineTransform(p, transform));
         return new Polygon().setVertices(transformVertices);
     };
 
