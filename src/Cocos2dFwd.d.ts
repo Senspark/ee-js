@@ -36,7 +36,7 @@ declare namespace _ccsg {
     };
 };
 
-declare module cc {
+declare namespace cc {
     type WebGLUniformLocation = number;
 
     /** Creates a cc.AffineTRansform object with all contents in the matrix. */
@@ -105,6 +105,13 @@ declare module cc {
             IsSizeLocked /*    */ = 1 << 20,
             IsPositionLocked /**/ = 1 << 21,
         }
+    }
+
+    export interface Action {
+        startWithTarget(target: any): void;
+        stop(): void;
+        step(delta: number): void;
+        update(delta: number): void;
     }
 
     export interface Sprite {
@@ -426,7 +433,7 @@ declare module cc {
     }
 }
 
-declare module sp {
+declare namespace sp {
     export class _SGSkeleton extends _ccsg.Node {
         constructor(skeletonDataFile?: string, atlasFile?: string, scale?: number);
 
@@ -454,5 +461,101 @@ declare module sp {
 
     export interface Skeleton {
         _sgNode: _SGSkeletonAnimation | null;
+    }
+
+    export namespace spine {
+        export class Animation {
+            name: string;
+            timelines: any[];
+            duration: number;
+
+            apply(skeleton: any, lastTime: any, time: any, loop: boolean, events: any, alpha: number, setupPose: boolean, mixingOut: any): void;
+            static binarySearch(values: number[], target: number, step: number): number;
+            static linearSearch(values: number[], target: number, step: number): number;
+        }
+
+        export class SkeletonData {
+            findBone(name: string): Bone;
+            findBoneIndex(name: string): number;
+            findSlot(name: string): any;
+            findSlotIndex(name: string): number;
+            findSkin(name: string): any;
+            findEvent(name: string): any;
+            findAnimation(name: string): any;
+            findIkConstraint(name: string): any;
+        }
+
+        export class TrackEntry {
+            trackIndex: number;
+            animation: Animation | null;
+            loop: boolean;
+            eventThreshold: number;
+            attachmentThreshold: number;
+            drawOrderThreshold: number;
+            animationStart: number;
+            animationEnd: number;
+            animationLast: number;
+            nextAnimationLast: number;
+            delay: number;
+            trackTime: number;
+            trackLast: number;
+            nextTrackLast: number;
+            trackEnd: number;
+            timeScale: number;
+            alpha: number;
+            mixAlpha: number;
+            mixTime: number;
+            mixDuration: number;
+
+            timelinesFirst: any[];
+            timelinesRotation: any[];
+            next: any | null;
+            mixingFrom: any | null
+            listener: any | null;
+
+            reset(): void;
+            getAnimationTime(): number;
+            setAnimationLast(animationLast: any): void;
+            isComplete(): boolean;
+            resetRotationDirections(): void;
+        }
+
+        export class AnimationState { }
+        export class AnimationStateData { }
+        export class AssetManager { }
+        export class AtlasAttachmentLoader { }
+        export class Attachment { }
+        export enum AttachmentType { }
+        export enum BlendMode { }
+        export class Bone { }
+        export class BoneData { }
+        export class BoundingBoxAttachment { }
+        export class Color { }
+        export class Event { }
+        export class EventData { }
+        export class EventQueue { }
+        export class IkConstraint { }
+        export class IkConstraintData { }
+        export class MeshAttachment { }
+        export class PathAttachment { }
+        export class PathConstraint { }
+        export class RegionAttachment { }
+        export class SharedAssetManager { }
+        export class Skeleton { }
+        export class SkeletonBounds { }
+        export class SkeletonData { }
+        export class SkeletonJson { }
+        export class Skin { }
+        export class Slot { }
+        export class SlotData { }
+        export class Texture { }
+        export enum TextureFilter { }
+        export enum TextureWrap { }
+        export class TextureRegion { }
+        export class TextureAtlas { }
+        export class TextureAtlasReader { }
+        export class TextureAtlasPage { }
+        export class TransformConstraint { }
+        export class TransformConstraintData { }
     }
 }
