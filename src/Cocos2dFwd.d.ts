@@ -1,31 +1,31 @@
-class AssetDB {
-    queryPathByUuid(uuid: string, callback: (error?: string, result: string) => void): void;
-    queryUrlByUuid(uuid: string, callback: (error?: string, result: string) => void): void;
-    queryInfoByUuid(uuid: string, callback: (error?: string, result: {}) => void): void;
-    queryMetaInfoByUuid(uuid: string, callback: (error?: string, result: {}) => void): void;
-    queryAssets(pattern: string, type: string, callback: (error?: string, result) => void): void;
-};
+interface AssetDB {
+    queryPathByUuid(uuid: string, callback: (error: string | null, result: string | null) => void): void;
+    queryUrlByUuid(uuid: string, callback: (error: string | null, result: string | null) => void): void;
+    queryInfoByUuid(uuid: string, callback: (error: string | null, result: {}) => void): void;
+    queryMetaInfoByUuid(uuid: string, callback: (error: string | null, result: {}) => void): void;
+    queryAssets(pattern: string, type: string, callback: (error: string | null, result: any) => void): void;
+}
 
-class AssetTable {
+interface AssetTable {
     getUuid(path: string, type?: string): string;
     getUuidArray(path: string, type?: string, out_urls?: string[]): string[];
-};
+}
 
-class Profile {
+interface Profile {
     data: any;
     save();
-};
+}
 
-class ProfileDB {
-    load(path: string, callback: (err?: string, profile?: ElectionProfile) => void): void;
-};
+interface ProfileDB {
+    load(path: string, callback: (err: string | null, profile: Profile | null) => void): void;
+}
 
-class Editor {
-    static assetdb: AssetDB;
-    static Profile: ProfileDB;
-};
+declare namespace Editor {
+    const assetdb: AssetDB;
+    const Profile: ProfileDB;
+}
 
-declare module _ccsg {
+declare namespace _ccsg {
     export class Node {
         getShaderProgram(): cc.GLProgram;
         setShaderProgram(program: cc.GLProgram): void;
@@ -40,22 +40,27 @@ declare module cc {
     type WebGLUniformLocation = number;
 
     export class AssetLibrary {
-        static loadAsset(uuid: string, callback: (error?: string, asset?: string) => void, options?: {}): void;
+        static loadAsset(uuid: string, callback: (error: string | null, asset: string | null) => void, options?: {}): void;
         static getLibUrlNoExt(uuid: string): string;
-        static queryAssetInfo(uuid: string, callback: (error?: string, url?: string, raw: boolean) => void): void;
+        static queryAssetInfo(uuid: string, callback: (error: string | null, url: string | null, raw: boolean) => void): void;
+
+        /**
+         * Gets the exists asset by uuid.
+         * @return The existing asset, if not loaded, just returns null.
+         */
         static getAssetByUuid(uuid: string): Asset | null;
-    };
+    }
 
     export namespace loader {
         const _resources: AssetTable;
         export function _loadResUuids(uuids: string[],
             progressCallback?: (completedCount: number, totalCount: number, item: any) => void,
             completeCallback?: (error: Error, resource: any) => void): void;
-    };
+    }
 
     export interface Object {
         _objFlags: number;
-    };
+    }
 
     export namespace Object {
         export enum Flags {
@@ -66,12 +71,12 @@ declare module cc {
             IsAnchorLocked /*  */ = 1 << 19,
             IsSizeLocked /*    */ = 1 << 20,
             IsPositionLocked /**/ = 1 << 21,
-        };
-    };
+        }
+    }
 
     export interface Sprite {
         _sgNode: Scale9Sprite;
-    };
+    }
 
     export class Scale9Sprite extends _ccsg.Node {
         loaded(): boolean;
@@ -101,11 +106,11 @@ declare module cc {
 
         getInsetBottom(): number;
         setInsetBottom(inset: number): void;
-    };
+    }
 
     export interface Node {
         _sgNode: _ccsg.Node;
-    };
+    }
 
     /** shaders */
     export namespace gl {
@@ -126,7 +131,7 @@ declare module cc {
 
         /** It will delete the given texture. If the texture was bound, it will invalidate the cached. */
         export function deleteTexture2D(texture: cc.Texture2D): void;
-    };
+    }
 
     export class GLProgram {
         constructor(vShaderFileName?: string, fShaderFileName?: string, glContext?: any);
@@ -182,7 +187,7 @@ declare module cc {
 
         /** Reloads all shaders, designed for Android when OpenGL context lost. */
         reset(): void;
-    };
+    }
 
     /** For native. */
     export class UniformValue {
@@ -199,7 +204,7 @@ declare module cc {
         setCallback(callback: any): void;
         setTexture(textureId: number, textureUnit: Texture2D): void;
         apply(): void;
-    };
+    }
 
     /** For native. */
     export class GLProgramState {
@@ -231,7 +236,7 @@ declare module cc {
 
         /** Adds a GL program to the cache for the given key. */
         static addProgram(program: GLProgram, key: string): void;
-    };
+    }
 
     /** kazmath */
     export namespace math {
@@ -260,7 +265,7 @@ declare module cc {
             inverseTransformNormal(matrix: Matrix4): this;
             assignFrom(vec: Vec3): this;
             toTypeArray(): number[];
-        };
+        }
 
         export class Quaternion {
             static rotationMatrix(matrix: Matrix3): Quaternion;
@@ -285,7 +290,7 @@ declare module cc {
             assignFrom(quaternion: Quaternion): this;
             add(quaternion: Quaternion): this;
             multiplyVec3(vec: Vec3): Vec3;
-        };
+        }
 
         export class Matrix3 {
             static createByRotationX(radians: number): Matrix3;
@@ -308,7 +313,7 @@ declare module cc {
             multiplyScalar(factor: number): this;
             assignFrom(matrix: Matrix3): this;
             equals(matrix: Matrix3): boolean;
-        };
+        }
 
         /** Sets matrix to an identity matrix. */
         export function mat4Identity(matrix: Matrix4): Matrix4;
@@ -384,9 +389,9 @@ declare module cc {
 
             /** Checks whether the current matrix equal to the specified matrix (approximately). */
             equals(matrix: Matrix4): boolean;
-        };
-    };
-};
+        }
+    }
+}
 
 declare module sp {
     export class _SGSkeleton extends _ccsg.Node {
@@ -409,12 +414,12 @@ declare module sp {
 
         /** Gets the time scale of skeleton. */
         getTimeScale(): number;
-    };
+    }
 
     export class _SGSkeletonAnimation extends _SGSkeleton {
-    };
+    }
 
     export interface Skeleton {
         _sgNode: _SGSkeletonAnimation | null;
-    };
-};
+    }
+}
