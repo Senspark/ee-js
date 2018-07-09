@@ -39,6 +39,39 @@ declare namespace _ccsg {
 declare module cc {
     type WebGLUniformLocation = number;
 
+    /** Creates a cc.AffineTRansform object with all contents in the matrix. */
+    export function affineTransformMake(a: number, b: number, c: number, d: number, tx: number, ty: number): AffineTransform;
+
+    /** Clones a cc.AffineTransform object from the specified transform. */
+    export function affineTransformClone(t: AffineTransform): AffineTransform;
+
+    /**
+     * Applies the affine transformation on a point.
+     * @param point Point or x.
+     * @param transOrY Transform matrix or y.
+     * @param t Tranform matrix.
+     */
+    export function pointApplyAffineTransform(point: Vec2 | number, transOrY: number | AffineTransform, t: AffineTransform): Vec2;
+
+    /** Applies the affine transformation on a size. */
+    export function sizeApplyAffineTransform(size: Size, t: AffineTransform): Size;
+
+    /** Creates an identity transformation matrix. */
+    export function affineTransformMakeIdentity(): AffineTransform;
+
+    /** Applies the affine transform on a rect. */
+    export function rectApplyAffineTransform(rect: Rect, t: AffineTransform): Record;
+
+    export function affineTransformTranslate(t: AffineTransform, tx: number, ty: number): AffineTransform;
+    export function affineTransformScale(t: AffineTransform, sx: number, sy: number): AffineTransform;
+    export function affineTransformRotate(t: AffineTransform, angle: number): AffineTransform;
+    export function affineTransformConcat(t1: AffineTransform, t2: AffineTransform): AffineTransform;
+    export function affineTransformConcatIn(t1: AffineTransform, t2: AffineTransform): AffineTransform;
+    export function affineTransformEqualToTranform(t1: AffineTransform, t2: AffineTransform): boolean;
+    export function affineTranformInvert(t1: AffineTransform): AffineTransform;
+    export function affineTransformInvertIn(t: AffineTransform): AffineTransform;
+    export function affineTransformInvertOut(t: AffineTransform, out: AffineTransform): void;
+
     export class AssetLibrary {
         static loadAsset(uuid: string, callback: (error: string | null, asset: string | null) => void, options?: {}): void;
         static getLibUrlNoExt(uuid: string): string;
