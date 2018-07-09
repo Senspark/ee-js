@@ -201,8 +201,10 @@ export class LanguageManager {
 
 if (CC_EDITOR) {
     /** Loads saved profile for the editor. */
-    Editor.Profile.load('profile://project/ee.json', (err, profile: Profile) => {
-        let manager = LanguageManager.getInstance();
-        manager.setProfile(profile);
+    Editor.Profile.load('profile://project/ee.json', (err, profile) => {
+        if (profile !== null) {
+            let manager = LanguageManager.getInstance();
+            manager.setProfile(profile);
+        }
     });
 }
