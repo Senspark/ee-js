@@ -33,8 +33,52 @@ declare namespace _ccsg {
         /** For native. */
         getGLProgramState(): cc.GLProgramState;
         setGLProgramState(state: cc.GLProgramState): void;
-    };
-};
+    }
+
+    export class Label extends Node {
+        width: number;
+        height: number;
+
+        getContentSize(): cc.Size;
+        setContentSize(widthOrSize: number | cc.Size, height?: number): void;
+
+        setMargin(margin: number): void;
+
+        getString(): string;
+        setString(value: string): void;
+
+        getStringLength(): number;
+
+        isWrapTextEnabled(): boolean;
+        enableWrapText(enabled: boolean): void;
+
+        enableItalics(enabled: boolean): void;
+        enableBold(enabled: boolean): void;
+        enableUnderline(enabled: boolean): void;
+
+        getFontName(): string;
+
+        getFontSize(): number;
+        setFontSize(size: number): void;
+
+        getSpacingX(): number;
+        setSpacingX(spacing: number): void;
+
+        isOutlined(): boolean;
+        setOutlined(enabled: boolean): void;
+
+        getOutlineColor(): cc.Color;
+        setOutlineColor(color: cc.Color): void;
+
+        getOutlineWidth(): number;
+        setOutlineWidth(width: number): void;
+
+        getLineHeight(): number;
+        setLineHeight(height: number): void;
+
+        getBMFontLineHeight(): number;
+    }
+}
 
 declare namespace cc {
     type WebGLUniformLocation = number;
@@ -97,13 +141,27 @@ declare namespace cc {
 
     export namespace Object {
         export enum Flags {
-            DontSave /*        */ = 1 << 3,
-            LockedInEditor /*  */ = 1 << 9,
-            IsRotationLocked /**/ = 1 << 17,
-            IsScaleLocked /*   */ = 1 << 18,
-            IsAnchorLocked /*  */ = 1 << 19,
-            IsSizeLocked /*    */ = 1 << 20,
-            IsPositionLocked /**/ = 1 << 21,
+            Destroyed /*             */ = 1 << 0,
+            RealDestroyed /*         */ = 1 << 1,
+            ToDestroy /*             */ = 1 << 2,
+            DontSave /*              */ = 1 << 3,
+            EditorOnly /*            */ = 1 << 4,
+            Dirty /*                 */ = 1 << 5,
+            DontDestroy /*           */ = 1 << 6,
+            Destroying /*            */ = 1 << 7,
+            Deactivating /*          */ = 1 << 8,
+            LockedInEditor /*        */ = 1 << 9,
+            IsOnEnableCalled /*      */ = 1 << 11,
+            IsEditorOnEnableCalled /**/ = 1 << 12,
+            IsPreloadStarted /*      */ = 1 << 13,
+            IsOnLoadCalled /*        */ = 1 << 14,
+            IsOnLoadStarted /*       */ = 1 << 15,
+            IsStartCalled /*         */ = 1 << 16,
+            IsRotationLocked /*      */ = 1 << 17,
+            IsScaleLocked /*         */ = 1 << 18,
+            IsAnchorLocked /*        */ = 1 << 19,
+            IsSizeLocked /*          */ = 1 << 20,
+            IsPositionLocked /*      */ = 1 << 21,
         }
     }
 
@@ -112,6 +170,10 @@ declare namespace cc {
         stop(): void;
         step(delta: number): void;
         update(delta: number): void;
+    }
+
+    export interface Label {
+        _sgNode: _ccsg.Label;
     }
 
     export interface Sprite {

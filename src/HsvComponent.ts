@@ -174,8 +174,13 @@ export class HsvComponent extends cc.Component {
         }
         {
             let component = this.getComponent(sp.Skeleton);
-            if (component !== null &&
-                component._sgNode !== null) {
+            if (component !== null && component._sgNode !== null) {
+                return component._sgNode;
+            }
+        }
+        {
+            let component = this.getComponent(cc.Label);
+            if (component !== null) {
                 return component._sgNode;
             }
         }
