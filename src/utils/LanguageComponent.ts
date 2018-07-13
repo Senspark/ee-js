@@ -35,16 +35,13 @@ export class LanguageComponent extends cc.Component {
     private _paramValues: string[] = [];
 
     /** Gets the multilingual parameter keys. */
-    @property({
-        type: [cc.String],
-        readonly: true
-    })
+    @property({ readonly: true })
     public get paramKeys(): string[] {
         return this.parseParamKeys(this.format);
     };
 
     /** Gets or sets the multilingual parameter values. */
-    @property({ type: [cc.String] })
+    @property
     public get paramValues() {
         while (this._paramValues.length < this.paramKeys.length) {
             this._paramValues.push('');
@@ -83,7 +80,7 @@ export class LanguageComponent extends cc.Component {
         }
     };
 
-    @property({ type: [cc.String] })
+    @property
     private get languages() {
         return this.manager.getLanguages();
     };

@@ -20,7 +20,7 @@ project-dir
 ```
 
 - Install @senspark/ee: `npm install @senspark/ee@latest`
-- Create a symbolic link to source files: `ln -s ./../node_modules/@senspark/ee/src ./assets/ee` (Can be changed depends on your project hierarchy)
+- Create a symbolic link to source files: `ln -s ./../node_modules/@senspark/ee/src/utils ./assets/ee` (Can be changed depends on your project hierarchy)
 - Create a symbolic link to package files (for inspectors): `ln -s ./../node_modules/@senspark/ee/packages ./packages/ee`
 - Modify `tsconfig.json` to fix compile errors in VS Code:
 

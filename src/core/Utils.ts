@@ -15,7 +15,7 @@ const kGetDeviceId = "Utils_getDeviceId";
 
 type Runnable<T> = () => T;
 
-function toBool(value: string) {
+function toBool(value?: string) {
     return value === "true";
 };
 
@@ -40,17 +40,17 @@ export function runOnUiThreadAndWait(runnable: Runnable<void>): void {
 
 export function getSHA1CertificateFingerprint(): string {
     let bridge = MessageBridgeImpl.getInstance();
-    return bridge.call(kGetSHA1CertificateFingerprint);
+    return bridge.call(kGetSHA1CertificateFingerprint) || '';
 };
 
 export function getVersionName(): string {
     let bridge = MessageBridgeImpl.getInstance();
-    return bridge.call(kGetVersionName);
+    return bridge.call(kGetVersionName) || '';
 };
 
 export function getVersionCode(): string {
     let bridge = MessageBridgeImpl.getInstance();
-    return bridge.call(kGetVersionCode);
+    return bridge.call(kGetVersionCode) || '';
 };
 
 export function isApplicationInstalled(applicationId: string): boolean {
@@ -89,5 +89,5 @@ export function testConnection(): boolean {
 
 export function getDeviceId(): string {
     let bridge = MessageBridgeImpl.getInstance();
-    return bridge.call(kGetDeviceId);
+    return bridge.call(kGetDeviceId) || '';
 };

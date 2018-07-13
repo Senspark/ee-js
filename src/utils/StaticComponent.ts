@@ -1,5 +1,12 @@
 const { ccclass, disallowMultiple, executeInEditMode, menu } = cc._decorator;
 
+const LockFlags =
+    cc.Object.Flags.IsPositionLocked |
+    cc.Object.Flags.IsRotationLocked |
+    cc.Object.Flags.IsScaleLocked |
+    cc.Object.Flags.IsAnchorLocked |
+    cc.Object.Flags.IsSizeLocked;
+
 /** Used with NestedPrefab */
 @ccclass
 @disallowMultiple
@@ -8,23 +15,21 @@ const { ccclass, disallowMultiple, executeInEditMode, menu } = cc._decorator;
 export class StaticComponent extends cc.Component {
     private originalPosition: cc.Vec2 = cc.Vec2.ZERO;
 
-    public onLoad() {
+    public onEnable(): void {
         if (CC_EDITOR) {
             this.originalPosition = this.node.position;
-            let Flags = cc.Object.Flags;
-            let flags = this._objFlags;
-            flags |= Flags.LockedInEditor;
-            flags |= Flags.IsPositionLocked;
-            flags |= Flags.IsRotationLocked;
-            flags |= Flags.IsScaleLocked;
-            flags |= Flags.IsAnchorLocked;
-            flags |= Flags.IsSizeLocked;
-            this._objFlags = flags;
+            this._objFlags |= LockFlags;
         }
     };
 
-    public update() {
+    public onDisable(): void {
         if (CC_EDITOR) {
+            this._objFlags &= ~LockFlags;
+        }
+    };
+
+    public update(delta: number): void {
+        if (CC_EDITOR && this.enabled) {
             this.node.position = this.originalPosition;
         }
     }
