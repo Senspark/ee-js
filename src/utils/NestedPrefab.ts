@@ -26,6 +26,9 @@ export class NestedPrefab extends cc.Component {
             this.view = undefined;
         }
         this._prefab = value;
+        if (this._prefab === null) {
+            this._prefab = undefined;
+        }
         if (this._prefab !== undefined) {
             this.instantiateView();
             if (CC_EDITOR) {
@@ -82,7 +85,9 @@ export class NestedPrefab extends cc.Component {
     }
 
     private freeze(node: cc.Node): void {
-        node.addComponent(StaticComponent);
+        if (node.getComponent(StaticComponent) === null) {
+            node.addComponent(StaticComponent);
+        }
         node.children.forEach(child => this.freeze(child));
     };
 };
