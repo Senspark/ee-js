@@ -55,8 +55,8 @@ export class NestedPrefab extends cc.Component {
             return;
         }
         if (this.view !== undefined) {
-            if (this.view.parent === null) {
-                // Somehow object is destroyed but remains referenced.
+            if (!this.view.isValid) {
+                // Object is destroyed but remains referenced.
                 this.view = undefined;
             }
         }
