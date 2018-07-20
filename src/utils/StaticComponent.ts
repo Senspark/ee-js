@@ -22,14 +22,16 @@ export class StaticComponent extends cc.Component {
             this.originalPosition = this.node.position;
 
             // Apply lock flags.
-            this._objFlags |= LockFlags;
+            this.node._components.forEach(comp => comp._objFlags |= LockFlags);
+            this.node._objFlags |= LockFlags;
         }
     };
 
     public onDisable(): void {
         if (CC_EDITOR) {
             // Remove lock flags.
-            this._objFlags &= ~LockFlags;
+            this.node._components.forEach(comp => comp._objFlags &= ~LockFlags);
+            this.node._objFlags &= ~LockFlags;
         }
     };
 

@@ -212,6 +212,7 @@ declare namespace cc {
 
     export interface Node {
         _sgNode: _ccsg.Node;
+        _components: Component[];
     }
 
     /** shaders */
