@@ -23,6 +23,141 @@ interface ProfileDB {
 declare namespace Editor {
     const assetdb: AssetDB;
     const Profile: ProfileDB;
+
+    export function polymerElement(data: object): void;
+
+    export namespace UI {
+        // app.asar/editor-framework/lib/renderer/ui/utils
+        export namespace PolymerUtils {
+            export function registerElement(data: object): void;
+            export function registerPanel(e: any, t: any): void;
+            export const elements: { [key: string]: any };
+            export const panels: { [key: string]: any };
+        }
+    }
+
+    export namespace Selection {
+        export function hover(e: any, t: any): void;
+    }
+
+    export namespace Utils {
+        export class Polygon { }
+    }
+}
+
+// app.asar/editor/page/scene-utils/editor-engine.js
+interface EditorEngine {
+    isInitialized(): boolean;
+    loadingScene(): cc.Scene;
+
+    forceRepaintIntervalInEM: number;
+    editingRootNode: cc.Node | null;
+
+    playInEditor(): void;
+    tick(delta: number, updateAnimation: boolean): void;
+    tickInEditMode(delta: number, updateAnimation: boolean): void;
+    repaintInEditMode(): void;
+    getInstanceById(id: any): any | null;
+    getIntersectionList(rect: cc.Rect, t?: boolean): { node: cc.Node, aabb?: cc.Rect, obb?: Editor.Utils.Polygon }[];
+    setDesignResolutionSize(width: number, height: number): void;
+    getDesignResolutionSize(): cc.Size;
+    obbApplyAffineTransform(e: any, t: any, i: any, n: any, c: any, r: any): void;
+    onError(error: any): void;
+    onResume(): void;
+    onPause(): void;
+    onPlay(): void;
+    onStop(): void;
+    startTick(): void;
+    _tick(): void;
+    _tickStart(): void;
+    _tickStop(): void;
+    reset(): void;
+    updateAnimatingInEditMode(): void;
+}
+
+// app.asar/editor/page/scene-utils/index.js
+declare namespace _Scene {
+    export const view: any;
+    export function reset(): void;
+    export function _softReload(e: any, t: any): void;
+    export function softReload(e: any, t: any): void;
+    export function defaultScene(): void;
+    export function newScene(e: any): void;
+    export function _loadSceneByUuid(uuid: string, callback: any): void;
+    export function loadSceneByUuid(uuid: string, callback: any): void;
+    export function initScene(e: any): void;
+    export function getEditingWorkspace(): object;
+    export function loadWorkspace(e: any, t: any): void;
+    export function stashScene(e: any): void;
+    export function _applyCanvasPreferences(e: any, t: any): void;
+    export const currentScene: cc.Scene;
+    export const title: string;
+    export function updateTitle(e: any): void;
+    export function save(e: any): void;
+    export function confirmClose(): void;
+    export function close(e: any, callback: any): void;
+    export const dirty: boolean;
+    export function copyNodes(e: any): void;
+    export function pasteNodes(e: any): void;
+    export function createNodes(e: any, t: any, n: any): void;
+    export function createNodesAt(e: any, t: any, n: any, i: any): void;
+    export function createNodeByClassID(e: any, t: any, n: any, i: any): void;
+    export function createNodeByPrefab(e: any, t: any, n: any, i: any): void;
+    export function deleteNodes(e: any): void;
+    export function duplicateNodes(e: any): void;
+    export function moveNodes(e: any, t: any, n: any): void;
+    export function addComponent(e: any, t: any): void;
+    export function removeComponent(e: any, t: any): void;
+    export function copyComponent(e: any): void;
+    export function pasteComponent(e: any, t: any): void;
+    export function newProperty(e: any, t: any, n: any): void;
+    export function resetProperty(e: any, t: any, n: any): void;
+    export function setProperty(e: any): void;
+    export function createPrefab(e: any, t: any): void;
+    export function applyPrefab(e: any): void;
+    export function revertPrefab(e: any): void;
+    export function setPrefabSync(e: any): void;
+    export function breakPrefabInstance(e: any): void;
+    export function linkPrefab(): void;
+    export function dumpNode(e: any): any;
+    export function select(e: any): void;
+    export function unselect(e: any): void;
+    export function hoverin(e: any): void;
+    export function hoverout(e: any): void;
+    export function activate(e: any): void;
+    export function deactivate(e: any): void;
+    export function hitTest(x: number, y: number): cc.Node | undefined;
+    export function rectHitTest(x: number, y: number, width: number, height: number): cc.Node | undefined;
+    export function _syncPrefab(e: any, t: any): void;
+    export function syncPrefab(e: any): void;
+    export function assetChanged(e: any): void;
+    export function assetsMoved(e: any): void;
+    export function setTransformTool(e: any): void;
+    export function setPivot(e: any): void;
+    export function setCoordinate(e: any): void;
+    export function alignSelection(e: any): void;
+    export function distributeSelection(e: any): void;
+    export function projectProfileUpdated(e: any): void;
+    export function printSimulatorLog(message: string): void;
+
+    // app.asar/editor/page/scene-utils/node-utils.js
+    export class NodeUtils {
+        static getWorldBounds(node: cc.Node, size?: cc.Size, out?: cc.Rect): cc.Rect;
+        static getWorldOrientedBounds(t: any, e: any, n: any, o: any, c: any, i: any): cc.Rect;
+        static getScenePosition(node: cc.Node): cc.Vec2;
+        static setScenePosition(node: cc.Node, position: cc.Vec2): void;
+        static getSceneRotation(node: cc.Node): number;
+        static setSceneRotation(node: cc.Node, rotation: number): void;
+        static getWorldPosition(node: cc.Node): cc.Vec2;
+        static setWorldPosition(node: cc.Node, position: cc.Vec2): void;
+        static getWorldRotation(node: cc.Node): number;
+        static setWorldRotation(node: cc.Node, rotation: number): void;
+        static getWorldScale(node: cc.Node): number;
+        static _hasFlagInComponents(node: cc.Node, flags: number): boolean;
+        static _destroyForUndo(node: cc.Node, callback: any): void;
+        static getNodePath(node: cc.Node): string;
+        static getChildUuids(node: cc.Node, includeOwn: boolean): string[];
+    }
 }
 
 declare namespace _ccsg {
@@ -82,6 +217,8 @@ declare namespace _ccsg {
 
 declare namespace cc {
     type WebGLUniformLocation = number;
+
+    export const engine: EditorEngine;
 
     /** Creates a cc.AffineTRansform object with all contents in the matrix. */
     export function affineTransformMake(a: number, b: number, c: number, d: number, tx: number, ty: number): AffineTransform;
@@ -213,6 +350,7 @@ declare namespace cc {
     export interface Node {
         _sgNode: _ccsg.Node;
         _components: Component[];
+        _activeInHierarchy: boolean;
     }
 
     /** shaders */

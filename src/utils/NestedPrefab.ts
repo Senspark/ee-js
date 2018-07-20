@@ -1,5 +1,6 @@
 import assert = require('assert');
 import { StaticComponent } from './StaticComponent';
+import { UnselectableComponent } from './UnselectableComponent';
 
 const { ccclass, disallowMultiple, executeInEditMode, menu, property } = cc._decorator;
 
@@ -107,6 +108,9 @@ export class NestedPrefab extends cc.Component {
     private freeze(node: cc.Node): void {
         if (node.getComponent(StaticComponent) === null) {
             node.addComponent(StaticComponent);
+        }
+        if (node.getComponent(UnselectableComponent) === null) {
+            node.addComponent(UnselectableComponent);
         }
         node.children.forEach(child => this.freeze(child));
     };
