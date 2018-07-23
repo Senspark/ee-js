@@ -309,6 +309,10 @@ declare namespace cc {
         update(delta: number): void;
     }
 
+    export interface Component {
+        gizmo: any;
+    }
+
     export interface Label {
         _sgNode: _ccsg.Label;
     }

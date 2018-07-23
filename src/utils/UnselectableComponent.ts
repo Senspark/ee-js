@@ -2,15 +2,30 @@ import assert = require('assert');
 
 const { ccclass, disallowMultiple, menu } = cc._decorator;
 
-if (CC_EDITOR) {
-    Editor.UI.PolymerUtils.elements['scene-view'].prototype._onMouseMove = (event: any) => {
-        event.stopPropagation();
+type Dict = { [key: string]: any };
 
-        let position = _Scene.view.pixelToWorld(cc.v2(event.offsetX, event.offsetY));
-        let delta = Number.MAX_VALUE;
-        let bestNode: cc.Node | undefined;
-        let entries = cc.engine.getIntersectionList(cc.rect(position.x, position.y, 1, 1));
-        entries.forEach(entry => {
+let cloneFunction = <T extends Function>(f: T) => {
+    let result = function (this: any) {
+        return f.apply(this, arguments);
+    };
+    for (let key in f) {
+        if (f.hasOwnProperty(key)) {
+            (<Dict>result)[key] = (<Dict>f)[key];
+        }
+    }
+    return <T><any>result;
+};
+
+let applyUnselectableComponent = () => {
+    cc.log('Apply unselectable component.');
+
+    // Clone the original getIntersectionList function.
+    let f = cc.engine.getIntersectionList;
+    let original = <typeof f>cloneFunction(f).bind(cc.engine);
+
+    // Overwrite the getIntersectionList function.
+    cc.engine.getIntersectionList = (rect: cc.Rect, t?: boolean) => {
+        return original(rect, t).filter(entry => {
             let node = entry.node;
             assert(node !== null);
             let comp = node.getComponent(UnselectableComponent);
@@ -19,26 +34,27 @@ if (CC_EDITOR) {
                 // Also disable polygon collider.
                 let collider = node.getComponent(cc.PolygonCollider);
                 if (collider !== null) {
-                    collider.gizmo._root.dragArea.ignoreMouseMove = true;
+                    collider.gizmo._root.dragArea.node.style.pointerEvents = 'none';
                 }
-                return;
+                return false;
             }
             // Reenable polygon collider
             let collider = node.getComponent(cc.PolygonCollider);
             if (collider !== null) {
-                collider.gizmo._root.dragArea.ignoreMouseMove = false;
+                collider.gizmo._root.dragArea.node.style.pointerEvents = 'fill';
             }
-            let rect = entry.aabb || _Scene.NodeUtils.getWorldBounds(node);
-            let c = position.sub(rect.center).magSqr();
-            if (c - delta < -1e-6) {
-                delta = c;
-                bestNode = node;
-            }
+            return true;
         });
-
-        let uuid = bestNode !== undefined ? bestNode.uuid : null;
-        Editor.Selection.hover('node', uuid);
     };
+}
+
+if (CC_EDITOR) {
+    // Check if it is already cloned.
+    const key = '__ee_js_overwrite_getIntersectionList';
+    if ((<Dict>cc.engine.getIntersectionList)[key] === undefined) {
+        applyUnselectableComponent();
+        ((<Dict>cc.engine.getIntersectionList)[key] = 'ok');
+    }
 }
 
 @ccclass
