@@ -33,14 +33,14 @@ let applyUnselectableComponent = () => {
                 // Ignore this node.
                 // Also disable polygon collider.
                 let collider = node.getComponent(cc.PolygonCollider);
-                if (collider !== null) {
+                if (collider !== null && collider.gizmo !== undefined) {
                     collider.gizmo._root.dragArea.node.style.pointerEvents = 'none';
                 }
                 return false;
             }
             // Reenable polygon collider
             let collider = node.getComponent(cc.PolygonCollider);
-            if (collider !== null) {
+            if (collider !== null && collider.gizmo !== undefined) {
                 collider.gizmo._root.dragArea.node.style.pointerEvents = 'fill';
             }
             return true;
