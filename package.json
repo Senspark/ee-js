@@ -25,12 +25,14 @@
   },
   "homepage": "https://github.com/Senspark/ee-js#readme",
   "devDependencies": {
-    "typescript": "^2.9.2",
-    "@types/node-polyglot": "^0.4.31"
+    "gl-matrix": "^2.7.0",
+    "hoek": "^5.0.3",
+    "node-polyglot": "^2.3.0",
+    "typescript": "^2.9.2"
   },
   "dependencies": {
-    "@types/node": "^10.3.3",
-    "@types/node-polyglot": "^0.4.31",
-    "node-polyglot": "^2.2.2"
+    "@types/gl-matrix": "^2.4.0",
+    "@types/node": "^10.5.2",
+    "@types/node-polyglot": "^0.4.31"
   }
 }

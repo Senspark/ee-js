@@ -1,5 +1,6 @@
 import assert = require('assert');
 import { StaticComponent } from './StaticComponent';
+import { UnselectableComponent } from './UnselectableComponent';
 
 const { ccclass, disallowMultiple, executeInEditMode, menu, property } = cc._decorator;
 
@@ -21,68 +22,96 @@ export class NestedPrefab extends cc.Component {
 
     private set prefab(value) {
         if (this._prefab !== undefined) {
-            assert(this.view !== undefined);
-            this.view!.destroy();
+            if (this.view === undefined) {
+                throw new Error('Prefab exist but the view is not present.');
+            }
+            this.view.destroy();
             this.view = undefined;
         }
         this._prefab = value;
+        if (this._prefab === null) {
+            // Change null to undefined.
+            this._prefab = undefined;
+        }
         if (this._prefab !== undefined) {
-            this.instantiateView();
-            if (CC_EDITOR) {
-                this.setupView();
+            if (this.instantiateView()) {
+                if (CC_EDITOR) {
+                    this.setupView();
+                }
             }
         }
     };
 
     public onLoad(): void {
         if (!CC_EDITOR && !this.instantiated) {
-            this.instantiateView();
-            this.instantiated = true;
+            if (this.instantiateView()) {
+                this.instantiated = true;
+            }
         }
     };
 
     public update(): void {
         if (!CC_EDITOR) {
-            assert(this.view !== undefined);
+            assert(this.view !== undefined, 'View should be present at runtime.');
             return;
         }
         if (this.view !== undefined) {
-            if (this.view.parent === null) {
-                // Somehow object is destroyed but remains referenced.
+            if (!this.view.isValid) {
+                // Object is destroyed but remains referenced.
                 this.view = undefined;
             }
         }
         if (this.prefab !== undefined && this.view === undefined) {
-            this.instantiateView();
-            this.setupView();
+            if (this.instantiateView()) {
+                this.setupView();
+            }
         }
     };
 
     public getView(): cc.Node {
         if (!this.instantiated) {
-            this.instantiateView();
-            this.instantiated = true;
+            if (this.instantiateView()) {
+                this.instantiated = true;
+            }
         }
-        return this.view!;
-    }
-
-    /** Creates a view from the current prefab and add it to this. */
-    private instantiateView(): void {
-        // cc.log('instantiate view for prefab ' + this.prefab.name);
-        assert(this.view === undefined);
-        assert(this.prefab !== undefined);
-        this.view = cc.instantiate(this.prefab!);
-        this.node.addChild(this.view);
+        if (this.view === undefined) {
+            throw new Error('Failed to instantiate view.');
+        }
+        return this.view;
     };
 
-    private setupView(): void {
-        assert(this.view !== undefined);
-        this.freeze(this.view!);
-        this.view!._objFlags |= cc.Object.Flags.DontSave;
-    }
+    /** Creates a view from the current prefab and add it to this. */
+    private instantiateView(): boolean {
+        if (this.view !== undefined) {
+            assert.fail('View already instantiate.');
+            return false;
+        }
+        if (this.prefab === undefined) {
+            assert.fail('Prefab is not exist.');
+            return false;
+        }
+        this.view = cc.instantiate(this.prefab);
+        this.node.addChild(this.view);
+        return true;
+    };
+
+    private setupView(): boolean {
+        if (this.view === undefined) {
+            assert.fail('View is not present');
+            return false;
+        }
+        this.freeze(this.view);
+        this.view._objFlags |= cc.Object.Flags.DontSave;
+        return true;
+    };
 
     private freeze(node: cc.Node): void {
-        node.addComponent(StaticComponent);
+        if (node.getComponent(StaticComponent) === null) {
+            node.addComponent(StaticComponent);
+        }
+        if (node.getComponent(UnselectableComponent) === null) {
+            node.addComponent(UnselectableComponent);
+        }
         node.children.forEach(child => this.freeze(child));
     };
 };

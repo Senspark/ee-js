@@ -1,3 +1,5 @@
+import * as gl from 'gl-matrix';
+
 import vertShader from './HsvShaderVert';
 import fragShader from './HsvShaderFrag';
 import { createHueMatrix, createSaturationMatrix, createBrightnesMatrix, createContrastMatrix } from './HsvUtils';
@@ -97,14 +99,21 @@ export class HsvComponent extends cc.Component {
     private brightnessMatrixDirty = true;
     private contrastMatrixDirty = true;
 
-    private matrix = new cc.math.Matrix4();
-    private hueMatrix = new cc.math.Matrix4();
-    private saturationMatrix = new cc.math.Matrix4();
-    private brightnessMatrix = new cc.math.Matrix4();
-    private contrastMatrix = new cc.math.Matrix4();
+    private matrix: gl.mat4;
+    private hueMatrix: gl.mat4;
+    private saturationMatrix: gl.mat4;
+    private brightnessMatrix: gl.mat4;
+    private contrastMatrix: gl.mat4;
 
     constructor() {
         super();
+
+        this.matrix = gl.mat4.create();
+        this.hueMatrix = gl.mat4.create();
+        this.saturationMatrix = gl.mat4.create();
+        this.brightnessMatrix = gl.mat4.create();
+        this.contrastMatrix = gl.mat4.create();
+
         this.initializeShader();
     };
 
@@ -155,7 +164,7 @@ export class HsvComponent extends cc.Component {
         if (!this.updateMatrix()) {
             return;
         }
-        let array: number[] = Array.prototype.slice.call(this.matrix.mat);
+        let array: number[] = Array.prototype.slice.call(this.matrix);
         if (cc.sys.isNative) {
             this.programState!.setUniformMat4('u_hsv', array);
         } else {
@@ -219,11 +228,11 @@ export class HsvComponent extends cc.Component {
         dirty = this.updateBrightnessMatrix() || dirty;
         dirty = this.updateContrastMatrix() || dirty;
         if (dirty) {
-            this.matrix.identity()
-                .multiply(this.hueMatrix)
-                .multiply(this.saturationMatrix)
-                .multiply(this.brightnessMatrix)
-                .multiply(this.contrastMatrix);
+            gl.mat4.identity(this.matrix);
+            gl.mat4.multiply(this.matrix, this.matrix, this.hueMatrix);
+            gl.mat4.multiply(this.matrix, this.matrix, this.saturationMatrix);
+            gl.mat4.multiply(this.matrix, this.matrix, this.brightnessMatrix);
+            gl.mat4.multiply(this.matrix, this.matrix, this.contrastMatrix);
             return true;
         }
         return false;
