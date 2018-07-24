@@ -115,9 +115,6 @@ export class NestedPrefab extends cc.Component {
     };
 
     private freeze(node: cc.Node): void {
-        if (node.getComponent(StaticComponent) === null) {
-            node.addComponent(StaticComponent);
-        }
         if (node.getComponent(UnselectableComponent) === null) {
             node.addComponent(UnselectableComponent);
         }
