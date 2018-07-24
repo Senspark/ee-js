@@ -54,8 +54,10 @@ export class NestedPrefab extends cc.Component {
     };
 
     public update(): void {
-        if (!CC_EDITOR && this.instantiate) {
-            assert(this.view !== undefined, 'View should be present at runtime.');
+        if (!CC_EDITOR) {
+            if (this.instantiate) {
+                assert(this.view !== undefined, 'View should be present at runtime.');
+            }
             return;
         }
         if (this.view !== undefined) {
@@ -75,14 +77,14 @@ export class NestedPrefab extends cc.Component {
         }
     };
 
-    public getView(): cc.Node {
+    public getView(): cc.Node | undefined {
+        if (!this.instantiate) {
+            return undefined;
+        }
         if (!this.instantiated) {
             if (this.instantiateView()) {
                 this.instantiated = true;
             }
-        }
-        if (this.view === undefined) {
-            throw new Error('Failed to instantiate view.');
         }
         return this.view;
     };
