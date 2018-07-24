@@ -666,6 +666,8 @@ declare namespace sp {
 
     export interface Skeleton {
         _sgNode: _SGSkeletonAnimation | null;
+
+        getCurrent(trackIndex: number): sp.spine.TrackEntry;
     }
 
     export namespace spine {
