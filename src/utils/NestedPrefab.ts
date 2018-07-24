@@ -61,6 +61,10 @@ export class NestedPrefab extends cc.Component {
                 this.view = undefined;
             }
         }
+        if (this.node.childrenCount > 0 && this.node.children[0] !== this.view) {
+            // This node was duplicated.
+            this.node.removeAllChildren();
+        }
         if (this.prefab !== undefined && this.view === undefined) {
             if (this.instantiateView()) {
                 this.setupView();
