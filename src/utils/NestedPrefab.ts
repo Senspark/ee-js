@@ -119,6 +119,12 @@ export class NestedPrefab extends cc.Component {
         if (node.getComponent(UnselectableComponent) === null) {
             node.addComponent(UnselectableComponent);
         }
+        let prefab = node.getComponent(NestedPrefab);
+        if (prefab !== null) {
+            if (!prefab.instantiate) {
+                node.active = false;
+            }
+        }
         node.children.forEach(child => this.freeze(child));
     };
 };
