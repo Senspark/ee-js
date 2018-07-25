@@ -140,6 +140,9 @@ declare namespace _Scene {
     export function projectProfileUpdated(e: any): void;
     export function printSimulatorLog(message: string): void;
 
+    // app.asar/editor/page/scene-utils/dump/get-hierarchy-dump.js
+    export function dumpHierarchy(scene?: cc.Scene, includeScene?: boolean): any;
+
     // app.asar/editor/page/scene-utils/node-utils.js
     export class NodeUtils {
         static getWorldBounds(node: cc.Node, size?: cc.Size, out?: cc.Rect): cc.Rect;
@@ -313,6 +316,20 @@ declare namespace cc {
         gizmo: any;
     }
 
+    export class PrefabInfo {
+        root: any;
+    }
+
+    export interface _BaseNode {
+        _parent: any | null;
+        _children: _BaseNode[];
+        _tag: number;
+        _active: boolean;
+        _activeInHierarchy: boolean;
+        _components: Component[];
+        _prefab: PrefabInfo | null;
+    }
+
     export interface Label {
         _sgNode: _ccsg.Label;
     }
@@ -353,8 +370,6 @@ declare namespace cc {
 
     export interface Node {
         _sgNode: _ccsg.Node;
-        _components: Component[];
-        _activeInHierarchy: boolean;
     }
 
     /** shaders */

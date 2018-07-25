@@ -16,8 +16,8 @@ let cloneFunction = <T extends Function>(f: T) => {
     return <T><any>result;
 };
 
-let applyUnselectableComponent = () => {
-    cc.log('Apply unselectable component.');
+let overwriteGetIntersectionList = () => {
+    cc.log('overwrite cc.engine.getIntersectionList.');
 
     // Clone the original getIntersectionList function.
     let f = cc.engine.getIntersectionList;
@@ -46,13 +46,59 @@ let applyUnselectableComponent = () => {
             return true;
         });
     };
-}
+};
+
+let overwriteDumpHierarchy = () => {
+    cc.log('overwrite _Scene.dumpHierarchy.');
+
+    enum NodeStates {
+        Normal = 0,
+        Prefab = 1,
+        Prefab_AutoSync = 2,
+        Prefab_Missing = 3,
+    };
+
+    let getChildren = (node: cc._BaseNode) => {
+        if (node.getComponent(UnselectableComponent) !== null) {
+            // Ignore this node.
+            return undefined;
+        }
+        let state = NodeStates.Normal;
+        if (node._prefab) {
+            if (node._prefab.root && node._prefab.root._prefab.sync) {
+                state = NodeStates.Prefab_AutoSync;
+            } else {
+                state = NodeStates.Prefab;
+            }
+        };
+        let children: {}[] = [];
+        node._children.map(getChildren).forEach(entry => {
+            if (entry !== undefined) {
+                children.push(entry);
+            }
+        });
+        return {
+            name: node.name,
+            id: node.uuid,
+            children: children.length > 0 ? children : null,
+            state: state,
+            isActive: node._activeInHierarchy,
+        };
+    };
+
+    _Scene.dumpHierarchy = (scene?: cc.Scene, includeScene?: boolean) => {
+        scene = scene || cc.director.getScene();
+        let nodes = includeScene ? [scene] : scene._children;
+        return nodes.map(getChildren);
+    };
+};
 
 if (CC_EDITOR) {
     // Check if it is already cloned.
     const key = '__ee_js_overwrite_getIntersectionList';
     if ((<Dict>cc.engine.getIntersectionList)[key] === undefined) {
-        applyUnselectableComponent();
+        overwriteGetIntersectionList();
+        overwriteDumpHierarchy();
         ((<Dict>cc.engine.getIntersectionList)[key] = 'ok');
     }
 }
