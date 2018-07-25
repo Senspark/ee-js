@@ -26,6 +26,44 @@ declare namespace Editor {
 
     export function polymerElement(data: object): void;
 
+    // app.asar/editor/page/gizmos/elements/gizmo.js
+    export class Gizmo {
+        _root: any;
+        node: cc.Node | null;
+        nodes: cc.Node[];
+        topNodes: cc.Node[];
+        selecting: boolean;
+        editing: boolean;
+        hovering: boolean;
+
+        layer(): string;
+        createRoot(): void;
+        registerMoveSvg(t: any, e: any, i: any);
+        createMoveCallbacks(t: any): any;
+        onCreateMoveCallbacks(): any;
+        recordChanges(): void;
+        commitChanges(): void;
+        worldToPixel(position: cc.Vec2): cc.Vec2;
+        pixelToWorld(position: cc.Vec2): cc.Vec2;
+        sceneToPixel(position: cc.Vec2): cc.Vec2;
+        pixelToScene(position: cc.Vec2): cc.Vec2;
+        defaultMinDifference(): number;
+        registerAdjustValue(t: any, e: any): void;
+        adjustValue(t: any, e: any, i: any): void;
+        targetValid(): boolean;
+        visible(): boolean;
+        _viewDirty(): boolean;
+        _nodeDirty(node?: cc.Node): boolean;
+        dirty(): boolean;
+        update(): void;
+        remove(): void;
+        ensureRoot(): void;
+        hide(): void;
+        show(): void;
+        rectHitTest(t: any, e: any): boolean;
+        _registerEvent(): void;
+    }
+
     export namespace UI {
         // app.asar/editor-framework/lib/renderer/ui/utils
         export namespace PolymerUtils {
@@ -38,6 +76,7 @@ declare namespace Editor {
 
     export namespace Selection {
         export function hover(e: any, t: any): void;
+        export function select(e: any, t: any): void;
     }
 
     export namespace Utils {

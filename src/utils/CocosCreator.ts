@@ -33,17 +33,7 @@ let overwriteGetIntersectionList = (oldFunction: typeof cc.engine.getIntersectio
             let comp = node.getComponent(UnselectableComponent);
             if (comp !== null && comp.enabled) {
                 // Ignore this node.
-                // Also disable polygon collider.
-                let collider = node.getComponent(cc.PolygonCollider);
-                if (collider !== null && collider.gizmo !== undefined) {
-                    collider.gizmo._root.dragArea.node.style.pointerEvents = 'none';
-                }
                 return false;
-            }
-            // Reenable polygon collider.
-            let collider = node.getComponent(cc.PolygonCollider);
-            if (collider !== null && collider.gizmo !== undefined) {
-                collider.gizmo._root.dragArea.node.style.pointerEvents = 'fill';
             }
             return true;
         });
@@ -61,7 +51,7 @@ let overwriteDumpHierarchy = (oldFunction: typeof _Scene.dumpHierarchy) => {
     };
 
     let getChildren = (node: cc._BaseNode) => {
-        if (node.getComponent(UnselectableComponent) != undefined) {
+        if (node.getComponent(UnselectableComponent) !== null) {
             // Ignore this node.
             return undefined;
         }
@@ -124,6 +114,40 @@ let overwriteCreateNodeFromAsset = (oldFunction: typeof _Scene.createNodeFromAss
     });
 };
 
+let overwriteGizmoRegisterEvent = (oldFunction: any) => {
+    cc.log('overwrite Editor.Gizmo._registerEvent');
+
+    return function (this: Editor.Gizmo) {
+        let node = this._root.node;
+        let isIgnore = () => {
+            assert(this.node !== null);
+            let comp = this.node!.getComponent(UnselectableComponent);
+            return comp !== null && comp.enabled;
+        };
+        node.addEventListener("mousedown", () => {
+            if (!isIgnore()) {
+                let uuid = this.nodes.map(node => node.uuid);
+                Editor.Selection.select("node", uuid)
+            }
+        }, true);
+        node.addEventListener("mouseover", () => {
+            if (!isIgnore()) {
+                Editor.Selection.hover("node", this.node!.uuid)
+            }
+        }, true);
+        node.addEventListener("mouseleave", () => {
+            if (!isIgnore()) {
+                Editor.Selection.hover("node", null)
+            }
+        }, true);
+        node.addEventListener("mousemove", (event: any) => {
+            if (!isIgnore()) {
+                event.srcElement.instance.ignoreMouseMove || event.stopPropagation()
+            }
+        })
+    };
+};
+
 let overwriteFunction = (oldFunction: any, callback: any) => {
     const key = '__ee_js_overwrite';
     let originalFunction = oldFunction;
@@ -139,6 +163,7 @@ if (CC_EDITOR) {
     cc.engine.getIntersectionList = overwriteFunction(cc.engine.getIntersectionList, overwriteGetIntersectionList);
     _Scene.dumpHierarchy = overwriteFunction(_Scene.dumpHierarchy, overwriteDumpHierarchy);
     _Scene.createNodeFromAsset = overwriteFunction(_Scene.createNodeFromAsset, overwriteCreateNodeFromAsset);
+    Editor.Gizmo.prototype._registerEvent = overwriteFunction(Editor.Gizmo.prototype._registerEvent, overwriteGizmoRegisterEvent);
 
     Editor.Profile.load('profile://project/ee.json', (err, profile) => {
         if (profile !== null) {
