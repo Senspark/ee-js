@@ -38,6 +38,7 @@ export class NestedPrefab extends cc.Component {
         }
         if (this._prefab !== undefined) {
             if (this.instantiateView()) {
+                this.instantiated = true;
                 if (CC_EDITOR) {
                     this.setupView();
                 }
@@ -45,11 +46,29 @@ export class NestedPrefab extends cc.Component {
         }
     };
 
+    public static createNode(prefab: cc.Prefab): cc.Node | undefined {
+        let node = new cc.Node();
+        let comp = node.addComponent(NestedPrefab);
+        comp.prefab = prefab;
+        node.name = prefab.name;
+        let view = comp.getView();
+        if (view === undefined) {
+            return undefined;
+        }
+        node.setContentSize(view.getContentSize());
+        node.setAnchorPoint(view.getAnchorPoint());
+        return node;
+    };
+
     public onLoad(): void {
         if (!CC_EDITOR && !this.instantiated && this.instantiate) {
             if (this.instantiateView()) {
                 this.instantiated = true;
             }
+        }
+        if (this.view !== undefined) {
+            this.node.setContentSize(this.view.getContentSize());
+            this.node.setAnchorPoint(this.view.getAnchorPoint());
         }
     };
 

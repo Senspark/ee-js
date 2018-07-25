@@ -1,8 +1,11 @@
 import assert = require('assert');
 
 import { UnselectableComponent } from './UnselectableComponent';
+import { NestedPrefab } from './NestedPrefab';
 
 type Dict = { [key: string]: any };
+
+let globalProfile: Profile | undefined;
 
 let cloneFunction = <T extends Function>(f: T) => {
     let result = function (this: any) {
@@ -16,15 +19,14 @@ let cloneFunction = <T extends Function>(f: T) => {
     return <T><any>result;
 };
 
-let overwriteGetIntersectionList = () => {
+let overwriteGetIntersectionList = (oldFunction: typeof cc.engine.getIntersectionList) => {
     cc.log('overwrite cc.engine.getIntersectionList.');
 
     // Clone the original getIntersectionList function.
-    let f = cc.engine.getIntersectionList;
-    let original = <typeof f>cloneFunction(f).bind(cc.engine);
+    let original = <typeof oldFunction>cloneFunction(oldFunction).bind(cc.engine);
 
     // Overwrite the getIntersectionList function.
-    cc.engine.getIntersectionList = (rect: cc.Rect, t?: boolean) => {
+    return (rect: cc.Rect, t?: boolean) => {
         return original(rect, t).filter(entry => {
             let node = entry.node;
             assert(node !== null);
@@ -38,7 +40,7 @@ let overwriteGetIntersectionList = () => {
                 }
                 return false;
             }
-            // Reenable polygon collider
+            // Reenable polygon collider.
             let collider = node.getComponent(cc.PolygonCollider);
             if (collider !== null && collider.gizmo !== undefined) {
                 collider.gizmo._root.dragArea.node.style.pointerEvents = 'fill';
@@ -48,7 +50,7 @@ let overwriteGetIntersectionList = () => {
     };
 };
 
-let overwriteDumpHierarchy = () => {
+let overwriteDumpHierarchy = (oldFunction: typeof _Scene.dumpHierarchy) => {
     cc.log('overwrite _Scene.dumpHierarchy.');
 
     enum NodeStates {
@@ -59,7 +61,7 @@ let overwriteDumpHierarchy = () => {
     };
 
     let getChildren = (node: cc._BaseNode) => {
-        if (node.getComponent(UnselectableComponent) !== null) {
+        if (node.getComponent(UnselectableComponent) != undefined) {
             // Ignore this node.
             return undefined;
         }
@@ -86,19 +88,61 @@ let overwriteDumpHierarchy = () => {
         };
     };
 
-    _Scene.dumpHierarchy = (scene?: cc.Scene, includeScene?: boolean) => {
+    return <typeof oldFunction>((scene?: cc.Scene, includeScene?: boolean) => {
         scene = scene || cc.director.getScene();
         let nodes = includeScene ? [scene] : scene._children;
         return nodes.map(getChildren);
-    };
+    });
+};
+
+let overwriteCreateNodeFromAsset = (oldFunction: typeof _Scene.createNodeFromAsset) => {
+    cc.log('overwrite _Scene.createNodeFromAsset.');
+
+    let original = cloneFunction(oldFunction);
+    return <typeof oldFunction>((uuid: string, callback: any) => {
+        if (globalProfile !== undefined && !globalProfile.data['use_nested_prefab']) {
+            original(uuid, callback);
+            return;
+        }
+        cc.AssetLibrary.queryAssetInfo(uuid, (error, url, raw, ctor) => {
+            if (ctor === cc.Prefab) {
+                cc.AssetLibrary.loadAsset(uuid, (error, result) => {
+                    if (error) {
+                        callback(error);
+                        return;
+                    }
+                    if (result instanceof cc.Prefab) {
+                        callback(null, NestedPrefab.createNode(result));
+                    } else {
+                        callback(new Error(`Expected asset type cc.Prefab but found ${cc.js.getClassName(result)}`));
+                    }
+                });
+            } else {
+                original(uuid, callback);
+            }
+        });
+    });
+};
+
+let overwriteFunction = (oldFunction: any, callback: any) => {
+    const key = '__ee_js_overwrite';
+    let originalFunction = oldFunction;
+    if (oldFunction[key] !== undefined) {
+        originalFunction = oldFunction[key];
+    }
+    let newFunction = callback(originalFunction);
+    newFunction[key] = originalFunction;
+    return newFunction;
 };
 
 if (CC_EDITOR) {
-    // Check if it is already overwrite.
-    const key = '__ee_js_overwrite';
-    if ((<Dict>cc.engine.getIntersectionList)[key] === undefined) {
-        overwriteGetIntersectionList();
-        overwriteDumpHierarchy();
-        ((<Dict>cc.engine.getIntersectionList)[key] = 'ok');
-    }
+    cc.engine.getIntersectionList = overwriteFunction(cc.engine.getIntersectionList, overwriteGetIntersectionList);
+    _Scene.dumpHierarchy = overwriteFunction(_Scene.dumpHierarchy, overwriteDumpHierarchy);
+    _Scene.createNodeFromAsset = overwriteFunction(_Scene.createNodeFromAsset, overwriteCreateNodeFromAsset);
+
+    Editor.Profile.load('profile://project/ee.json', (err, profile) => {
+        if (profile !== null) {
+            globalProfile = profile;
+        }
+    });
 }

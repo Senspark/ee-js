@@ -2,7 +2,7 @@ interface AssetDB {
     queryPathByUuid(uuid: string, callback: (error: string | null, result: string | null) => void): void;
     queryUrlByUuid(uuid: string, callback: (error: string | null, result: string | null) => void): void;
     queryInfoByUuid(uuid: string, callback: (error: string | null, result: {}) => void): void;
-    queryMetaInfoByUuid(uuid: string, callback: (error: string | null, result: {}) => void): void;
+    queryMetaInfoByUuid(uuid: string, callback: (error: string | null, result: any) => void): void;
     queryAssets(pattern: string, type: string, callback: (error: string | null, result: any) => void): void;
 }
 
@@ -143,6 +143,9 @@ declare namespace _Scene {
     // app.asar/editor/page/scene-utils/dump/get-hierarchy-dump.js
     export function dumpHierarchy(scene?: cc.Scene, includeScene?: boolean): any;
 
+    // app.asar/editor/page/scene-utils/utils.js
+    export function createNodeFromAsset(uuid: string, callback: any): void;
+
     // app.asar/editor/page/scene-utils/node-utils.js
     export class NodeUtils {
         static getWorldBounds(node: cc.Node, size?: cc.Size, out?: cc.Rect): cc.Rect;
@@ -257,9 +260,9 @@ declare namespace cc {
     export function affineTransformInvertOut(t: AffineTransform, out: AffineTransform): void;
 
     export class AssetLibrary {
-        static loadAsset(uuid: string, callback: (error: string | null, asset: string | null) => void, options?: {}): void;
+        static loadAsset(uuid: string, callback: (error: string | null, asset: any | null) => void, options?: {}): void;
         static getLibUrlNoExt(uuid: string): string;
-        static queryAssetInfo(uuid: string, callback: (error: string | null, url: string | null, raw: boolean) => void): void;
+        static queryAssetInfo(uuid: string, callback: (error: string | null, url?: string, raw?: boolean, ctor?: any) => void): void;
 
         /**
          * Gets the exists asset by uuid.
