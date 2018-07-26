@@ -102,7 +102,29 @@ let overwriteCreateNodeFromAsset = (oldFunction: typeof _Scene.createNodeFromAss
                         return;
                     }
                     if (result instanceof cc.Prefab) {
-                        callback(null, NestedPrefab.createNode(result));
+                        const defaultPrefabs = [
+                            'sprite',
+                            'sprite_splash',
+                            'label',
+                            'richtext',
+                            'particlesystem',
+                            'tiledmap',
+                            'canvas',
+                            'button',
+                            'pageview',
+                            'progressBar',
+                            'editbox',
+                            'slider',
+                            'toggle',
+                            'toggleContainer',
+                            'videoplayer',
+                            'webview',
+                        ];
+                        if (defaultPrefabs.indexOf(result.name) === -1) {
+                            callback(null, NestedPrefab.createNode(result));
+                        } else {
+                            original(uuid, callback);
+                        }
                     } else {
                         callback(new Error(`Expected asset type cc.Prefab but found ${cc.js.getClassName(result)}`));
                     }
