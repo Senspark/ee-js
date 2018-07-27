@@ -1,12 +1,11 @@
+import assert = require('assert');
 import * as Polyglot from 'node-polyglot';
+import { ProfileManager } from './ProfileManager';
 
 type Observer = () => void;
 
 export class LanguageManager {
     private static sharedInstance?: LanguageManager;
-
-    /** Current profile, used in editor only. */
-    private profile?: Profile;
 
     /**
      * Current config directory.
@@ -34,20 +33,11 @@ export class LanguageManager {
         this.configs = {};
         this.observers = {};
         this.polyglot = new Polyglot();
-    };
 
-    /**
-     * Sets the settings profile.
-     * Used in editor only.
-     * @param profile The settings profile to set.
-     */
-    public setProfile(profile: Profile) {
-        if (CC_EDITOR) {
-            this.profile = profile;
-            this.currentLanguage = profile.data.current_language;
-            this.configDir = profile.data.config_dir;
-            this.updateConfigs();
-        }
+        let profile = ProfileManager.getInstance();
+        this.currentLanguage = profile.loadData('current_language');
+        this.configDir = profile.loadData('config_dir');
+        this.updateConfigs();
     };
 
     /**
@@ -73,8 +63,8 @@ export class LanguageManager {
     public setConfigDir(path: string): void {
         this.configDir = path;
         if (CC_EDITOR) {
-            this.profile!.data.config_dir = path;
-            this.profile!.save();
+            let profile = ProfileManager.getInstance();
+            profile.saveData('config_dir', this.configDir);
         }
         this.updateConfigs();
         this.updateLanguage();
@@ -84,8 +74,8 @@ export class LanguageManager {
     public resetConfigDir(): void {
         this.configDir = undefined;
         if (CC_EDITOR) {
-            this.profile!.data.config_dir = this.configDir;
-            this.profile!.save();
+            let profile = ProfileManager.getInstance();
+            profile.saveData('config_dir', this.configDir);
         }
         this.updateConfigs();
     };
@@ -145,8 +135,8 @@ export class LanguageManager {
     public setCurrentLanguage(language: string | undefined): void {
         this.currentLanguage = language;
         if (CC_EDITOR) {
-            this.profile!.data.current_language = language;
-            this.profile!.save();
+            let profile = ProfileManager.getInstance();
+            profile.saveData('current_language', language);
         }
         this.updateLanguage();
     };
@@ -198,13 +188,3 @@ export class LanguageManager {
         return true;
     };
 };
-
-if (CC_EDITOR) {
-    /** Loads saved profile for the editor. */
-    Editor.Profile.load('profile://project/ee.json', (err, profile) => {
-        if (profile !== null) {
-            let manager = LanguageManager.getInstance();
-            manager.setProfile(profile);
-        }
-    });
-}
