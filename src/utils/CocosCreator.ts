@@ -2,10 +2,11 @@ import assert = require('assert');
 
 import { UnselectableComponent } from './UnselectableComponent';
 import { NestedPrefab } from './NestedPrefab';
+import { ProfileManager } from './ProfileManager';
 
 type Dict = { [key: string]: any };
 
-let globalProfile: Profile | undefined;
+const setting_key = 'use_nested_prefab';
 
 let cloneFunction = <T extends Function>(f: T) => {
     let result = function (this: any) {
@@ -27,6 +28,10 @@ let overwriteGetIntersectionList = (oldFunction: typeof cc.engine.getIntersectio
 
     // Overwrite the getIntersectionList function.
     return (rect: cc.Rect, t?: boolean) => {
+        let profile = ProfileManager.getInstance();
+        if (!profile.loadData(setting_key)) {
+            return original(rect, t);
+        }
         return original(rect, t).filter(entry => {
             let node = entry.node;
             assert(node !== null);
@@ -42,6 +47,8 @@ let overwriteGetIntersectionList = (oldFunction: typeof cc.engine.getIntersectio
 
 let overwriteDumpHierarchy = (oldFunction: typeof _Scene.dumpHierarchy) => {
     cc.log('overwrite _Scene.dumpHierarchy.');
+
+    let original = <typeof oldFunction>cloneFunction(oldFunction);
 
     enum NodeStates {
         Normal = 0,
@@ -79,6 +86,10 @@ let overwriteDumpHierarchy = (oldFunction: typeof _Scene.dumpHierarchy) => {
     };
 
     return <typeof oldFunction>((scene?: cc.Scene, includeScene?: boolean) => {
+        let profile = ProfileManager.getInstance();
+        if (!profile.loadData(setting_key)) {
+            return original(scene, includeScene);
+        }
         scene = scene || cc.director.getScene();
         let nodes = includeScene ? [scene] : scene._children;
         return nodes.map(getChildren);
@@ -90,7 +101,8 @@ let overwriteCreateNodeFromAsset = (oldFunction: typeof _Scene.createNodeFromAss
 
     let original = cloneFunction(oldFunction);
     return <typeof oldFunction>((uuid: string, callback: any) => {
-        if (globalProfile !== undefined && !globalProfile.data['use_nested_prefab']) {
+        let profile = ProfileManager.getInstance();
+        if (!profile.loadData('use_nested_prefab')) {
             original(uuid, callback);
             return;
         }
@@ -142,6 +154,10 @@ let overwriteGizmoRegisterEvent = (oldFunction: typeof Editor.Gizmo.prototype._r
     return function (this: Editor.Gizmo) {
         let node = <SVGPolygonElement>(this._root.node);
         let isIgnore = () => {
+            let profile = ProfileManager.getInstance();
+            if (!profile.loadData(setting_key)) {
+                return false;
+            }
             assert(this.node !== null);
             let comp = this.node!.getComponent(UnselectableComponent);
             return comp !== null && comp.enabled;
@@ -191,10 +207,4 @@ if (CC_EDITOR) {
     _Scene.dumpHierarchy = overwriteFunction(_Scene.dumpHierarchy, overwriteDumpHierarchy);
     _Scene.createNodeFromAsset = overwriteFunction(_Scene.createNodeFromAsset, overwriteCreateNodeFromAsset);
     Editor.Gizmo.prototype._registerEvent = overwriteFunction(Editor.Gizmo.prototype._registerEvent, overwriteGizmoRegisterEvent);
-
-    Editor.Profile.load('profile://project/ee.json', (err, profile) => {
-        if (profile !== null) {
-            globalProfile = profile;
-        }
-    });
 }

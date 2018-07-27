@@ -74,6 +74,17 @@ declare namespace Editor {
         }
     }
 
+    export class Ipc {
+        static sendToAll(event: string, ...args: any[]): void;
+    };
+
+    // app.asar/editor-framework/lib/share
+    export class IpcListener {
+        on(event: string, callback: any);
+        once(event: string, callback: any);
+        clear(): void;
+    };
+
     export namespace Selection {
         export function hover(e: any, t: any): void;
         export function select(e: any, t: any): void;

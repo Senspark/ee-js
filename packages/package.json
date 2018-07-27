@@ -5,6 +5,16 @@
         "name": "plugin"
     },
     "main": "main.js",
+    "main-menu": {
+        "ee/use_nested_prefab": {
+            "accelerator": "Command+E",
+            "checked": true,
+            "label": "Use NestedPrefab",
+            "message": "ee:use_nested_prefab",
+            "position": "prefab",
+            "type": "checkbox"
+        }
+    },
     "description": "ee packages",
     "version": "0.0.1",
     "name": "ee"
