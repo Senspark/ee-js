@@ -136,37 +136,42 @@ let overwriteCreateNodeFromAsset = (oldFunction: typeof _Scene.createNodeFromAss
     });
 };
 
-let overwriteGizmoRegisterEvent = (oldFunction: any) => {
+let overwriteGizmoRegisterEvent = (oldFunction: typeof Editor.Gizmo.prototype._registerEvent) => {
     cc.log('overwrite Editor.Gizmo._registerEvent');
 
     return function (this: Editor.Gizmo) {
-        let node = this._root.node;
+        let node = <SVGPolygonElement>(this._root.node);
         let isIgnore = () => {
             assert(this.node !== null);
             let comp = this.node!.getComponent(UnselectableComponent);
             return comp !== null && comp.enabled;
         };
-        node.addEventListener("mousedown", () => {
-            if (!isIgnore()) {
-                let uuid = this.nodes.map(node => node.uuid);
-                Editor.Selection.select("node", uuid)
+        node.addEventListener("mousedown", (event: MouseEvent) => {
+            if (isIgnore()) {
+                return;
             }
+            let uuid = this.nodes.map(node => node.uuid);
+            Editor.Selection.select("node", uuid)
         }, true);
-        node.addEventListener("mouseover", () => {
-            if (!isIgnore()) {
-                Editor.Selection.hover("node", this.node!.uuid)
+        node.addEventListener("mouseover", (event: MouseEvent) => {
+            if (isIgnore()) {
+                return;
             }
+            Editor.Selection.hover("node", this.node!.uuid);
         }, true);
-        node.addEventListener("mouseleave", () => {
-            if (!isIgnore()) {
-                Editor.Selection.hover("node", null)
+        node.addEventListener("mouseleave", (event: Event) => {
+            if (isIgnore()) {
+                return;
             }
+            Editor.Selection.hover("node", null);
         }, true);
-        node.addEventListener("mousemove", (event: any) => {
-            if (!isIgnore()) {
-                event.srcElement.instance.ignoreMouseMove || event.stopPropagation()
+        node.addEventListener("mousemove", (event: MouseEvent) => {
+            if (isIgnore()) {
+                return;
             }
-        })
+            let element = <SVGPolygonElement>event.srcElement;
+            (<any>element).instance.ignoreMouseMove || event.stopPropagation();
+        }, false)
     };
 };
 
