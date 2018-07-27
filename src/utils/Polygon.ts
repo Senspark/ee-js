@@ -64,7 +64,7 @@ export class Polygon {
      * @return True if there is a collision, false otherwise.
      */
     public collides(polygon: Polygon): boolean {
-        if (!cc.rectIntersection(this.getAABB(), polygon.getAABB())) {
+        if (!cc.Intersection.rectRect(this.getAABB(), polygon.getAABB())) {
             return false;
         }
         return cc.Intersection.polygonPolygon(this.getVertices(), polygon.getVertices());
