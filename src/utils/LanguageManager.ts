@@ -1,10 +1,11 @@
 import assert = require('assert');
 import * as Polyglot from 'node-polyglot';
 import { ProfileManager } from './ProfileManager';
+import { ObserverManager } from './ObserverManager';
 
 type Observer = () => void;
 
-export class LanguageManager {
+export class LanguageManager extends ObserverManager<Observer> {
     private static sharedInstance?: LanguageManager;
 
     /**
@@ -20,18 +21,15 @@ export class LanguageManager {
     /** Wrappee i18n manager. */
     private polyglot: Polyglot;
 
-    /** Observes language changing events. */
-    private observers: { [index: string]: Observer | undefined };
-
     /** Gets the singleton. */
     static getInstance(): LanguageManager {
         return this.sharedInstance || (this.sharedInstance = new this());
     };
 
     private constructor() {
+        super();
         // Hide construction.
         this.configs = {};
-        this.observers = {};
         this.polyglot = new Polyglot();
 
         let profile = ProfileManager.getInstance();
@@ -120,10 +118,7 @@ export class LanguageManager {
                 this.polyglot.extend(config);
             }
         }
-        Object.keys(this.observers).forEach(key => {
-            let observer = this.observers[key];
-            observer!();
-        });
+        this.dispatch(observer => observer());
     };
 
     /** Gets the active language. */
@@ -168,23 +163,5 @@ export class LanguageManager {
             return '';
         }
         return match[1];
-    };
-
-    /** Adds an observer whose the specified key. */
-    public addObserver(key: string, observer: Observer): boolean {
-        if (this.observers[key] !== undefined) {
-            return false;
-        }
-        this.observers[key] = observer;
-        return true;
-    };
-
-    /** Removes an observer whose the specified key. */
-    public removeObserver(key: string): boolean {
-        if (this.observers[key] === undefined) {
-            return false;
-        }
-        delete this.observers[key];
-        return true;
     };
 };
