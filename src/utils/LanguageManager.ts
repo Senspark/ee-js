@@ -1,12 +1,12 @@
+import assert = require('assert');
 import * as Polyglot from 'node-polyglot';
+import { ProfileManager } from './ProfileManager';
+import { ObserverManager } from './ObserverManager';
 
 type Observer = () => void;
 
-export class LanguageManager {
+export class LanguageManager extends ObserverManager<Observer> {
     private static sharedInstance?: LanguageManager;
-
-    /** Current profile, used in editor only. */
-    private profile?: Profile;
 
     /**
      * Current config directory.
@@ -21,33 +21,21 @@ export class LanguageManager {
     /** Wrappee i18n manager. */
     private polyglot: Polyglot;
 
-    /** Observes language changing events. */
-    private observers: { [index: string]: Observer | undefined };
-
     /** Gets the singleton. */
     static getInstance(): LanguageManager {
         return this.sharedInstance || (this.sharedInstance = new this());
     };
 
     private constructor() {
+        super();
         // Hide construction.
         this.configs = {};
-        this.observers = {};
         this.polyglot = new Polyglot();
-    };
 
-    /**
-     * Sets the settings profile.
-     * Used in editor only.
-     * @param profile The settings profile to set.
-     */
-    public setProfile(profile: Profile) {
-        if (CC_EDITOR) {
-            this.profile = profile;
-            this.currentLanguage = profile.data.current_language;
-            this.configDir = profile.data.config_dir;
-            this.updateConfigs();
-        }
+        let profile = ProfileManager.getInstance();
+        this.currentLanguage = profile.loadData('current_language');
+        this.configDir = profile.loadData('config_dir');
+        this.updateConfigs();
     };
 
     /**
@@ -73,8 +61,8 @@ export class LanguageManager {
     public setConfigDir(path: string): void {
         this.configDir = path;
         if (CC_EDITOR) {
-            this.profile!.data.config_dir = path;
-            this.profile!.save();
+            let profile = ProfileManager.getInstance();
+            profile.saveData('config_dir', this.configDir);
         }
         this.updateConfigs();
         this.updateLanguage();
@@ -84,8 +72,8 @@ export class LanguageManager {
     public resetConfigDir(): void {
         this.configDir = undefined;
         if (CC_EDITOR) {
-            this.profile!.data.config_dir = this.configDir;
-            this.profile!.save();
+            let profile = ProfileManager.getInstance();
+            profile.saveData('config_dir', this.configDir);
         }
         this.updateConfigs();
     };
@@ -130,10 +118,7 @@ export class LanguageManager {
                 this.polyglot.extend(config);
             }
         }
-        Object.keys(this.observers).forEach(key => {
-            let observer = this.observers[key];
-            observer!();
-        });
+        this.dispatch(observer => observer());
     };
 
     /** Gets the active language. */
@@ -145,8 +130,8 @@ export class LanguageManager {
     public setCurrentLanguage(language: string | undefined): void {
         this.currentLanguage = language;
         if (CC_EDITOR) {
-            this.profile!.data.current_language = language;
-            this.profile!.save();
+            let profile = ProfileManager.getInstance();
+            profile.saveData('current_language', language);
         }
         this.updateLanguage();
     };
@@ -179,32 +164,4 @@ export class LanguageManager {
         }
         return match[1];
     };
-
-    /** Adds an observer whose the specified key. */
-    public addObserver(key: string, observer: Observer): boolean {
-        if (this.observers[key] !== undefined) {
-            return false;
-        }
-        this.observers[key] = observer;
-        return true;
-    };
-
-    /** Removes an observer whose the specified key. */
-    public removeObserver(key: string): boolean {
-        if (this.observers[key] === undefined) {
-            return false;
-        }
-        delete this.observers[key];
-        return true;
-    };
 };
-
-if (CC_EDITOR) {
-    /** Loads saved profile for the editor. */
-    Editor.Profile.load('profile://project/ee.json', (err, profile) => {
-        if (profile !== null) {
-            let manager = LanguageManager.getInstance();
-            manager.setProfile(profile);
-        }
-    });
-}

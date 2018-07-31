@@ -64,7 +64,7 @@ export class Polygon {
      * @return True if there is a collision, false otherwise.
      */
     public collides(polygon: Polygon): boolean {
-        if (!cc.rectIntersection(this.getAABB(), polygon.getAABB())) {
+        if (!cc.Intersection.rectRect(this.getAABB(), polygon.getAABB())) {
             return false;
         }
         return cc.Intersection.polygonPolygon(this.getVertices(), polygon.getVertices());
@@ -86,4 +86,11 @@ export class Polygon {
         let maxY = Math.max(...ys);
         return cc.rect(minX, minY, maxX - minX, maxY - minY);
     };
+
+    public getSquareMinDistanceToPoint(p: cc.Vec2): number {
+        let rect = this.getAABB();
+        let DeltaX = p.x - Math.max(rect.origin.x, Math.min(p.x, rect.origin.x + rect.size.width));
+        let DeltaY = p.y - Math.max(rect.origin.y, Math.min(p.y, rect.origin.y + rect.size.height));
+        return (DeltaX * DeltaX + DeltaY * DeltaY);
+    }
 };

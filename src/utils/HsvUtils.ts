@@ -1,86 +1,88 @@
+import * as gl from 'gl-matrix';
+
 const rwgt = 0.3086;
 const gwgt = 0.6094;
 const bwgt = 0.0820;
 
-function transformRGB(m: cc.math.Matrix4, r: number, g: number, b: number): [number, number, number] {
+function transformRGB(m: gl.mat4, r: number, g: number, b: number): [number, number, number] {
     return [
-        r * m.get(0, 0) + g * m.get(0, 1) + b * m.get(0, 2) + m.get(0, 3),
-        r * m.get(1, 0) + g * m.get(1, 1) + b * m.get(1, 2) + m.get(1, 3),
-        r * m.get(2, 0) + g * m.get(2, 1) + b * m.get(2, 2) + m.get(2, 3),
+        r * m[0] + g * m[4] + b * m[8] + m[12],
+        r * m[1] + g * m[5] + b * m[9] + m[13],
+        r * m[2] + g * m[6] + b * m[10] + m[14],
     ];
 };
 
-function createShearZMatrix(x: number, y: number): cc.math.Matrix4 {
-    let matrix = new cc.math.Matrix4();
-    matrix.identity();
-    matrix.set(2, 0, x);
-    matrix.set(2, 1, y);
+function createShearZMatrix(x: number, y: number): gl.mat4 {
+    let matrix = gl.mat4.create();
+    matrix[2] = x;
+    matrix[6] = y;
     return matrix;
 };
 
-export function createHueMatrix(degrees: number): cc.math.Matrix4 {
-    let m = new cc.math.Matrix4();
-    m.identity();
+export function createHueMatrix(degrees: number): gl.mat4 {
+    let m = gl.mat4.create();
+    let temp = gl.mat4.create();
 
     // Rotate the grey vector into positive Z.
     // Sin = 1/sqrt(2).
     // Cos = 1/sqrt(2).
-    m.multiply(cc.math.Matrix4.createByRotationX(Math.PI / 4));
+    gl.mat4.multiply(m, m, gl.mat4.fromXRotation(temp, Math.PI / 4));
 
     // Sin = -1/sqrt(3).
     // Cos = sqrt(2/3).
-    m.multiply(cc.math.Matrix4.createByRotationY(-0.615479709));
+    gl.mat4.multiply(m, m, gl.mat4.fromYRotation(temp, -0.615479709));
 
     // Shear the space to make the luminance plane horizontal.
     let [lx, ly, lz] = transformRGB(m, rwgt, gwgt, bwgt);
     let zsx = lx / lz;
     let zsy = ly / lz;
-    m.multiply(createShearZMatrix(zsx, zsy));
+    gl.mat4.multiply(m, m, createShearZMatrix(zsx, zsy));
 
     // Rotate the hue.
-    m.multiply(cc.math.Matrix4.createByRotationZ(cc.degreesToRadians(degrees)));
+    gl.mat4.multiply(m, m, gl.mat4.fromZRotation(temp, cc.degreesToRadians(degrees)));
 
     // Unshear the space to put the luminance plane back.
-    m.multiply(createShearZMatrix(-zsx, -zsy));
+    gl.mat4.multiply(m, m, createShearZMatrix(-zsx, -zsy));
 
     // Rotate the grey vector back into place.
     // Sin = 1/sqrt(3).
     // Cos = sqrt(2/3);
-    m.multiply(cc.math.Matrix4.createByRotationY(0.615479709));
+    gl.mat4.multiply(m, m, gl.mat4.fromYRotation(temp, 0.615479709));
 
     // Sin = -1/sqrt(2).
     // Cos = 1/sqrt(2).
-    m.multiply(cc.math.Matrix4.createByRotationX(-Math.PI / 4));
+    gl.mat4.multiply(m, m, gl.mat4.fromXRotation(temp, -Math.PI / 4));
 
     return m;
 }
 
-export function createSaturationMatrix(s: number): cc.math.Matrix4 {
-    let m = new cc.math.Matrix4();
-    m.set(0, 0, (1 - s) * rwgt + s);
-    m.set(1, 0, (1 - s) * rwgt);
-    m.set(2, 0, (1 - s) * rwgt);
+export function createSaturationMatrix(s: number): gl.mat4 {
+    let m = gl.mat4.create();
+    m[0] = (1 - s) * rwgt + s;
+    m[1] = (1 - s) * rwgt;
+    m[2] = (1 - s) * rwgt;
 
-    m.set(0, 1, (1 - s) * gwgt);
-    m.set(1, 1, (1 - s) * gwgt + s);
-    m.set(2, 1, (1 - s) * gwgt);
+    m[4] = (1 - s) * gwgt;
+    m[5] = (1 - s) * gwgt + s;
+    m[6] = (1 - s) * gwgt;
 
-    m.set(0, 2, (1 - s) * bwgt);
-    m.set(1, 2, (1 - s) * bwgt);
-    m.set(2, 2, (1 - s) * bwgt + s);
+    m[8] = (1 - s) * bwgt;
+    m[9] = (1 - s) * bwgt;
+    m[10] = (1 - s) * bwgt + s;
 
-    m.set(3, 3, 1.0);
+    m[15] = 1.0;
     return m;
 };
 
-export function createContrastMatrix(r: number, g: number, b: number): cc.math.Matrix4 {
+export function createContrastMatrix(r: number, g: number, b: number): gl.mat4 {
     let m = createBrightnesMatrix((1 - r) / 2, (1 - g) / 2, (1 - b) / 2);
-    m.set(0, 0, r);
-    m.set(1, 1, g);
-    m.set(2, 2, b);
+    m[0] = r;
+    m[5] = g;
+    m[10] = b;
     return m;
 };
 
-export function createBrightnesMatrix(r: number, g: number, b: number): cc.math.Matrix4 {
-    return cc.math.Matrix4.createByTranslation(r, g, b);
+export function createBrightnesMatrix(r: number, g: number, b: number): gl.mat4 {
+    let m = gl.mat4.create();
+    return gl.mat4.fromTranslation(m, [r, g, b]);
 };
