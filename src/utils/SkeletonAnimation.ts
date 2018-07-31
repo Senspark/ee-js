@@ -11,6 +11,9 @@ export class SkeletonAnimation extends sp.Skeleton {
         super();
         if (CC_EDITOR) {
             UpdateManager.getInstance().addObserver(this.uuid, delta => {
+                if (!this.enabled) {
+                    return;
+                }
                 if (this._sgNode === null) {
                     return;
                 }
