@@ -727,9 +727,81 @@ declare namespace sp {
 
         /** Gets the time scale of skeleton. */
         getTimeScale(): number;
+
+        /** Computes the world SRT from the local SRT for each bone. */
+        updateWorldTransform(): void;
+
+        /** Sets the bones and slots to the setup pose. */
+        setToSetupPose(): void;
+
+        /** Sets the bones to the setup pose, using the values form the BoneData list in the SkeletonData. */
+        setBonesToSetupPose(): void;
+
+        /** Sets the slots to the setup pose, using the values from the SlotData list in the SkeletonData. */
+        setSlotsToSetupPose(): void;
+
+        /** Finds a bone by name. */
+        findBone(name: string): spine.Bone;
+
+        /** Finds a slot by name. */
+        findSlot(name: string): spine.Slot;
+
+        /** Finds a skin by name and makes it the active skin. */
+        setSkin(name: string): spine.Skin;
+
+        /** Returns the attachment for the slot and attachment name. */
+        getAttachment(slotName: string, attachmentName: string): spine.Attachment;
+
+        /** Sets the attachment for the slot and attachment name. */
+        setAttachment(slotName: string, attachmentName: string): void;
+
+        /** Sets the premultiplied alpha value. */
+        setPremultipliedAlpha(premultiplied: boolean): void;
+
+        /** Returns whether to enable premultipled alpha. */
+        isPremultipliedAlpha(): boolean;
+
+        /** Sets skeleton data. */
+        setSkeletonData(data: spine.SkeletonData, ownsDat: boolean): void;
+
+        /** Returns the renderer of attachment. */
+        getTextureAtlas(regionAttachment: spine.RegionAttachment | spine.BoundingBoxAttachment): spine.TextureAtlasRegion;
+
+        /** Returns the blend func. */
+        getBlendFunc(): cc.BlendFunc;
+
+        /** Sets the blend func. */
+        setBlendFunc(src: cc.BlendFunc | number, dst?: number): void;
+
+        update(delta: number): void;
     }
 
     export class _SGSkeletonAnimation extends _SGSkeleton {
+        /** Sets animation state data. */
+        setAnimationStateData(stateData: spine.AnimationStateData): void;
+
+        /** Mix applies all keyframe values, interpolated for the specified time and mixed with the current values. */
+        setMix(fromAnimation: string, toAnimation: string, duration: number): void;
+
+        /** Sets the current animation, any queued animations are cleared. */
+        setAnimation(trackIndex: number, name: string, loop: boolean): spine.TrackEntry | null;
+
+        /** Adds an animation to be played delay seconds after the current or last queued animation. */
+        addAnimation(trackIndex: number, name: string, loop: boolean, delay: number = 0): spine.TrackEntry | null;
+
+        /** Finds animation with specified name. */
+        findAnimation(name: string): spine.Animation | null;
+
+        /** Returns track entry by trackIndex. */
+        getCurrent(trackIndex: number): spine.TrackEntry | null;
+
+        /** Clears all tracks of animation state. */
+        clearTracks(): void;
+
+        /** Clears track of animation state by trackIndex. */
+        clearTrack(trackIndex: number): void;
+
+        update(delta: number): void;
     }
 
     export interface Skeleton {
@@ -830,6 +902,7 @@ declare namespace sp {
         export class TextureAtlas { }
         export class TextureAtlasReader { }
         export class TextureAtlasPage { }
+        export class TextureAtlasRegion { }
         export class TransformConstraint { }
         export class TransformConstraintData { }
     }
