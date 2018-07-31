@@ -305,7 +305,7 @@ declare namespace cc {
     export function affineTransformConcat(t1: AffineTransform, t2: AffineTransform): AffineTransform;
     export function affineTransformConcatIn(t1: AffineTransform, t2: AffineTransform): AffineTransform;
     export function affineTransformEqualToTranform(t1: AffineTransform, t2: AffineTransform): boolean;
-    export function affineTranformInvert(t1: AffineTransform): AffineTransform;
+    export function affineTransformInvert(t1: AffineTransform): AffineTransform;
     export function affineTransformInvertIn(t: AffineTransform): AffineTransform;
     export function affineTransformInvertOut(t: AffineTransform, out: AffineTransform): void;
 
