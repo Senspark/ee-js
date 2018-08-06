@@ -365,6 +365,10 @@ declare namespace cc {
         update(delta: number): void;
     }
 
+    export interface ActionInterval {
+        _computeEaseTime(delta: number): number;
+    }
+
     export interface Component {
         gizmo: any;
     }
