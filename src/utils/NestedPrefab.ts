@@ -47,11 +47,11 @@ export class NestedPrefab extends cc.Component {
     };
 
     public static createNode(prefab: cc.Prefab): cc.Node | undefined {
-        let node = new cc.Node();
-        let comp = node.addComponent(NestedPrefab);
+        const node = new cc.Node();
+        const comp = node.addComponent(NestedPrefab);
         comp.prefab = prefab;
         node.name = prefab.name;
-        let view = comp.getView();
+        const view = comp.getView();
         if (view === undefined) {
             return undefined;
         }
@@ -102,6 +102,13 @@ export class NestedPrefab extends cc.Component {
         }
     };
 
+    /** Creates a view using the current prefab. */
+    public createView(): cc.Node {
+        assert(this.prefab !== undefined);
+        const view = cc.instantiate(this.prefab!);
+        return view;
+    };
+
     public getView(): cc.Node | undefined {
         if (!this.instantiate) {
             return undefined;
@@ -124,7 +131,7 @@ export class NestedPrefab extends cc.Component {
             assert.fail('Prefab is not exist.');
             return false;
         }
-        this.view = cc.instantiate(this.prefab);
+        this.view = this.createView();
         this.node.addChild(this.view);
         return true;
     };
@@ -143,7 +150,7 @@ export class NestedPrefab extends cc.Component {
         if (node.getComponent(UnselectableComponent) === null) {
             node.addComponent(UnselectableComponent);
         }
-        let prefab = node.getComponent(NestedPrefab);
+        const prefab = node.getComponent(NestedPrefab);
         if (prefab !== null) {
             if (!prefab.instantiate) {
                 node.active = false;
