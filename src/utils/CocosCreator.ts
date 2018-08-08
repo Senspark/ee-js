@@ -8,11 +8,11 @@ type Dict = { [key: string]: any };
 
 const setting_key = 'use_nested_prefab';
 
-let cloneFunction = <T extends Function>(f: T) => {
-    let result = function (this: any) {
+const cloneFunction = <T extends Function>(f: T) => {
+    const result = function (this: any) {
         return f.apply(this, arguments);
     };
-    for (let key in f) {
+    for (const key in f) {
         if (f.hasOwnProperty(key)) {
             (<Dict>result)[key] = (<Dict>f)[key];
         }
@@ -20,22 +20,22 @@ let cloneFunction = <T extends Function>(f: T) => {
     return <T><any>result;
 };
 
-let overwriteGetIntersectionList = (oldFunction: typeof cc.engine.getIntersectionList) => {
+const overwriteGetIntersectionList = (oldFunction: typeof cc.engine.getIntersectionList) => {
     cc.log('overwrite cc.engine.getIntersectionList.');
 
     // Clone the original getIntersectionList function.
-    let original = <typeof oldFunction>cloneFunction(oldFunction).bind(cc.engine);
+    const original = <typeof oldFunction>cloneFunction(oldFunction).bind(cc.engine);
 
     // Overwrite the getIntersectionList function.
     return (rect: cc.Rect, t?: boolean) => {
-        let profile = ProfileManager.getInstance();
+        const profile = ProfileManager.getInstance();
         if (!profile.loadData(setting_key)) {
             return original(rect, t);
         }
         return original(rect, t).filter(entry => {
-            let node = entry.node;
+            const node = entry.node;
             assert(node !== null);
-            let comp = node.getComponent(UnselectableComponent);
+            const comp = node.getComponent(UnselectableComponent);
             if (comp !== null && comp.enabled) {
                 // Ignore this node.
                 return false;
@@ -49,7 +49,7 @@ let overwriteGetIntersectionList = (oldFunction: typeof cc.engine.getIntersectio
 const overwriteDumpHierarchy = (oldFunction: typeof _Scene.dumpHierarchy) => {
     cc.log('overwrite _Scene.dumpHierarchy.');
 
-    let original = <typeof oldFunction>cloneFunction(oldFunction);
+    const original = <typeof oldFunction>cloneFunction(oldFunction);
 
     enum NodeStates {
         Normal = 0,
@@ -58,7 +58,7 @@ const overwriteDumpHierarchy = (oldFunction: typeof _Scene.dumpHierarchy) => {
         Prefab_Missing = 3,
     };
 
-    let getChildren = (node: cc._BaseNode) => {
+    const getChildren = (node: cc._BaseNode) => {
         if (node.getComponent(UnselectableComponent) !== null) {
             // Ignore this node.
             return undefined;
@@ -71,7 +71,7 @@ const overwriteDumpHierarchy = (oldFunction: typeof _Scene.dumpHierarchy) => {
                 state = NodeStates.Prefab;
             }
         };
-        let children: {}[] = [];
+        const children: {}[] = [];
         node._children.map(getChildren).forEach(entry => {
             if (entry !== undefined) {
                 children.push(entry);
@@ -87,7 +87,7 @@ const overwriteDumpHierarchy = (oldFunction: typeof _Scene.dumpHierarchy) => {
     };
 
     return <typeof oldFunction>((scene?: cc.Scene, includeScene?: boolean) => {
-        let profile = ProfileManager.getInstance();
+        const profile = ProfileManager.getInstance();
         if (!profile.loadData(setting_key)) {
             return original(scene, includeScene);
         }
@@ -101,9 +101,9 @@ const overwriteDumpHierarchy = (oldFunction: typeof _Scene.dumpHierarchy) => {
 const overwriteCreateNodeFromAsset = (oldFunction: typeof _Scene.createNodeFromAsset) => {
     cc.log('overwrite _Scene.createNodeFromAsset.');
 
-    let original = cloneFunction(oldFunction);
+    const original = cloneFunction(oldFunction);
     return <typeof oldFunction>((uuid: string, callback: any) => {
-        let profile = ProfileManager.getInstance();
+        const profile = ProfileManager.getInstance();
         if (!profile.loadData('use_nested_prefab')) {
             original(uuid, callback);
             return;
@@ -150,25 +150,25 @@ const overwriteCreateNodeFromAsset = (oldFunction: typeof _Scene.createNodeFromA
     });
 };
 
-let overwriteGizmoRegisterEvent = (oldFunction: typeof Editor.Gizmo.prototype._registerEvent) => {
+const overwriteGizmoRegisterEvent = (oldFunction: typeof Editor.Gizmo.prototype._registerEvent) => {
     cc.log('overwrite Editor.Gizmo._registerEvent');
 
     return function (this: Editor.Gizmo) {
-        let node = <SVGPolygonElement>(this._root.node);
-        let isIgnore = () => {
-            let profile = ProfileManager.getInstance();
+        const node = <SVGPolygonElement>(this._root.node);
+        const isIgnore = () => {
+            const profile = ProfileManager.getInstance();
             if (!profile.loadData(setting_key)) {
                 return false;
             }
             assert(this.node !== null);
-            let comp = this.node!.getComponent(UnselectableComponent);
+            const comp = this.node!.getComponent(UnselectableComponent);
             return comp !== null && comp.enabled;
         };
         node.addEventListener("mousedown", (event: MouseEvent) => {
             if (isIgnore()) {
                 return;
             }
-            let uuid = this.nodes.map(node => node.uuid);
+            const uuid = this.nodes.map(node => node.uuid);
             Editor.Selection.select("node", uuid)
         }, true);
         node.addEventListener("mouseover", (event: MouseEvent) => {
@@ -187,19 +187,19 @@ let overwriteGizmoRegisterEvent = (oldFunction: typeof Editor.Gizmo.prototype._r
             if (isIgnore()) {
                 return;
             }
-            let element = <SVGPolygonElement>event.srcElement;
+            const element = <SVGPolygonElement>event.srcElement;
             (<any>element).instance.ignoreMouseMove || event.stopPropagation();
         }, false)
     };
 };
 
-let overwriteFunction = (oldFunction: any, callback: any) => {
+const overwriteFunction = (oldFunction: any, callback: any) => {
     const key = '__ee_js_overwrite';
     let originalFunction = oldFunction;
     if (oldFunction[key] !== undefined) {
         originalFunction = oldFunction[key];
     }
-    let newFunction = callback(originalFunction);
+    const newFunction = callback(originalFunction);
     newFunction[key] = originalFunction;
     return newFunction;
 };
