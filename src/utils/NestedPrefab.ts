@@ -91,8 +91,14 @@ export class NestedPrefab extends cc.Component {
         }
         if (this.prefab !== undefined && this.view === undefined) {
             if (this.instantiateView()) {
+                this.instantiated = true;
                 this.setupView();
             }
+        }
+        const view = this.getView();
+        if (view !== undefined) {
+            this.node.setContentSize(view.getContentSize());
+            this.node.setAnchorPoint(view.getAnchorPoint());
         }
     };
 
