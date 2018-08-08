@@ -14,10 +14,9 @@ export class SkeletonAnimation extends sp.Skeleton {
                 if (!this.enabled) {
                     return;
                 }
-                if (this._sgNode === null) {
+                if (!this.updateInternal(delta)) {
                     return;
                 }
-                this._sgNode.update(delta);
                 cc.engine.repaintInEditMode();
             });
         }
@@ -34,10 +33,42 @@ export class SkeletonAnimation extends sp.Skeleton {
             return super.setAnimation(trackIndex, name, loop);
         }
         super.setAnimation(trackIndex, name, loop);
-        if (this._sgNode === null) {
-            return <sp.spine.TrackEntry><any>null;
+        return <sp.spine.TrackEntry>(this.setAnimationInternal(trackIndex, name, loop));
+    };
+
+    private updateInternal(delta: number): boolean {
+        if (cc.ENGINE_VERSION >= '2') {
+            const state = this.getState();
+            if (state === undefined) {
+                return false;
+            }
+            state.update(delta);
+            return true;
+        } else {
+            const node = this._sgNode;
+            if (node === null) {
+                return false;
+            }
+            node.update(delta);
+            return true;
         }
-        let track = this._sgNode.setAnimation(trackIndex, name, loop);
-        return <sp.spine.TrackEntry>track;
+    };
+
+    private setAnimationInternal(trackIndex: number, name: string, loop: boolean): sp.spine.TrackEntry | null {
+        if (cc.ENGINE_VERSION >= '2') {
+            const state = this.getState();
+            if (state === undefined) {
+                return null;
+            }
+            const track = state.setAnimation(trackIndex, name, loop);
+            return track;
+        } else {
+            const node = this._sgNode;
+            if (node === null) {
+                return null;
+            }
+            const track = node.setAnimation(trackIndex, name, loop);
+            return track;
+        }
     };
 };

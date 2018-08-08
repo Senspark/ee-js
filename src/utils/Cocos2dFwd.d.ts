@@ -809,7 +809,11 @@ declare namespace sp {
     }
 
     export interface Skeleton {
+        /** Version < 2.0 */
         _sgNode: _SGSkeletonAnimation | null;
+
+        /** Version > 2.0 */
+        getState(): spine.AnimationState | undefined;
 
         getCurrent(trackIndex: number): sp.spine.TrackEntry;
     }
@@ -871,7 +875,14 @@ declare namespace sp {
             resetRotationDirections(): void;
         }
 
-        export class AnimationState { }
+        export class AnimationState {
+            update(delta: number): void;
+            clearTracks(): void;
+            clearTrack(trackIndex: number): void;
+            setAnimation(setAnimationWith: number, animationName: string, loop: boolean): TrackEntry;
+            setAnimationWith(trackIndex: number, animationName: string, loop: boolean): TrackEntry;
+        }
+
         export class AnimationStateData { }
         export class AssetManager { }
         export class AtlasAttachmentLoader { }
