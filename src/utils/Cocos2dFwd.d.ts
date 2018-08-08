@@ -312,6 +312,9 @@ declare namespace cc {
     export function affineTransformInvertIn(t: AffineTransform): AffineTransform;
     export function affineTransformInvertOut(t: AffineTransform, out: AffineTransform): void;
 
+    /** Version < 2.0 */
+    export function degreesToRadians(degrees: number): number;
+
     export class AssetLibrary {
         static loadAsset(uuid: string, callback: (error: string | null, asset: any | null) => void, options?: {}): void;
         static getLibUrlNoExt(uuid: string): string;
