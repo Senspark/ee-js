@@ -140,8 +140,8 @@ declare namespace _Scene {
     export function loadWorkspace(e: any, t: any): void;
     export function stashScene(e: any): void;
     export function _applyCanvasPreferences(e: any, t: any): void;
-    export const currentScene: cc.Scene;
-    export const title: string;
+    export const currentScene: () => cc.Scene;
+    export const title: () => string;
     export function updateTitle(e: any): void;
     export function save(e: any): void;
     export function confirmClose(): void;
@@ -149,8 +149,8 @@ declare namespace _Scene {
     export const dirty: boolean;
     export function copyNodes(e: any): void;
     export function pasteNodes(e: any): void;
-    export function createNodes(e: any, t: any, n: any): void;
-    export function createNodesAt(e: any, t: any, n: any, i: any): void;
+    export function createNodes(uuids: string[], t: any, options: { unlinkPrefab?: boolean }, callback: any): void;
+    export function createNodesAt(uuids: string[], x: number, y: number, options: { unlinkPrefab?: boolean }): void;
     export function createNodeByClassID(e: any, t: any, n: any, i: any): void;
     export function createNodeByPrefab(e: any, t: any, n: any, i: any): void;
     export function deleteNodes(e: any): void;

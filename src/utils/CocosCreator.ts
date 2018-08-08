@@ -45,7 +45,8 @@ let overwriteGetIntersectionList = (oldFunction: typeof cc.engine.getIntersectio
     };
 };
 
-let overwriteDumpHierarchy = (oldFunction: typeof _Scene.dumpHierarchy) => {
+/** Version < 2 */
+const overwriteDumpHierarchy = (oldFunction: typeof _Scene.dumpHierarchy) => {
     cc.log('overwrite _Scene.dumpHierarchy.');
 
     let original = <typeof oldFunction>cloneFunction(oldFunction);
@@ -96,7 +97,8 @@ let overwriteDumpHierarchy = (oldFunction: typeof _Scene.dumpHierarchy) => {
     });
 };
 
-let overwriteCreateNodeFromAsset = (oldFunction: typeof _Scene.createNodeFromAsset) => {
+/** Version < 2 */
+const overwriteCreateNodeFromAsset = (oldFunction: typeof _Scene.createNodeFromAsset) => {
     cc.log('overwrite _Scene.createNodeFromAsset.');
 
     let original = cloneFunction(oldFunction);
@@ -202,10 +204,83 @@ let overwriteFunction = (oldFunction: any, callback: any) => {
     return newFunction;
 };
 
+// Version >= 2
+// app.asar/editor/page/scene-utils/dump/hierarchy.js
+const dumpHierarchy = (scene?: cc.Scene, includeScene?: boolean) => {
+    const profile = ProfileManager.getInstance();
+    const filter: boolean = profile.loadData(setting_key);
+
+    enum NodeStates {
+        Normal = 0,
+        Prefab = 1,
+        Prefab_AutoSync = 2,
+        Prefab_Missing = 3,
+    };
+
+    const getChildren = (node: cc._BaseNode, filter: boolean) => {
+        if (filter && node.getComponent(UnselectableComponent) !== null) {
+            // Ignore this node.
+            return undefined;
+        }
+        let state = NodeStates.Normal;
+        if (node._prefab) {
+            if (node._prefab.root) {
+                if (node._prefab.root._prefab.asset) {
+                    if (node._prefab.root._prefab.sync) {
+                        state = NodeStates.Prefab_AutoSync;
+                    } else {
+                        state = NodeStates.Prefab;
+                    }
+                } else {
+                    state = NodeStates.Prefab_Missing;
+                }
+            } else {
+                state = NodeStates.Prefab;
+            }
+        };
+        const children: {}[] = [];
+        node._children.map(node => getChildren(node, filter)).forEach(entry => {
+            if (entry !== undefined) {
+                children.push(entry);
+            }
+        });
+        return {
+            name: node.name,
+            id: node.uuid,
+            children: children.length > 0 ? children : null,
+            prefabState: state,
+            locked: !!(node._objFlags & cc.Object.Flags.LockedInEditor),
+            isActive: node._activeInHierarchy,
+            hidden: node instanceof cc.PrivateNode
+        };
+    };
+
+    scene = scene || cc.director.getScene();
+    const nodes = includeScene ? [<cc._BaseNode>(scene)] : scene._children;
+    return nodes.map(node => getChildren(node, filter));
+};
+
 if (CC_EDITOR) {
     cc.engine.getIntersectionList = overwriteFunction(cc.engine.getIntersectionList, overwriteGetIntersectionList);
     if (cc.ENGINE_VERSION >= '2') {
+        const panels = Editor.UI.PolymerUtils.panels;
 
+        // app.asar/editor/builtin/scene/panel/scene.js
+        const scene = panels['scene'];
+
+        // app.asar/editor/builtin/scene/panel/messages/*.js
+        const messages = scene.prototype.messages;
+        messages['scene:query-hierarchy'] = (event: any) => {
+            if (!cc.engine.isInitialized) {
+                event.reply(null, '', []);
+                return;
+            }
+            const nodes = dumpHierarchy();
+            const uuid = _Scene.currentScene().uuid;
+            event.reply(null, uuid, nodes);
+        };
+
+        // TODO: createNodeFromAsset for version >= 2.
     } else {
         _Scene.dumpHierarchy = overwriteFunction(_Scene.dumpHierarchy, overwriteDumpHierarchy);
         _Scene.createNodeFromAsset = overwriteFunction(_Scene.createNodeFromAsset, overwriteCreateNodeFromAsset);
