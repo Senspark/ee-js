@@ -190,7 +190,10 @@ declare namespace _Scene {
     export function projectProfileUpdated(e: any): void;
     export function printSimulatorLog(message: string): void;
 
-    // app.asar/editor/page/scene-utils/dump/get-hierarchy-dump.js
+    /**
+     * Version < 2.0
+     * app.asar/editor/page/scene-utils/dump/get-hierarchy-dump.js
+     */
     export function dumpHierarchy(scene?: cc.Scene, includeScene?: boolean): any;
 
     // app.asar/editor/page/scene-utils/utils.js
@@ -328,6 +331,16 @@ declare namespace cc {
             completeCallback?: (error: Error, resource: any) => void): void;
     }
 
+    /** Version >= 2 */
+    export namespace vmath {
+        export { vec2, vec3, vec4, mat2, mat3, mat4 } from 'gl-matrix';
+    }
+
+    /** Version >= 2 */
+    export namespace AffineTransform {
+        export function fromMat4(out: AffineTransform, matrix: vmath.mat4): AffineTransform;
+    }
+
     export interface Object {
         _objFlags: number;
     }
@@ -427,6 +440,9 @@ declare namespace cc {
 
     export interface Node {
         _sgNode: _ccsg.Node;
+
+        /** Version >= 2 */
+        getWorldMatrix(out: vmath.mat4): vmath.mat4;
     }
 
     /** shaders */

@@ -53,8 +53,27 @@ export class Polygon {
      * Transforms this polygon and returns a new copy.
      * @return The transformed polygon.
      */
-    public transform(transform: cc.AffineTransform): Polygon {
-        let transformVertices = this.vertices.map(p => cc.pointApplyAffineTransform(p, transform));
+    public transform(transform: cc.AffineTransform | cc.vmath.mat4): Polygon {
+        if (transform instanceof cc.AffineTransform) {
+            return this.transformAffine(transform);
+        }
+        return this.transformMatrix(transform);
+    };
+
+    private transformMatrix(matrix: cc.vmath.mat4): Polygon {
+        const tranform = cc.AffineTransform.fromMat4(cc.AffineTransform.identity(), matrix);
+        return this.transformAffine(tranform);
+    };
+
+    private transformAffine(transform: cc.AffineTransform): Polygon {
+        const transformVertices = this.vertices.map(p => {
+            if (cc.ENGINE_VERSION >= '2') {
+                let result = cc.Vec2.ZERO;
+                return cc.AffineTransform.transformVec2(result, p, transform);
+            } else {
+                return cc.pointApplyAffineTransform(p, transform);
+            }
+        });
         return new Polygon().setVertices(transformVertices);
     };
 

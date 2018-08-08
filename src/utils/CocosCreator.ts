@@ -91,7 +91,7 @@ let overwriteDumpHierarchy = (oldFunction: typeof _Scene.dumpHierarchy) => {
             return original(scene, includeScene);
         }
         scene = scene || cc.director.getScene();
-        let nodes = includeScene ? [scene] : scene._children;
+        const nodes = includeScene ? [<cc._BaseNode>(scene)] : scene._children;
         return nodes.map(getChildren);
     });
 };
@@ -204,7 +204,11 @@ let overwriteFunction = (oldFunction: any, callback: any) => {
 
 if (CC_EDITOR) {
     cc.engine.getIntersectionList = overwriteFunction(cc.engine.getIntersectionList, overwriteGetIntersectionList);
-    _Scene.dumpHierarchy = overwriteFunction(_Scene.dumpHierarchy, overwriteDumpHierarchy);
-    _Scene.createNodeFromAsset = overwriteFunction(_Scene.createNodeFromAsset, overwriteCreateNodeFromAsset);
+    if (cc.ENGINE_VERSION >= '2') {
+
+    } else {
+        _Scene.dumpHierarchy = overwriteFunction(_Scene.dumpHierarchy, overwriteDumpHierarchy);
+        _Scene.createNodeFromAsset = overwriteFunction(_Scene.createNodeFromAsset, overwriteCreateNodeFromAsset);
+    }
     Editor.Gizmo.prototype._registerEvent = overwriteFunction(Editor.Gizmo.prototype._registerEvent, overwriteGizmoRegisterEvent);
 }
