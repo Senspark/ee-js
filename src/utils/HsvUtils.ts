@@ -38,8 +38,10 @@ export function createHueMatrix(degrees: number): gl.mat4 {
     let zsy = ly / lz;
     gl.mat4.multiply(m, m, createShearZMatrix(zsx, zsy));
 
+    const converter = (cc.ENGINE_VERSION >= '2' ? cc.misc.degreesToRadians : cc.degreesToRadians);
+
     // Rotate the hue.
-    gl.mat4.multiply(m, m, gl.mat4.fromZRotation(temp, cc.degreesToRadians(degrees)));
+    gl.mat4.multiply(m, m, gl.mat4.fromZRotation(temp, converter(degrees)));
 
     // Unshear the space to put the luminance plane back.
     gl.mat4.multiply(m, m, createShearZMatrix(-zsx, -zsy));

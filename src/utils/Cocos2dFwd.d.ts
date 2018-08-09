@@ -140,8 +140,8 @@ declare namespace _Scene {
     export function loadWorkspace(e: any, t: any): void;
     export function stashScene(e: any): void;
     export function _applyCanvasPreferences(e: any, t: any): void;
-    export const currentScene: cc.Scene;
-    export const title: string;
+    export const currentScene: () => cc.Scene;
+    export const title: () => string;
     export function updateTitle(e: any): void;
     export function save(e: any): void;
     export function confirmClose(): void;
@@ -149,8 +149,8 @@ declare namespace _Scene {
     export const dirty: boolean;
     export function copyNodes(e: any): void;
     export function pasteNodes(e: any): void;
-    export function createNodes(e: any, t: any, n: any): void;
-    export function createNodesAt(e: any, t: any, n: any, i: any): void;
+    export function createNodes(uuids: string[], t: any, options: { unlinkPrefab?: boolean }, callback: any): void;
+    export function createNodesAt(uuids: string[], x: number, y: number, options: { unlinkPrefab?: boolean }): void;
     export function createNodeByClassID(e: any, t: any, n: any, i: any): void;
     export function createNodeByPrefab(e: any, t: any, n: any, i: any): void;
     export function deleteNodes(e: any): void;
@@ -190,7 +190,10 @@ declare namespace _Scene {
     export function projectProfileUpdated(e: any): void;
     export function printSimulatorLog(message: string): void;
 
-    // app.asar/editor/page/scene-utils/dump/get-hierarchy-dump.js
+    /**
+     * Version < 2.0
+     * app.asar/editor/page/scene-utils/dump/get-hierarchy-dump.js
+     */
     export function dumpHierarchy(scene?: cc.Scene, includeScene?: boolean): any;
 
     // app.asar/editor/page/scene-utils/utils.js
@@ -309,6 +312,9 @@ declare namespace cc {
     export function affineTransformInvertIn(t: AffineTransform): AffineTransform;
     export function affineTransformInvertOut(t: AffineTransform, out: AffineTransform): void;
 
+    /** Version < 2.0 */
+    export function degreesToRadians(degrees: number): number;
+
     export class AssetLibrary {
         static loadAsset(uuid: string, callback: (error: string | null, asset: any | null) => void, options?: {}): void;
         static getLibUrlNoExt(uuid: string): string;
@@ -326,6 +332,16 @@ declare namespace cc {
         export function _loadResUuids(uuids: string[],
             progressCallback?: (completedCount: number, totalCount: number, item: any) => void,
             completeCallback?: (error: Error, resource: any) => void): void;
+    }
+
+    /** Version >= 2 */
+    export namespace vmath {
+        export { vec2, vec3, vec4, mat2, mat3, mat4 } from 'gl-matrix';
+    }
+
+    /** Version >= 2 */
+    export namespace AffineTransform {
+        export function fromMat4(out: AffineTransform, matrix: vmath.mat4): AffineTransform;
     }
 
     export interface Object {
@@ -363,6 +379,10 @@ declare namespace cc {
         stop(): void;
         step(delta: number): void;
         update(delta: number): void;
+    }
+
+    export interface ActionInterval {
+        _computeEaseTime(delta: number): number;
     }
 
     export interface Component {
@@ -423,6 +443,9 @@ declare namespace cc {
 
     export interface Node {
         _sgNode: _ccsg.Node;
+
+        /** Version >= 2 */
+        getWorldMatrix(out: vmath.mat4): vmath.mat4;
     }
 
     /** shaders */
@@ -805,7 +828,11 @@ declare namespace sp {
     }
 
     export interface Skeleton {
+        /** Version < 2.0 */
         _sgNode: _SGSkeletonAnimation | null;
+
+        /** Version > 2.0 */
+        getState(): spine.AnimationState | undefined;
 
         getCurrent(trackIndex: number): sp.spine.TrackEntry;
     }
@@ -867,7 +894,14 @@ declare namespace sp {
             resetRotationDirections(): void;
         }
 
-        export class AnimationState { }
+        export class AnimationState {
+            update(delta: number): void;
+            clearTracks(): void;
+            clearTrack(trackIndex: number): void;
+            setAnimation(setAnimationWith: number, animationName: string, loop: boolean): TrackEntry;
+            setAnimationWith(trackIndex: number, animationName: string, loop: boolean): TrackEntry;
+        }
+
         export class AnimationStateData { }
         export class AssetManager { }
         export class AtlasAttachmentLoader { }
