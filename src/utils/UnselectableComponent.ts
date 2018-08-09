@@ -10,7 +10,7 @@ export class UnselectableComponent extends cc.Component {
             let component = this.getComponent(cc.PolygonCollider);
             if (component !== null) {
                 let gizmo = component.gizmo;
-                if (gizmo !== null) {
+                if (gizmo !== null && gizmo !== undefined) {
                     let element = <SVGPolygonElement>(gizmo._root.dragArea.node);
                     element.style.pointerEvents = 'none';
                 }
@@ -23,7 +23,7 @@ export class UnselectableComponent extends cc.Component {
             let component = this.getComponent(cc.PolygonCollider);
             if (component !== null) {
                 let gizmo = component.gizmo;
-                if (gizmo !== null) {
+                if (gizmo !== null && gizmo !== undefined) {
                     let element = <SVGPolygonElement>(gizmo._root.dragArea.node);
                     element.style.pointerEvents = 'fill';
                 }
