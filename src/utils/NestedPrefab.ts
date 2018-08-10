@@ -113,6 +113,9 @@ export class NestedPrefab extends cc.Component {
         if (!this.instantiate) {
             return undefined;
         }
+        if (this.prefab === undefined) {
+            return undefined;
+        }
         if (!this.instantiated) {
             if (this.instantiateView()) {
                 this.instantiated = true;
