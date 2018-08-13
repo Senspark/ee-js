@@ -23,6 +23,9 @@ export class NestedPrefab extends cc.Component {
     @property(cc.Boolean)
     private instantiate: boolean = true;
 
+    @property(cc.Boolean)
+    private synchronize: boolean = true;
+
     private set prefab(value) {
         if (this._prefab !== undefined) {
             if (this.view === undefined) {
@@ -66,10 +69,7 @@ export class NestedPrefab extends cc.Component {
                 this.instantiated = true;
             }
         }
-        if (this.view !== undefined) {
-            this.node.setContentSize(this.view.getContentSize());
-            this.node.setAnchorPoint(this.view.getAnchorPoint());
-        }
+        this.applySync();
     };
 
     public update(): void {
@@ -95,11 +95,7 @@ export class NestedPrefab extends cc.Component {
                 this.setupView();
             }
         }
-        const view = this.getView();
-        if (view !== undefined) {
-            this.node.setContentSize(view.getContentSize());
-            this.node.setAnchorPoint(view.getAnchorPoint());
-        }
+        this.applySync();
     };
 
     /** Creates a view using the current prefab. */
@@ -160,5 +156,13 @@ export class NestedPrefab extends cc.Component {
             }
         }
         node.children.forEach(child => this.freeze(child));
+    };
+
+    private applySync() {
+        const view = this.getView();
+        if (view !== undefined && this.synchronize) {
+            this.node.setContentSize(view.getContentSize());
+            this.node.setAnchorPoint(view.getAnchorPoint());
+        }
     };
 };
