@@ -67,9 +67,9 @@ export class NestedPrefab extends cc.Component {
         if (!CC_EDITOR && !this.instantiated && this.instantiate) {
             if (this.instantiateView()) {
                 this.instantiated = true;
+                this.applySync();
             }
         }
-        this.applySync();
     };
 
     public update(): void {
