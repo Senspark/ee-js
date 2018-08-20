@@ -314,6 +314,13 @@ declare namespace cc {
 
     /** Version < 2.0 */
     export function degreesToRadians(degrees: number): number;
+    export function radiansToDegrees(angle: number): number;
+
+    /** Version >= 2.0 */
+    export namespace misc {
+        export function degreesToRadians(degrees: number): number;
+        export function radiansToDegrees(angle: number): number;
+    }
 
     export class AssetLibrary {
         static loadAsset(uuid: string, callback: (error: string | null, asset: any | null) => void, options?: {}): void;
@@ -342,6 +349,9 @@ declare namespace cc {
     /** Version >= 2 */
     export namespace AffineTransform {
         export function fromMat4(out: AffineTransform, matrix: vmath.mat4): AffineTransform;
+
+        export function identity(): AffineTransform;
+        export function invert(out: AffineTransform, transform: AffineTransform): AffineTransform;
     }
 
     export interface Object {
