@@ -342,6 +342,7 @@ declare namespace cc {
     /** Version >= 2 */
     export namespace AffineTransform {
         export function fromMat4(out: AffineTransform, matrix: vmath.mat4): AffineTransform;
+        export function transformRect(out: Rect, rect: Rect, transform: AffineTransform): Rect;
     }
 
     export interface Object {
