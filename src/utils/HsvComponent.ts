@@ -114,7 +114,11 @@ export class HsvComponent extends cc.Component {
         this.brightnessMatrix = gl.mat4.create();
         this.contrastMatrix = gl.mat4.create();
 
-        this.initializeShader();
+        if (cc.ENGINE_VERSION >= '2') {
+            // TODO.
+        } else {
+            this.initializeShader();
+        }
     };
 
     private isSupported(): boolean {
