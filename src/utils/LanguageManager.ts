@@ -87,7 +87,8 @@ export class LanguageManager extends ObserverManager<Observer> {
         if (CC_EDITOR) {
             Editor.assetdb.queryUrlByUuid(this.configDir, (err, url) => {
                 let pattern = url + '/*.json';
-                Editor.assetdb.queryAssets(pattern, 'text', (err, result) => {
+                const type = (cc.ENGINE_VERSION >= '2' ? 'json' : 'text');
+                Editor.assetdb.queryAssets(pattern, type, (err, result) => {
                     result.forEach((item: any) => {
                         import(item.path).then(config => {
                             let language = this.parseLanguage(item.path);
@@ -103,7 +104,11 @@ export class LanguageManager extends ObserverManager<Observer> {
                     let path = urls[i] + '.json'; // Suffixed with .json for regex matching.
                     let content = results[i];
                     let language = this.parseLanguage(path);
-                    this.configs[language] = content;
+                    if (cc.ENGINE_VERSION >= '2') {
+                        this.configs[language] = content.json;
+                    } else {
+                        this.configs[language] = content;
+                    }
                     this.updateLanguage();
                 }
             });
