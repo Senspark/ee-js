@@ -846,6 +846,8 @@ declare namespace sp {
         /** Version < 2.0 */
         _sgNode: _SGSkeletonAnimation | null;
 
+        _skeleton: spine.Skeleton | null;
+
         /** Version > 2.0 */
         getState(): spine.AnimationState | undefined;
 
@@ -910,11 +912,16 @@ declare namespace sp {
         }
 
         export class AnimationState {
+            apply(skeleton: Skeleton): void;
             update(delta: number): void;
             clearTracks(): void;
             clearTrack(trackIndex: number): void;
             setAnimation(setAnimationWith: number, animationName: string, loop: boolean): TrackEntry;
             setAnimationWith(trackIndex: number, animationName: string, loop: boolean): TrackEntry;
+        }
+
+        export class Skeleton {
+            update(delta: number): void;
         }
 
         export class AnimationStateData { }
@@ -937,7 +944,6 @@ declare namespace sp {
         export class PathConstraint { }
         export class RegionAttachment { }
         export class SharedAssetManager { }
-        export class Skeleton { }
         export class SkeletonBounds { }
         export class SkeletonData { }
         export class SkeletonJson { }
