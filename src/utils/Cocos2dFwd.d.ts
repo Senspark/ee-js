@@ -276,8 +276,12 @@ declare namespace _ccsg {
 
 declare namespace cc {
     type WebGLUniformLocation = number;
+    type WebGLContext = any;
 
     export const engine: EditorEngine;
+
+    /** Version >= 2 */
+    export function log(msg: string | any, ...subst: any[]): void;
 
     /** Creates a cc.AffineTRansform object with all contents in the matrix. */
     export function affineTransformMake(a: number, b: number, c: number, d: number, tx: number, ty: number): AffineTransform;
@@ -315,6 +319,17 @@ declare namespace cc {
     /** Version < 2.0 */
     export function degreesToRadians(degrees: number): number;
     export function radiansToDegrees(angle: number): number;
+
+    export namespace macro {
+        /** Version < 2.0 */
+        export const ATTRIBUTE_NAME_POSITION: string;
+        export const ATTRIBUTE_NAME_COLOR: string;
+        export const ATTRIBUTE_NAME_TEX_COORD: string;
+
+        export const VERTEX_ATTRIB_POSITION: number;
+        export const VERTEX_ATTRIB_COLOR: number;
+        export const VERTEX_ATTRIB_TEX_COORDS: number;
+    }
 
     /** Version >= 2.0 */
     export namespace misc {
@@ -404,6 +419,21 @@ declare namespace cc {
         root: any;
     }
 
+    export interface Texture2D {
+        update(options?: {
+            image?: DOMImageElement,
+            mipmap?: boolean,
+            format?: PixelFormat,
+            minFilter?: Filter,
+            magFilter?: Filter,
+            wrapS?: WrapMode,
+            wrapT?: WrapMode,
+            premultiplyAlpha?: boolean,
+        }): void;
+
+        getId(): string;
+    }
+
     export interface _BaseNode {
         _parent: any | null;
         _children: _BaseNode[];
@@ -418,7 +448,7 @@ declare namespace cc {
         _sgNode: _ccsg.Label;
     }
 
-    export interface Sprite {
+    export interface Sprite extends RenderComponent {
         _sgNode: Scale9Sprite;
     }
 
@@ -461,6 +491,368 @@ declare namespace cc {
         /** Version >= 2 */
         getNodeToWorldTransformAR(out?: cc.AffineTransform): cc.AffineTransform;
         getWorldToNodeTransform(out?: cc.AffineTransform): cc.AffineTransform;
+    }
+
+    /** Version >= 2 */
+    export class RenderFlow {
+        static FLAG_DONOTHING: number;
+        static FLAG_LOCAL_TRANFORM: number;
+        static FLAG_WORLD_TRANFORM: number;
+        static FLAG_TRANFORM: number;
+        static FLAG_COLOR: number;
+        static FLAG_OPACITY: number;
+        static FLAG_UPDATE_RENDER_DATA: number;
+        static FLAG_RENDER: number;
+        static FLAG_CUSTOM_IA_RENDER: number;
+        static FLAG_CHILDREN: number;
+        static FLAG_POST_UPDATE_RENDER_DATA: number;
+        static FLAG_POST_RENDER: number;
+        static FLAG_FINAL: number;
+    };
+
+    export namespace renderer {
+        export const _forward: renderEngine.ForwardRenderer;
+
+        export namespace renderEngine {
+            /** Version >= 2 */
+            export interface Camera { }
+            export interface Device { }
+
+            export class ForwardRenderer extends renderer.Base {
+                constructor(device: any, builtin: any);
+                reset(): void;
+                render(scene: any): void;
+                renderCamera(camera: any, scene: any): void;
+                _transparentStage(view: any, items: any): void;
+            }
+
+            export class Asset {
+                constructor(persist?: boolean);
+                unload(): void;
+                reload(): void;
+            }
+
+            export class TextureAsset extends Asset {
+                _texture: any;
+                constructor(persist?: boolean);
+                getImpl(): any;
+                getId(): void;
+                destroy(): void;
+            }
+
+            export class Material extends Asset {
+                hash: string;
+                _texIds: any;
+                effect: renderer.Effect;
+                _effect: renderer.Effect;
+                _mainTech: renderer.Technique;
+                _texture: Texture2D | null;
+                constructor(persist?: boolean);
+                updateHash(): void;
+            }
+
+            export class SpriteMaterial extends Material {
+                effect: any;
+                useTexture: boolean;
+                useModel: boolean;
+                use2DPos: boolean;
+                useColor: boolean;
+                texture: any;
+                color: any;
+                constructor();
+                clone(): SpriteMaterial;
+            }
+
+            export class GraySpriteMaterial extends Material {
+                effect: any;
+                texture: any;
+                color: any;
+                constructor();
+                clone(): GraySpriteMaterial;
+            }
+
+            export interface StencilMaterial extends Material {
+                effect: any;
+                useTexture: boolean;
+                useModel: boolean;
+                useColor: boolean;
+                texture: any;
+                alphaThreshold: number;
+                constructor();
+                clone(): StencilMaterial;
+            }
+
+            export interface IARenderData { }
+            export interface InputAssembler { }
+            export interface Model { }
+            export interface Pool { }
+            export interface RecyclePool { }
+            export interface RenderData { }
+            export interface Scene { }
+
+            export interface Texture2D { }
+            export interface View { }
+
+            export namespace canvas {
+                export class Device { }
+                export class Texture2D { }
+            }
+
+            export namespace gfx {
+                /** Buffer usage. */
+                /** gl.STATIC_DRAW */
+                export const USAGE_STATIC: number;
+                /** gl.DYNAMIC_DRAW */
+                export const USAGE_DYNAMIC: number;
+                /** gl.STREAM_DRAW */
+                export const USAGE_STREAM: number;
+
+                /** Index buffer format. */
+                /** gl.UNSIGNED_BYTE */
+                export const INDEX_FMT_UINT8: number;
+                /** gl.UNSIGNED_SHORT */
+                export const INDEX_FMT_UINT16: number;
+                /** gl.UNSIGNED_INT */
+                export const INDEX_FMT_UINT32: number;
+
+                /** Vertex attribute semantic. */
+                export const ATTR_POSITION: string;
+                export const ATTR_NORMAL: 'a_normal';
+                export const ATTR_TANGENT: 'a_tangent'
+                export const ATTR_BITANGENT: 'a_bitangent';
+                export const ATTR_WEIGHTS: 'a_weights';
+                export const ATTR_JOINTS: 'a_joints';
+                export const ATTR_COLOR: 'a_color';
+                export const ATTR_COLOR0: 'a_color0';
+                export const ATTR_COLOR1: 'a_color1';
+                export const ATTR_UV: 'a_uv';
+                export const ATTR_UV0: 'a_uv0';
+                export const ATTR_UV1: 'a_uv1';
+                export const ATTR_UV2: 'a_uv2';
+                export const ATTR_UV3: 'a_uv3';
+                export const ATTR_UV4: 'a_uv4';
+                export const ATTR_UV5: 'a_uv5';
+                export const ATTR_UV6: 'a_uv6';
+                export const ATTR_UV7: 'a_uv7';
+
+                /** Blend equations. */
+                /** gl.FUNC_ADD */
+                export const BLEND_FUNC_ADD: number;
+                /** gl.FUNC_SUBTRACT */
+                export const BLEND_FUNC_SUBTRACT: number;
+                /** gl.FUNC_REVERSE_SUBTRACT */
+                export const BLEND_FUNC_REVERSE_SUBTRACT: number;
+
+                /** Blend modes. */
+                /** gl.ZERO */
+                export const BLEND_ZERO: number;
+                /** gl.ONE */
+                export const BLEND_ONE: number;
+                /** gl.SRC_COLOR */
+                export const BLEND_SRC_COLOR: number;
+                /** gl.ONE_MINUS_SRC_COLOR */
+                export const BLEND_ONE_MINUS_SRC_COLOR: number;
+                /** gl.DST_COLOR */
+                export const BLEND_DST_COLOR: number;
+                /** gl.ONE_MINUS_DST_COLOR */
+                export const BLEND_ONE_MINUS_DST_COLOR: number;
+                /** gl.SRC_ALPHA */
+                export const BLEND_SRC_ALPHA: number;
+                /** gl.ONE_MINUS_SRC_ALPHA */
+                export const BLEND_ONE_MINUS_SRC_ALPHA: number;
+                /** gl.DST_ALPHA */
+                export const BLEND_DST_ALPHA: number;
+                /** gl.ONE_MINUS_DST_ALPHA */
+                export const BLEND_ONE_MINUS_DST_ALPHA: number;
+                /** gl.CONSTANT_COLOR */
+                export const BLEND_CONSTANT_COLOR: number;
+                /** gl.ONE_MINUS_CONSTANT_COLOR */
+                export const BLEND_ONE_MINUS_CONSTANT_COLOR: number;
+                /** gl.CONSTANT_ALPHA */
+                export const BLEND_CONSTANT_ALPHA: number;
+                /** gl.ONE_MINUS_CONSTANT_ALPHA */
+                export const BLEND_ONE_MINUS_CONSTANT_ALPHA: number;
+                /** gl.SRC_ALPHA_SATURATE */
+                export const BLEND_SRC_ALPHA_SATURATE: number;
+
+                /** Cull modes. */
+                export const CULL_NONE: number;
+                export const CULL_FRONT: number;
+                export const CULL_BACK: number;
+                export const CULL_FRONT_AND_BACK: number;
+
+                export class VertexFormat { }
+                export class IndexBuffer { }
+                export class VertexBuffer { }
+                export class Program {
+                    id: number;
+                    constructor(device: any, options: any);
+                    link(): void;
+                    destroy(): void;
+                }
+                export class Texture { }
+                export class Texture2D { }
+                export class TextureCube { }
+                export class RenderBuffer { }
+                export class FrameBuffer { }
+                export class Device { }
+
+                export function attrTypeBytes(attyType: any): number;
+                export function glFilter(gl: WebGLContext, filter: any, mipFilter: any): any;
+                export function glTextureFmt(fmt: any): any;
+            }
+
+            export interface math { }
+
+            export namespace renderer {
+                /** Parameter types. */
+                export const PARAM_INT: number;
+                export const PARAM_INT2: number;
+                export const PARAM_INT3: number;
+                export const PARAM_INT4: number;
+                export const PARAM_FLOAT: number;
+                export const PARAM_FLOAT2: number;
+                export const PARAM_FLOAT3: number;
+                export const PARAM_FLOAT: number;
+                export const PARAM_MAT2: number;
+                export const PARAM_MAT3: number;
+                export const PARAM_MAT4: number;
+                export const PARAM_TEXTURE_2D: number;
+                export const PARAM_TEXTURE_CUBE: number;
+
+                export function addStage(name: string): void;
+                export function createIA(device: any, data: any): InputAssembler | null;
+
+                export class Pass {
+                    constructor(name: string);
+
+                    setCullMode(cullMode: number): void;
+
+                    setBlend(
+                        blendEq?: number,
+                        blendSrc?: number,
+                        blendDst?: number,
+                        blendAlphaEq?: number,
+                        blendSrcAlpha?: number,
+                        blendDstAlpha?: number,
+                        blendColor?: number): void;
+
+                    setDepth(
+                        depthTest?: boolean,
+                        depthWrite?: boolean,
+                        depthFunc?: number): void;
+
+                    setStencilFront(
+                        stencilFunc?: number,
+                        stencilRef?: number,
+                        stencilMask?: number,
+                        stencilFailOp?: number,
+                        stencilZFailOp?: number,
+                        stencilZPassOp?: number,
+                        stencilWriteMask?: number): void;
+
+                    setStencilBack(
+                        stencilFunc?: number,
+                        stencilRef?: number,
+                        stencilMask?: number,
+                        stencilFailOp?: number,
+                        stencilZFailOp?: number,
+                        stencilZPassOp?: number,
+                        stencilWriteMask?: number): void;
+
+                    disableStencilTest(): void;
+                }
+
+                export class Technique {
+                    passes: Pass[];
+                    stageIDs: number[];
+
+                    constructor(
+                        stages: string[],
+                        parameters: {
+                            name: string,
+                            type: number
+                        }[],
+                        passes: Pass[],
+                        layer?: any);
+
+                    setStages(stages: string[]): void;
+                }
+
+                export class Effect {
+                    constructor(
+                        techniques: Technique[],
+                        properties?: {
+                            [key: string]: any
+                        },
+                        defines?: {
+                            name: string,
+                            value: boolean
+                        }[]);
+
+                    clear(): void;
+                    getTechnique(stage: any): Technique | null;
+                    getProperty(name: string): any;
+                    setProperty(name: string, value: any): void;
+                    getDefine(name: string): any | null;
+                    define(name: string, value: any): void;
+                    extractDefines(out: any): any;
+                }
+
+                export interface InputAssembler { }
+
+                export interface View { }
+
+                export interface Light { }
+                export interface Camera { }
+                export interface Model { }
+                export interface Scene { }
+
+                export class Base {
+                    _device: any;
+                    _programLib: ProgramLib;
+                    _opts: any;
+                    _type2defaultValue: any;
+                    _stage2fn: any;
+                    _usedTextureUnits: number;
+                    _viewPools: any;
+                    _drawItemsPools: any;
+                    _stageItemsPools: any;
+                    constructor(device: any, opts: any);
+                    _resetTextureUnit(): void;
+                    _registerStaghe(name: any, fn: any): void;
+                    _reset(): void;
+                    _requestView(): void;
+                    _render(view: any, scene: any): void;
+                    _draw(item: any): void;
+                }
+
+                export class ProgramLib {
+                    _templates: any;
+                    constructor(device: any, templates: any, chunks: any);
+                    define(name: any, vert: any, frag: any, defines: any): void;
+                    getKey(name: string, defines: any): any;
+                    getProgram(name: string, defines: any): gfx.Program;
+                }
+            }
+
+            export namespace shaders {
+                export const chunks: any;
+                export const templates: any;
+            }
+        }
+    }
+
+    export interface RenderComponent {
+        _renderData: any;
+        markForUpdateRenderData(enabled: boolean): void;
+        markForRender(enabled: boolean): void;
+        markForCustomIARender(enabled: boolean): void;
+        disableRender(): void;
+        requestRenderData(data: any): void;
+        getMaterial(): Material | null;
+        _updateMaterial(material: Material): void;
+        _updateBlendFunc(updateHash: boolean): void;
     }
 
     /** shaders */
