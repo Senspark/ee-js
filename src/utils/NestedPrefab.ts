@@ -1,5 +1,4 @@
 import assert = require('assert');
-import { StaticComponent } from './StaticComponent';
 import { UnselectableComponent } from './UnselectableComponent';
 
 const { ccclass, disallowMultiple, executeInEditMode, menu, property } = cc._decorator;
