@@ -590,7 +590,6 @@ declare namespace cc {
             interface RenderData { }
             interface Scene { }
 
-            interface Texture2D { }
             interface View { }
 
             namespace canvas {
@@ -771,7 +770,8 @@ declare namespace cc {
                         stages: string[],
                         parameters: {
                             name: string,
-                            type: number
+                            type: number,
+                            size?: number,
                         }[],
                         passes: Pass[],
                         layer?: any);
@@ -787,7 +787,7 @@ declare namespace cc {
                         },
                         defines?: {
                             name: string,
-                            value: boolean
+                            value: any
                         }[]);
 
                     clear(): void;
@@ -1234,13 +1234,15 @@ declare namespace sp {
         update(delta: number): void;
     }
 
-    interface Skeleton {
+    interface Skeleton extends cc.RenderComponent {
         /** Version < 2.0 */
         _sgNode: _SGSkeletonAnimation | null;
 
         _skeleton: spine.Skeleton | null;
 
         /** Version > 2.0 */
+        _renderDatas: any[]; // Don't use _renderData.
+
         getState(): spine.AnimationState | undefined;
 
         getCurrent(trackIndex: number): sp.spine.TrackEntry;
