@@ -24,10 +24,10 @@ declare namespace Editor {
     const assetdb: AssetDB;
     const Profile: ProfileDB;
 
-    export function polymerElement(data: object): void;
+    function polymerElement(data: object): void;
 
     // app.asar/editor/page/gizmos/elements/gizmo.js
-    export class Gizmo {
+    class Gizmo {
         _root: any;
         node: cc.Node | null;
         nodes: cc.Node[];
@@ -64,34 +64,34 @@ declare namespace Editor {
         _registerEvent(): void;
     }
 
-    export namespace UI {
+    namespace UI {
         // app.asar/editor-framework/lib/renderer/ui/utils
-        export namespace PolymerUtils {
-            export function registerElement(data: object): void;
-            export function registerPanel(e: any, t: any): void;
-            export const elements: { [key: string]: any };
-            export const panels: { [key: string]: any };
+        namespace PolymerUtils {
+            function registerElement(data: object): void;
+            function registerPanel(e: any, t: any): void;
+            const elements: { [key: string]: any };
+            const panels: { [key: string]: any };
         }
     }
 
-    export class Ipc {
+    class Ipc {
         static sendToAll(event: string, ...args: any[]): void;
     };
 
     // app.asar/editor-framework/lib/share
-    export class IpcListener {
+    class IpcListener {
         on(event: string, callback: any);
         once(event: string, callback: any);
         clear(): void;
     };
 
-    export namespace Selection {
-        export function hover(e: any, t: any): void;
-        export function select(e: any, t: any): void;
+    namespace Selection {
+        function hover(e: any, t: any): void;
+        function select(e: any, t: any): void;
     }
 
-    export namespace Utils {
-        export class Polygon { }
+    namespace Utils {
+        class Polygon { }
     }
 }
 
@@ -127,80 +127,80 @@ interface EditorEngine {
 
 // app.asar/editor/page/scene-utils/index.js
 declare namespace _Scene {
-    export const view: any;
-    export function reset(): void;
-    export function _softReload(e: any, t: any): void;
-    export function softReload(e: any, t: any): void;
-    export function defaultScene(): void;
-    export function newScene(e: any): void;
-    export function _loadSceneByUuid(uuid: string, callback: any): void;
-    export function loadSceneByUuid(uuid: string, callback: any): void;
-    export function initScene(e: any): void;
-    export function getEditingWorkspace(): object;
-    export function loadWorkspace(e: any, t: any): void;
-    export function stashScene(e: any): void;
-    export function _applyCanvasPreferences(e: any, t: any): void;
-    export const currentScene: () => cc.Scene;
-    export const title: () => string;
-    export function updateTitle(e: any): void;
-    export function save(e: any): void;
-    export function confirmClose(): void;
-    export function close(e: any, callback: any): void;
-    export const dirty: boolean;
-    export function copyNodes(e: any): void;
-    export function pasteNodes(e: any): void;
-    export function createNodes(uuids: string[], t: any, options: { unlinkPrefab?: boolean }, callback: any): void;
-    export function createNodesAt(uuids: string[], x: number, y: number, options: { unlinkPrefab?: boolean }): void;
-    export function createNodeByClassID(e: any, t: any, n: any, i: any): void;
-    export function createNodeByPrefab(e: any, t: any, n: any, i: any): void;
-    export function deleteNodes(e: any): void;
-    export function duplicateNodes(e: any): void;
-    export function moveNodes(e: any, t: any, n: any): void;
-    export function addComponent(e: any, t: any): void;
-    export function removeComponent(e: any, t: any): void;
-    export function copyComponent(e: any): void;
-    export function pasteComponent(e: any, t: any): void;
-    export function newProperty(e: any, t: any, n: any): void;
-    export function resetProperty(e: any, t: any, n: any): void;
-    export function setProperty(e: any): void;
-    export function createPrefab(e: any, t: any): void;
-    export function applyPrefab(e: any): void;
-    export function revertPrefab(e: any): void;
-    export function setPrefabSync(e: any): void;
-    export function breakPrefabInstance(e: any): void;
-    export function linkPrefab(): void;
-    export function dumpNode(e: any): any;
-    export function select(e: any): void;
-    export function unselect(e: any): void;
-    export function hoverin(e: any): void;
-    export function hoverout(e: any): void;
-    export function activate(e: any): void;
-    export function deactivate(e: any): void;
-    export function hitTest(x: number, y: number): cc.Node | undefined;
-    export function rectHitTest(x: number, y: number, width: number, height: number): cc.Node | undefined;
-    export function _syncPrefab(e: any, t: any): void;
-    export function syncPrefab(e: any): void;
-    export function assetChanged(e: any): void;
-    export function assetsMoved(e: any): void;
-    export function setTransformTool(e: any): void;
-    export function setPivot(e: any): void;
-    export function setCoordinate(e: any): void;
-    export function alignSelection(e: any): void;
-    export function distributeSelection(e: any): void;
-    export function projectProfileUpdated(e: any): void;
-    export function printSimulatorLog(message: string): void;
+    const view: any;
+    function reset(): void;
+    function _softReload(e: any, t: any): void;
+    function softReload(e: any, t: any): void;
+    function defaultScene(): void;
+    function newScene(e: any): void;
+    function _loadSceneByUuid(uuid: string, callback: any): void;
+    function loadSceneByUuid(uuid: string, callback: any): void;
+    function initScene(e: any): void;
+    function getEditingWorkspace(): object;
+    function loadWorkspace(e: any, t: any): void;
+    function stashScene(e: any): void;
+    function _applyCanvasPreferences(e: any, t: any): void;
+    const currentScene: () => cc.Scene;
+    const title: () => string;
+    function updateTitle(e: any): void;
+    function save(e: any): void;
+    function confirmClose(): void;
+    function close(e: any, callback: any): void;
+    const dirty: boolean;
+    function copyNodes(e: any): void;
+    function pasteNodes(e: any): void;
+    function createNodes(uuids: string[], t: any, options: { unlinkPrefab?: boolean }, callback: any): void;
+    function createNodesAt(uuids: string[], x: number, y: number, options: { unlinkPrefab?: boolean }): void;
+    function createNodeByClassID(e: any, t: any, n: any, i: any): void;
+    function createNodeByPrefab(e: any, t: any, n: any, i: any): void;
+    function deleteNodes(e: any): void;
+    function duplicateNodes(e: any): void;
+    function moveNodes(e: any, t: any, n: any): void;
+    function addComponent(e: any, t: any): void;
+    function removeComponent(e: any, t: any): void;
+    function copyComponent(e: any): void;
+    function pasteComponent(e: any, t: any): void;
+    function newProperty(e: any, t: any, n: any): void;
+    function resetProperty(e: any, t: any, n: any): void;
+    function setProperty(e: any): void;
+    function createPrefab(e: any, t: any): void;
+    function applyPrefab(e: any): void;
+    function revertPrefab(e: any): void;
+    function setPrefabSync(e: any): void;
+    function breakPrefabInstance(e: any): void;
+    function linkPrefab(): void;
+    function dumpNode(e: any): any;
+    function select(e: any): void;
+    function unselect(e: any): void;
+    function hoverin(e: any): void;
+    function hoverout(e: any): void;
+    function activate(e: any): void;
+    function deactivate(e: any): void;
+    function hitTest(x: number, y: number): cc.Node | undefined;
+    function rectHitTest(x: number, y: number, width: number, height: number): cc.Node | undefined;
+    function _syncPrefab(e: any, t: any): void;
+    function syncPrefab(e: any): void;
+    function assetChanged(e: any): void;
+    function assetsMoved(e: any): void;
+    function setTransformTool(e: any): void;
+    function setPivot(e: any): void;
+    function setCoordinate(e: any): void;
+    function alignSelection(e: any): void;
+    function distributeSelection(e: any): void;
+    function projectProfileUpdated(e: any): void;
+    function printSimulatorLog(message: string): void;
 
     /**
      * Version < 2.0
      * app.asar/editor/page/scene-utils/dump/get-hierarchy-dump.js
      */
-    export function dumpHierarchy(scene?: cc.Scene, includeScene?: boolean): any;
+    function dumpHierarchy(scene?: cc.Scene, includeScene?: boolean): any;
 
     // app.asar/editor/page/scene-utils/utils.js
-    export function createNodeFromAsset(uuid: string, callback: any): void;
+    function createNodeFromAsset(uuid: string, callback: any): void;
 
     // app.asar/editor/page/scene-utils/node-utils.js
-    export class NodeUtils {
+    class NodeUtils {
         static getWorldBounds(node: cc.Node, size?: cc.Size, out?: cc.Rect): cc.Rect;
         static getWorldOrientedBounds(t: any, e: any, n: any, o: any, c: any, i: any): cc.Rect;
         static getScenePosition(node: cc.Node): cc.Vec2;
@@ -220,7 +220,7 @@ declare namespace _Scene {
 }
 
 declare namespace _ccsg {
-    export class Node {
+    class Node {
         getShaderProgram(): cc.GLProgram;
         setShaderProgram(program: cc.GLProgram): void;
 
@@ -229,7 +229,7 @@ declare namespace _ccsg {
         setGLProgramState(state: cc.GLProgramState): void;
     }
 
-    export class Label extends Node {
+    class Label extends Node {
         width: number;
         height: number;
 
@@ -278,16 +278,16 @@ declare namespace cc {
     type WebGLUniformLocation = number;
     type WebGLContext = any;
 
-    export const engine: EditorEngine;
+    const engine: EditorEngine;
 
     /** Version >= 2 */
-    export function log(msg: string | any, ...subst: any[]): void;
+    function log(msg: string | any, ...subst: any[]): void;
 
     /** Creates a cc.AffineTRansform object with all contents in the matrix. */
-    export function affineTransformMake(a: number, b: number, c: number, d: number, tx: number, ty: number): AffineTransform;
+    function affineTransformMake(a: number, b: number, c: number, d: number, tx: number, ty: number): AffineTransform;
 
     /** Clones a cc.AffineTransform object from the specified transform. */
-    export function affineTransformClone(t: AffineTransform): AffineTransform;
+    function affineTransformClone(t: AffineTransform): AffineTransform;
 
     /**
      * Applies the affine transformation on a point.
@@ -295,49 +295,49 @@ declare namespace cc {
      * @param transOrY Transform matrix or y.
      * @param t Tranform matrix.
      */
-    export function pointApplyAffineTransform(point: Vec2 | number, transOrY: number | AffineTransform, t?: AffineTransform): Vec2;
+    function pointApplyAffineTransform(point: Vec2 | number, transOrY: number | AffineTransform, t?: AffineTransform): Vec2;
 
     /** Applies the affine transformation on a size. */
-    export function sizeApplyAffineTransform(size: Size, t: AffineTransform): Size;
+    function sizeApplyAffineTransform(size: Size, t: AffineTransform): Size;
 
     /** Creates an identity transformation matrix. */
-    export function affineTransformMakeIdentity(): AffineTransform;
+    function affineTransformMakeIdentity(): AffineTransform;
 
     /** Applies the affine transform on a rect. */
-    export function rectApplyAffineTransform(rect: Rect, t: AffineTransform): Record;
+    function rectApplyAffineTransform(rect: Rect, t: AffineTransform): Record;
 
-    export function affineTransformTranslate(t: AffineTransform, tx: number, ty: number): AffineTransform;
-    export function affineTransformScale(t: AffineTransform, sx: number, sy: number): AffineTransform;
-    export function affineTransformRotate(t: AffineTransform, angle: number): AffineTransform;
-    export function affineTransformConcat(t1: AffineTransform, t2: AffineTransform): AffineTransform;
-    export function affineTransformConcatIn(t1: AffineTransform, t2: AffineTransform): AffineTransform;
-    export function affineTransformEqualToTranform(t1: AffineTransform, t2: AffineTransform): boolean;
-    export function affineTransformInvert(t1: AffineTransform): AffineTransform;
-    export function affineTransformInvertIn(t: AffineTransform): AffineTransform;
-    export function affineTransformInvertOut(t: AffineTransform, out: AffineTransform): void;
+    function affineTransformTranslate(t: AffineTransform, tx: number, ty: number): AffineTransform;
+    function affineTransformScale(t: AffineTransform, sx: number, sy: number): AffineTransform;
+    function affineTransformRotate(t: AffineTransform, angle: number): AffineTransform;
+    function affineTransformConcat(t1: AffineTransform, t2: AffineTransform): AffineTransform;
+    function affineTransformConcatIn(t1: AffineTransform, t2: AffineTransform): AffineTransform;
+    function affineTransformEqualToTranform(t1: AffineTransform, t2: AffineTransform): boolean;
+    function affineTransformInvert(t1: AffineTransform): AffineTransform;
+    function affineTransformInvertIn(t: AffineTransform): AffineTransform;
+    function affineTransformInvertOut(t: AffineTransform, out: AffineTransform): void;
 
     /** Version < 2.0 */
-    export function degreesToRadians(degrees: number): number;
-    export function radiansToDegrees(angle: number): number;
+    function degreesToRadians(degrees: number): number;
+    function radiansToDegrees(angle: number): number;
 
-    export namespace macro {
+    namespace macro {
         /** Version < 2.0 */
-        export const ATTRIBUTE_NAME_POSITION: string;
-        export const ATTRIBUTE_NAME_COLOR: string;
-        export const ATTRIBUTE_NAME_TEX_COORD: string;
+        const ATTRIBUTE_NAME_POSITION: string;
+        const ATTRIBUTE_NAME_COLOR: string;
+        const ATTRIBUTE_NAME_TEX_COORD: string;
 
-        export const VERTEX_ATTRIB_POSITION: number;
-        export const VERTEX_ATTRIB_COLOR: number;
-        export const VERTEX_ATTRIB_TEX_COORDS: number;
+        const VERTEX_ATTRIB_POSITION: number;
+        const VERTEX_ATTRIB_COLOR: number;
+        const VERTEX_ATTRIB_TEX_COORDS: number;
     }
 
     /** Version >= 2.0 */
-    export namespace misc {
-        export function degreesToRadians(degrees: number): number;
-        export function radiansToDegrees(angle: number): number;
+    namespace misc {
+        function degreesToRadians(degrees: number): number;
+        function radiansToDegrees(angle: number): number;
     }
 
-    export class AssetLibrary {
+    class AssetLibrary {
         static loadAsset(uuid: string, callback: (error: string | null, asset: any | null) => void, options?: {}): void;
         static getLibUrlNoExt(uuid: string): string;
         static queryAssetInfo(uuid: string, callback: (error: string | null, url?: string, raw?: boolean, ctor?: any) => void): void;
@@ -349,33 +349,33 @@ declare namespace cc {
         static getAssetByUuid(uuid: string): Asset | null;
     }
 
-    export namespace loader {
+    namespace loader {
         const _resources: AssetTable;
-        export function _loadResUuids(uuids: string[],
+        function _loadResUuids(uuids: string[],
             progressCallback?: (completedCount: number, totalCount: number, item: any) => void,
             completeCallback?: (error: Error, resource: any) => void): void;
     }
 
     /** Version >= 2 */
-    export namespace vmath {
+    namespace vmath {
         export { vec2, vec3, vec4, mat2, mat3, mat4 } from 'gl-matrix';
     }
 
     /** Version >= 2 */
-    export namespace AffineTransform {
-        export function fromMat4(out: AffineTransform, matrix: vmath.mat4): AffineTransform;
-        export function transformRect(out: Rect, rect: Rect, transform: AffineTransform): Rect;
+    namespace AffineTransform {
+        function fromMat4(out: AffineTransform, matrix: vmath.mat4): AffineTransform;
+        function transformRect(out: Rect, rect: Rect, transform: AffineTransform): Rect;
 
-        export function identity(): AffineTransform;
-        export function invert(out: AffineTransform, transform: AffineTransform): AffineTransform;
+        function identity(): AffineTransform;
+        function invert(out: AffineTransform, transform: AffineTransform): AffineTransform;
     }
 
-    export interface Object {
+    interface Object {
         _objFlags: number;
     }
 
-    export namespace Object {
-        export enum Flags {
+    namespace Object {
+        enum Flags {
             Destroyed /*             */ = 1 << 0,
             RealDestroyed /*         */ = 1 << 1,
             ToDestroy /*             */ = 1 << 2,
@@ -400,26 +400,26 @@ declare namespace cc {
         }
     }
 
-    export interface Action {
+    interface Action {
         startWithTarget(target: any): void;
         stop(): void;
         step(delta: number): void;
         update(delta: number): void;
     }
 
-    export interface ActionInterval {
+    interface ActionInterval {
         _computeEaseTime(delta: number): number;
     }
 
-    export interface Component {
+    interface Component {
         gizmo: any;
     }
 
-    export class PrefabInfo {
+    class PrefabInfo {
         root: any;
     }
 
-    export interface Texture2D {
+    interface Texture2D {
         update(options?: {
             image?: DOMImageElement,
             mipmap?: boolean,
@@ -434,7 +434,7 @@ declare namespace cc {
         getId(): string;
     }
 
-    export interface _BaseNode {
+    interface _BaseNode {
         _parent: any | null;
         _children: _BaseNode[];
         _tag: number;
@@ -444,15 +444,15 @@ declare namespace cc {
         _prefab: PrefabInfo | null;
     }
 
-    export interface Label {
+    interface Label {
         _sgNode: _ccsg.Label;
     }
 
-    export interface Sprite extends RenderComponent {
+    interface Sprite extends RenderComponent {
         _sgNode: Scale9Sprite;
     }
 
-    export class Scale9Sprite extends _ccsg.Node {
+    class Scale9Sprite extends _ccsg.Node {
         loaded(): boolean;
 
         /** Changes the texture file of 9 slice sprite. */
@@ -482,7 +482,7 @@ declare namespace cc {
         setInsetBottom(inset: number): void;
     }
 
-    export interface Node {
+    interface Node {
         _sgNode: _ccsg.Node;
 
         /** Version >= 2 */
@@ -494,7 +494,7 @@ declare namespace cc {
     }
 
     /** Version >= 2 */
-    export class RenderFlow {
+    class RenderFlow {
         static FLAG_DONOTHING: number;
         static FLAG_LOCAL_TRANFORM: number;
         static FLAG_WORLD_TRANFORM: number;
@@ -510,15 +510,15 @@ declare namespace cc {
         static FLAG_FINAL: number;
     };
 
-    export namespace renderer {
-        export const _forward: renderEngine.ForwardRenderer;
+    namespace renderer {
+        const _forward: renderEngine.ForwardRenderer;
 
-        export namespace renderEngine {
+        namespace renderEngine {
             /** Version >= 2 */
-            export interface Camera { }
-            export interface Device { }
+            interface Camera { }
+            interface Device { }
 
-            export class ForwardRenderer extends renderer.Base {
+            class ForwardRenderer extends renderer.Base {
                 constructor(device: any, builtin: any);
                 reset(): void;
                 render(scene: any): void;
@@ -526,13 +526,13 @@ declare namespace cc {
                 _transparentStage(view: any, items: any): void;
             }
 
-            export class Asset {
+            class Asset {
                 constructor(persist?: boolean);
                 unload(): void;
                 reload(): void;
             }
 
-            export class TextureAsset extends Asset {
+            class TextureAsset extends Asset {
                 _texture: any;
                 constructor(persist?: boolean);
                 getImpl(): any;
@@ -540,7 +540,7 @@ declare namespace cc {
                 destroy(): void;
             }
 
-            export class Material extends Asset {
+            class Material extends Asset {
                 hash: string;
                 _texIds: any;
                 effect: renderer.Effect;
@@ -551,7 +551,7 @@ declare namespace cc {
                 updateHash(): void;
             }
 
-            export class SpriteMaterial extends Material {
+            class SpriteMaterial extends Material {
                 effect: any;
                 useTexture: boolean;
                 useModel: boolean;
@@ -563,7 +563,7 @@ declare namespace cc {
                 clone(): SpriteMaterial;
             }
 
-            export class GraySpriteMaterial extends Material {
+            class GraySpriteMaterial extends Material {
                 effect: any;
                 texture: any;
                 color: any;
@@ -571,7 +571,7 @@ declare namespace cc {
                 clone(): GraySpriteMaterial;
             }
 
-            export interface StencilMaterial extends Material {
+            interface StencilMaterial extends Material {
                 effect: any;
                 useTexture: boolean;
                 useModel: boolean;
@@ -582,148 +582,148 @@ declare namespace cc {
                 clone(): StencilMaterial;
             }
 
-            export interface IARenderData { }
-            export interface InputAssembler { }
-            export interface Model { }
-            export interface Pool { }
-            export interface RecyclePool { }
-            export interface RenderData { }
-            export interface Scene { }
+            interface IARenderData { }
+            interface InputAssembler { }
+            interface Model { }
+            interface Pool { }
+            interface RecyclePool { }
+            interface RenderData { }
+            interface Scene { }
 
-            export interface Texture2D { }
-            export interface View { }
+            interface Texture2D { }
+            interface View { }
 
-            export namespace canvas {
-                export class Device { }
-                export class Texture2D { }
+            namespace canvas {
+                class Device { }
+                class Texture2D { }
             }
 
-            export namespace gfx {
+            namespace gfx {
                 /** Buffer usage. */
                 /** gl.STATIC_DRAW */
-                export const USAGE_STATIC: number;
+                const USAGE_STATIC: number;
                 /** gl.DYNAMIC_DRAW */
-                export const USAGE_DYNAMIC: number;
+                const USAGE_DYNAMIC: number;
                 /** gl.STREAM_DRAW */
-                export const USAGE_STREAM: number;
+                const USAGE_STREAM: number;
 
                 /** Index buffer format. */
                 /** gl.UNSIGNED_BYTE */
-                export const INDEX_FMT_UINT8: number;
+                const INDEX_FMT_UINT8: number;
                 /** gl.UNSIGNED_SHORT */
-                export const INDEX_FMT_UINT16: number;
+                const INDEX_FMT_UINT16: number;
                 /** gl.UNSIGNED_INT */
-                export const INDEX_FMT_UINT32: number;
+                const INDEX_FMT_UINT32: number;
 
                 /** Vertex attribute semantic. */
-                export const ATTR_POSITION: string;
-                export const ATTR_NORMAL: 'a_normal';
-                export const ATTR_TANGENT: 'a_tangent'
-                export const ATTR_BITANGENT: 'a_bitangent';
-                export const ATTR_WEIGHTS: 'a_weights';
-                export const ATTR_JOINTS: 'a_joints';
-                export const ATTR_COLOR: 'a_color';
-                export const ATTR_COLOR0: 'a_color0';
-                export const ATTR_COLOR1: 'a_color1';
-                export const ATTR_UV: 'a_uv';
-                export const ATTR_UV0: 'a_uv0';
-                export const ATTR_UV1: 'a_uv1';
-                export const ATTR_UV2: 'a_uv2';
-                export const ATTR_UV3: 'a_uv3';
-                export const ATTR_UV4: 'a_uv4';
-                export const ATTR_UV5: 'a_uv5';
-                export const ATTR_UV6: 'a_uv6';
-                export const ATTR_UV7: 'a_uv7';
+                const ATTR_POSITION: string;
+                const ATTR_NORMAL: 'a_normal';
+                const ATTR_TANGENT: 'a_tangent'
+                const ATTR_BITANGENT: 'a_bitangent';
+                const ATTR_WEIGHTS: 'a_weights';
+                const ATTR_JOINTS: 'a_joints';
+                const ATTR_COLOR: 'a_color';
+                const ATTR_COLOR0: 'a_color0';
+                const ATTR_COLOR1: 'a_color1';
+                const ATTR_UV: 'a_uv';
+                const ATTR_UV0: 'a_uv0';
+                const ATTR_UV1: 'a_uv1';
+                const ATTR_UV2: 'a_uv2';
+                const ATTR_UV3: 'a_uv3';
+                const ATTR_UV4: 'a_uv4';
+                const ATTR_UV5: 'a_uv5';
+                const ATTR_UV6: 'a_uv6';
+                const ATTR_UV7: 'a_uv7';
 
                 /** Blend equations. */
                 /** gl.FUNC_ADD */
-                export const BLEND_FUNC_ADD: number;
+                const BLEND_FUNC_ADD: number;
                 /** gl.FUNC_SUBTRACT */
-                export const BLEND_FUNC_SUBTRACT: number;
+                const BLEND_FUNC_SUBTRACT: number;
                 /** gl.FUNC_REVERSE_SUBTRACT */
-                export const BLEND_FUNC_REVERSE_SUBTRACT: number;
+                const BLEND_FUNC_REVERSE_SUBTRACT: number;
 
                 /** Blend modes. */
                 /** gl.ZERO */
-                export const BLEND_ZERO: number;
+                const BLEND_ZERO: number;
                 /** gl.ONE */
-                export const BLEND_ONE: number;
+                const BLEND_ONE: number;
                 /** gl.SRC_COLOR */
-                export const BLEND_SRC_COLOR: number;
+                const BLEND_SRC_COLOR: number;
                 /** gl.ONE_MINUS_SRC_COLOR */
-                export const BLEND_ONE_MINUS_SRC_COLOR: number;
+                const BLEND_ONE_MINUS_SRC_COLOR: number;
                 /** gl.DST_COLOR */
-                export const BLEND_DST_COLOR: number;
+                const BLEND_DST_COLOR: number;
                 /** gl.ONE_MINUS_DST_COLOR */
-                export const BLEND_ONE_MINUS_DST_COLOR: number;
+                const BLEND_ONE_MINUS_DST_COLOR: number;
                 /** gl.SRC_ALPHA */
-                export const BLEND_SRC_ALPHA: number;
+                const BLEND_SRC_ALPHA: number;
                 /** gl.ONE_MINUS_SRC_ALPHA */
-                export const BLEND_ONE_MINUS_SRC_ALPHA: number;
+                const BLEND_ONE_MINUS_SRC_ALPHA: number;
                 /** gl.DST_ALPHA */
-                export const BLEND_DST_ALPHA: number;
+                const BLEND_DST_ALPHA: number;
                 /** gl.ONE_MINUS_DST_ALPHA */
-                export const BLEND_ONE_MINUS_DST_ALPHA: number;
+                const BLEND_ONE_MINUS_DST_ALPHA: number;
                 /** gl.CONSTANT_COLOR */
-                export const BLEND_CONSTANT_COLOR: number;
+                const BLEND_CONSTANT_COLOR: number;
                 /** gl.ONE_MINUS_CONSTANT_COLOR */
-                export const BLEND_ONE_MINUS_CONSTANT_COLOR: number;
+                const BLEND_ONE_MINUS_CONSTANT_COLOR: number;
                 /** gl.CONSTANT_ALPHA */
-                export const BLEND_CONSTANT_ALPHA: number;
+                const BLEND_CONSTANT_ALPHA: number;
                 /** gl.ONE_MINUS_CONSTANT_ALPHA */
-                export const BLEND_ONE_MINUS_CONSTANT_ALPHA: number;
+                const BLEND_ONE_MINUS_CONSTANT_ALPHA: number;
                 /** gl.SRC_ALPHA_SATURATE */
-                export const BLEND_SRC_ALPHA_SATURATE: number;
+                const BLEND_SRC_ALPHA_SATURATE: number;
 
                 /** Cull modes. */
-                export const CULL_NONE: number;
-                export const CULL_FRONT: number;
-                export const CULL_BACK: number;
-                export const CULL_FRONT_AND_BACK: number;
+                const CULL_NONE: number;
+                const CULL_FRONT: number;
+                const CULL_BACK: number;
+                const CULL_FRONT_AND_BACK: number;
 
-                export class VertexFormat { }
-                export class IndexBuffer { }
-                export class VertexBuffer { }
-                export class Program {
+                class VertexFormat { }
+                class IndexBuffer { }
+                class VertexBuffer { }
+                class Program {
                     id: number;
                     constructor(device: any, options: any);
                     link(): void;
                     destroy(): void;
                 }
-                export class Texture { }
-                export class Texture2D { }
-                export class TextureCube { }
-                export class RenderBuffer { }
-                export class FrameBuffer { }
-                export class Device { }
+                class Texture { }
+                class Texture2D { }
+                class TextureCube { }
+                class RenderBuffer { }
+                class FrameBuffer { }
+                class Device { }
 
-                export function attrTypeBytes(attyType: any): number;
-                export function glFilter(gl: WebGLContext, filter: any, mipFilter: any): any;
-                export function glTextureFmt(fmt: any): any;
+                function attrTypeBytes(attyType: any): number;
+                function glFilter(gl: WebGLContext, filter: any, mipFilter: any): any;
+                function glTextureFmt(fmt: any): any;
             }
 
-            export interface math { }
+            interface math { }
 
-            export namespace renderer {
+            namespace renderer {
                 /** Parameter types. */
-                export const PARAM_INT: number;
-                export const PARAM_INT2: number;
-                export const PARAM_INT3: number;
-                export const PARAM_INT4: number;
-                export const PARAM_FLOAT: number;
-                export const PARAM_FLOAT2: number;
-                export const PARAM_FLOAT3: number;
-                export const PARAM_FLOAT: number;
-                export const PARAM_MAT2: number;
-                export const PARAM_MAT3: number;
-                export const PARAM_MAT4: number;
-                export const PARAM_TEXTURE_2D: number;
-                export const PARAM_TEXTURE_CUBE: number;
+                const PARAM_INT: number;
+                const PARAM_INT2: number;
+                const PARAM_INT3: number;
+                const PARAM_INT4: number;
+                const PARAM_FLOAT: number;
+                const PARAM_FLOAT2: number;
+                const PARAM_FLOAT3: number;
+                const PARAM_FLOAT: number;
+                const PARAM_MAT2: number;
+                const PARAM_MAT3: number;
+                const PARAM_MAT4: number;
+                const PARAM_TEXTURE_2D: number;
+                const PARAM_TEXTURE_CUBE: number;
 
-                export function addStage(name: string): void;
-                export function createIA(device: any, data: any): InputAssembler | null;
+                function addStage(name: string): void;
+                function createIA(device: any, data: any): InputAssembler | null;
 
-                export class Pass {
+                class Pass {
                     constructor(name: string);
 
                     setCullMode(cullMode: number): void;
@@ -763,7 +763,7 @@ declare namespace cc {
                     disableStencilTest(): void;
                 }
 
-                export class Technique {
+                class Technique {
                     passes: Pass[];
                     stageIDs: number[];
 
@@ -779,7 +779,7 @@ declare namespace cc {
                     setStages(stages: string[]): void;
                 }
 
-                export class Effect {
+                class Effect {
                     constructor(
                         techniques: Technique[],
                         properties?: {
@@ -799,16 +799,16 @@ declare namespace cc {
                     extractDefines(out: any): any;
                 }
 
-                export interface InputAssembler { }
+                interface InputAssembler { }
 
-                export interface View { }
+                interface View { }
 
-                export interface Light { }
-                export interface Camera { }
-                export interface Model { }
-                export interface Scene { }
+                interface Light { }
+                interface Camera { }
+                interface Model { }
+                interface Scene { }
 
-                export class Base {
+                class Base {
                     _device: any;
                     _programLib: ProgramLib;
                     _opts: any;
@@ -827,7 +827,7 @@ declare namespace cc {
                     _draw(item: any): void;
                 }
 
-                export class ProgramLib {
+                class ProgramLib {
                     _templates: any;
                     constructor(device: any, templates: any, chunks: any);
                     define(name: any, vert: any, frag: any, defines: any): void;
@@ -836,14 +836,14 @@ declare namespace cc {
                 }
             }
 
-            export namespace shaders {
-                export const chunks: any;
-                export const templates: any;
+            namespace shaders {
+                const chunks: any;
+                const templates: any;
             }
         }
     }
 
-    export interface RenderComponent {
+    interface RenderComponent {
         _renderData: any;
         markForUpdateRenderData(enabled: boolean): void;
         markForRender(enabled: boolean): void;
@@ -856,27 +856,27 @@ declare namespace cc {
     }
 
     /** shaders */
-    export namespace gl {
+    namespace gl {
         /** Invalidates the GL state cache. */
-        export function invalidateStateCache(): void;
+        function invalidateStateCache(): void;
 
         /** Uses the GL program in case program is different than the current one. */
-        export function useProgram(program: GLProgram): void;
+        function useProgram(program: GLProgram): void;
 
         /** Deletes the GL program. If it is the one that is being used, it invalidates it. */
-        export function deleteProgram(program: GLProgram): void;
+        function deleteProgram(program: GLProgram): void;
 
         /** Uses a blending function in case it is not already used. */
-        export function blendFunc(src: number, dst: number): void;
+        function blendFunc(src: number, dst: number): void;
 
         /** If the texture is not already bound, it binds it. */
-        export function bindTexture2D(texture: cc.Texture2D): void;
+        function bindTexture2D(texture: cc.Texture2D): void;
 
         /** It will delete the given texture. If the texture was bound, it will invalidate the cached. */
-        export function deleteTexture2D(texture: cc.Texture2D): void;
+        function deleteTexture2D(texture: cc.Texture2D): void;
     }
 
-    export class GLProgram {
+    class GLProgram {
         constructor(vShaderFileName?: string, fShaderFileName?: string, glContext?: any);
 
         /** Destroys the program. */
@@ -933,7 +933,7 @@ declare namespace cc {
     }
 
     /** For native. */
-    export class UniformValue {
+    class UniformValue {
         constructor(uniform: any, program: GLProgram);
         setFloat(value: number): void;
         setInt(value: number): void;
@@ -950,7 +950,7 @@ declare namespace cc {
     }
 
     /** For native. */
-    export class GLProgramState {
+    class GLProgramState {
         static getOrCreateWithGLProgram(program: GLProgram): GLProgramState;
         constructor(program: GLProgram);
         getGLProgram(): GLProgram;
@@ -970,7 +970,7 @@ declare namespace cc {
         setUniformTexture(name: string, textureId: number): void;
     };
 
-    export class shaderCache {
+    class shaderCache {
         /** Reloads the default shaders. */
         static reloadDefaultShaders(): void;
 
@@ -982,10 +982,10 @@ declare namespace cc {
     }
 
     /** kazmath */
-    export namespace math {
-        export function vec3(x: number | Vec3, y?: number, z?: number);
+    namespace math {
+        function vec3(x: number | Vec3, y?: number, z?: number);
 
-        export class Vec3 {
+        class Vec3 {
             static zero: Vec3;
             x: number;
             y: number;
@@ -1010,7 +1010,7 @@ declare namespace cc {
             toTypeArray(): number[];
         }
 
-        export class Quaternion {
+        class Quaternion {
             static rotationMatrix(matrix: Matrix3): Quaternion;
             static rotationYawPitchRoll(yaw: number, pitch: number, roll: number): Quaternion;
             static slerp(quaternion: Quaternion, t: number): Quaternion;
@@ -1035,7 +1035,7 @@ declare namespace cc {
             multiplyVec3(vec: Vec3): Vec3;
         }
 
-        export class Matrix3 {
+        class Matrix3 {
             static createByRotationX(radians: number): Matrix3;
             static createByRotationY(radians: number): Matrix3;
             static createByRotationZ(radians: number): Matrix3;
@@ -1059,21 +1059,21 @@ declare namespace cc {
         }
 
         /** Sets matrix to an identity matrix. */
-        export function mat4Identity(matrix: Matrix4): Matrix4;
+        function mat4Identity(matrix: Matrix4): Matrix4;
 
         /** Calculates the inverse of matrix and stores the result in out. */
-        export function mat4Inverse(out: Matrix4, matrix: Matrix4): Matrix4 | null;
+        function mat4Inverse(out: Matrix4, matrix: Matrix4): Matrix4 | null;
 
         /** Multiples x with y and stores the result in out, returns out. */
-        export function mat4Multiply(out: Matrix4, x: Matrix4, y: Matrix4): Matrix4;
+        function mat4Multiply(out: Matrix4, x: Matrix4, y: Matrix4): Matrix4;
 
         /**
          * Builds a translation matrix. All other elements in the matrix
          * will be set to zero except for the diagonal which is set to 1.0
          */
-        export function mat4Translation(matrix: Matrix4, x: number, y: number, z: number): Matrix4;
+        function mat4Translation(matrix: Matrix4, x: number, y: number, z: number): Matrix4;
 
-        export class Matrix4 {
+        class Matrix4 {
             /** Builds a rotation matrix around the X-axis. */
             static createByRotationX(radians: number, matrix?: Matrix4): Matrix4;
 
@@ -1137,7 +1137,7 @@ declare namespace cc {
 }
 
 declare namespace sp {
-    export class _SGSkeleton extends _ccsg.Node {
+    class _SGSkeleton extends _ccsg.Node {
         constructor(skeletonDataFile?: string, atlasFile?: string, scale?: number);
 
         /** Sets whether open debug slots. */
@@ -1206,7 +1206,7 @@ declare namespace sp {
         update(delta: number): void;
     }
 
-    export class _SGSkeletonAnimation extends _SGSkeleton {
+    class _SGSkeletonAnimation extends _SGSkeleton {
         /** Sets animation state data. */
         setAnimationStateData(stateData: spine.AnimationStateData): void;
 
@@ -1234,7 +1234,7 @@ declare namespace sp {
         update(delta: number): void;
     }
 
-    export interface Skeleton {
+    interface Skeleton {
         /** Version < 2.0 */
         _sgNode: _SGSkeletonAnimation | null;
 
