@@ -419,6 +419,28 @@ declare namespace cc {
         root: any;
     }
 
+    interface Event {
+        _propagationStopped: boolean;
+        _propagationImmediateStopped: boolean;
+    }
+
+    class EventListener {
+        owner: Node;
+        checkAvailable(): boolean;
+        clone(): EventListener;
+        isEnabled(): boolean;
+        setEnabled(enabled: boolean): void;
+    }
+
+    class TouchOneByOne extends EventListener {
+        onTouchBegan: ((touch: Touch, event: Event.EventTouch) => boolean) | null;
+        onTouchMoved: ((touch: Touch, event: Event.EventTouch) => void) | null;
+        onTouchEnded: ((touch: Touch, event: Event.EventTouch) => void) | null;
+        onTouchCancelled: ((touch: any, event: any) => void) | null;
+        isSwalowTouches(): boolean;
+        setSwallowTouches(needSwallow: boolean): void;
+    }
+
     interface Texture2D {
         update(options?: {
             image?: DOMImageElement,
@@ -483,7 +505,14 @@ declare namespace cc {
     }
 
     interface Node {
+        /** Version < 2 */
         _sgNode: _ccsg.Node;
+
+        _touchListener: TouchOneByOne | null;
+        _mouseListener: EventListener | null;
+
+        _hitTest(point: Vec2, listener?: EventListener): boolean;
+        _getCapturingTargets(eventType: string, targets: Node[]): void;
 
         /** Version >= 2 */
         getWorldMatrix(out: vmath.mat4): vmath.mat4;
