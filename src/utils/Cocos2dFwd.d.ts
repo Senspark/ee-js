@@ -3,6 +3,7 @@ interface AssetDB {
     queryUrlByUuid(uuid: string, callback: (error: string | null, result: string | null) => void): void;
     queryInfoByUuid(uuid: string, callback: (error: string | null, result: {}) => void): void;
     queryMetaInfoByUuid(uuid: string, callback: (error: string | null, result: any) => void): void;
+    queryUuidByUrl(url: string, callback: (error: string | null, uuid: string | null) => void): void;
     queryAssets(pattern: string, type: string, callback: (error: string | null, result: any) => void): void;
 }
 
