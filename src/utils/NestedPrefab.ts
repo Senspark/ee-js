@@ -29,10 +29,14 @@ export class NestedPrefab extends cc.Component {
     private set prefab(value) {
         if (this._prefab !== undefined) {
             if (this.view === undefined) {
-                throw new Error('Prefab exist but the view is not present.');
+                if (CC_EDITOR) {
+                    throw new Error('Prefab exist but the view is not present.');
+                }
+            } else {
+                this.instantiated = false;
+                this.view.destroy();
+                this.view = undefined;
             }
-            this.view.destroy();
-            this.view = undefined;
         }
         this._prefab = value;
         if (this._prefab === null) {
@@ -42,9 +46,7 @@ export class NestedPrefab extends cc.Component {
         if (this._prefab !== undefined) {
             if (this.instantiateView()) {
                 this.instantiated = true;
-                if (CC_EDITOR) {
-                    this.setupView();
-                }
+                this.setupView();
             }
         }
     };
@@ -119,6 +121,10 @@ export class NestedPrefab extends cc.Component {
         }
         return this.view;
     };
+
+    public setPrefab(prefab: cc.Prefab) {
+        this.prefab = prefab;
+    }
 
     /** Creates a view from the current prefab and add it to this. */
     private instantiateView(): boolean {
