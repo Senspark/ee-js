@@ -3,8 +3,249 @@ import * as gl from 'gl-matrix';
 import vertShader from './HsvShaderVert';
 import fragShader from './HsvShaderFrag';
 import { createHueMatrix, createSaturationMatrix, createBrightnesMatrix, createContrastMatrix } from './HsvUtils';
+import { HsvMaterial } from './HsvMaterial';
 
 const { ccclass, disallowMultiple, executeInEditMode, menu, property } = cc._decorator;
+
+/**
+ * Finds the rendering node (_ccsg.Node).
+ * @param view The view.
+ */
+const getRenderingNode = (view: cc.Node | undefined): _ccsg.Node | undefined => {
+    if (view === undefined) {
+        return undefined;
+    }
+    {
+        const component = view.getComponent(cc.Sprite);
+        if (component !== null) {
+            return component._sgNode;
+        }
+    }
+    {
+        const component = view.getComponent(sp.Skeleton);
+        if (component !== null && component._sgNode !== null) {
+            return component._sgNode;
+        }
+    }
+    {
+        const component = view.getComponent(cc.Label);
+        if (component !== null) {
+            return component._sgNode;
+        }
+    }
+    return undefined;
+};
+
+const createRenderer = (view: cc.Node) => {
+    if (cc.ENGINE_VERSION >= '2') {
+        const renderer = new HsvRenderer_2_0_WebGL();
+        if (renderer.initialize(view)) {
+            return renderer;
+        }
+    } else {
+        if (cc.sys.isNative) {
+            const renderer = new HsvRenderer_1_9_Native();
+            if (renderer.initialize(view)) {
+                return renderer;
+            }
+        } else {
+            const renderer = new HsvRenderer_1_9_WebGL();
+            if (renderer.initialize(view)) {
+                return renderer;
+            }
+        }
+    }
+    return new NullHsvRenderer();
+};
+
+interface HsvRenderer {
+    initialize(view: cc.Node): boolean;
+    setEnabled(enabled: boolean): void;
+    updateMatrix(matrix: gl.mat4): void;
+    updateMaterial(): void;
+};
+
+class NullHsvRenderer implements HsvRenderer {
+    public initialize(view: cc.Node): boolean { return true; };
+    public setEnabled(enabled: boolean): void { };
+    public updateMatrix(matrix: gl.mat4): void { };
+    public updateMaterial(): void { };
+};
+
+class HsvRenderer_1_9_WebGL implements HsvRenderer {
+    private view?: cc.Node;
+
+    private renderingNode?: _ccsg.Node;
+
+    private program?: cc.GLProgram;
+    private oldProgram?: cc.GLProgram;
+
+    private isSupported(): boolean {
+        return 'opengl' in cc.sys.capabilities
+    };
+
+    public initialize(view: cc.Node): boolean {
+        if (!this.isSupported()) {
+            return false;
+        }
+        this.view = view;
+        const program = new cc.GLProgram();
+        program.initWithString(vertShader, fragShader);
+        program.addAttribute(<string><any>cc.macro.ATTRIBUTE_NAME_POSITION, cc.macro.VERTEX_ATTRIB_POSITION);
+        program.addAttribute(<string><any>cc.macro.ATTRIBUTE_NAME_COLOR, cc.macro.VERTEX_ATTRIB_COLOR);
+        program.addAttribute(<string><any>cc.macro.ATTRIBUTE_NAME_TEX_COORD, cc.macro.VERTEX_ATTRIB_TEX_COORDS);
+        program.link();
+        program.updateUniforms();
+        this.program = program;
+        return true;
+    };
+
+    private setRenderingNode(node: _ccsg.Node | undefined): void {
+        if (node === this.renderingNode) {
+            return;
+        }
+        if (this.renderingNode !== undefined) {
+            this.renderingNode.setShaderProgram(this.oldProgram!);
+        }
+        this.renderingNode = node;
+        if (this.renderingNode !== undefined) {
+            this.oldProgram = this.renderingNode.getShaderProgram();
+            this.renderingNode.setShaderProgram(this.program!);
+        }
+    };
+
+    public setEnabled(enabled: boolean): void {
+        if (enabled) {
+            this.setRenderingNode(getRenderingNode(this.view));
+        } else {
+            this.setRenderingNode(undefined);
+        }
+    };
+
+    public updateMatrix(matrix: gl.mat4): void {
+        // Constantly update the current rendering node.
+        this.setRenderingNode(getRenderingNode(this.view));
+        let array: number[] = Array.prototype.slice.call(matrix);
+        let location = this.program!.getUniformLocationForName('u_hsv');
+        this.program!.use();
+        this.program!.setUniformLocationWithMatrix4fv(location, array);
+    };
+
+    public updateMaterial(): void { };
+};
+
+class HsvRenderer_1_9_Native implements HsvRenderer {
+    private view?: cc.Node;
+
+    private renderingNode?: _ccsg.Node;
+
+    private programState?: cc.GLProgramState;
+    private oldProgramState?: cc.GLProgramState;
+
+    private isSupported(): boolean {
+        return 'opengl' in cc.sys.capabilities
+    };
+
+    public initialize(view: cc.Node): boolean {
+        if (!this.isSupported()) {
+            return false;
+        }
+        this.view = view;
+        const program = new cc.GLProgram();
+        program.initWithString(vertShader, fragShader);
+        program.link();
+        program.updateUniforms();
+        this.programState = cc.GLProgramState.getOrCreateWithGLProgram(program);
+        return true;
+    };
+
+    private setRenderingNode(node: _ccsg.Node | undefined): void {
+        if (node === this.renderingNode) {
+            return;
+        }
+        if (this.renderingNode !== undefined) {
+            this.renderingNode.setGLProgramState(this.oldProgramState!);
+        }
+        this.renderingNode = node;
+        if (this.renderingNode !== undefined) {
+            this.oldProgramState = this.renderingNode.getGLProgramState();
+            this.renderingNode.setGLProgramState(this.programState!);
+        }
+    };
+
+    public setEnabled(enabled: boolean): void {
+        if (enabled) {
+            this.setRenderingNode(getRenderingNode(this.view));
+        } else {
+            this.setRenderingNode(undefined);
+        }
+    };
+
+    public updateMatrix(matrix: gl.mat4): void {
+        // Constantly update the current rendering node.
+        this.setRenderingNode(getRenderingNode(this.view));
+        let array: number[] = Array.prototype.slice.call(matrix);
+        this.programState!.setUniformMat4('u_hsv', array);
+    };
+
+    public updateMaterial(): void { };
+};
+
+class HsvRenderer_2_0_WebGL implements HsvRenderer {
+    private view?: cc.Node;
+    private material: HsvMaterial | null;
+
+    public constructor() {
+        this.material = null;
+    };
+
+    public initialize(view: cc.Node): boolean {
+        this.view = view;
+        const material = new HsvMaterial();
+        this.material = material;
+        return true;
+    };
+
+    public setEnabled(enabled: boolean): void {
+        // Do nothing.
+    };
+
+    public updateMatrix(matrix: gl.mat4): void {
+        const material = this.material;
+        if (material === null) {
+            return;
+        }
+        const array: number[] = Array.prototype.slice.call(matrix);
+        // Convert gl.mat4 to cc.vmath.mat4.
+        const convertedMatrix = cc.vmath.mat4.create();
+        cc.vmath.mat4.set.call(null, convertedMatrix, ...array);
+        material.setMatrix(convertedMatrix);
+    };
+
+    public updateMaterial(): void {
+        const material = this.material;
+        if (material === null) {
+            return;
+        }
+        const view = this.view;
+        if (view === undefined) {
+            return;
+        }
+        const sprite = view.getComponent(cc.Sprite);
+        if (material === sprite.getMaterial()) {
+            return;
+        }
+        sprite._updateMaterial(material);
+
+        const texture = sprite.spriteFrame.getTexture();
+        material.setTexture(texture);
+        if (sprite._renderData !== null) {
+            sprite._renderData._material = material;
+        }
+        sprite.markForUpdateRenderData(true);
+        sprite.markForRender(true);
+    };
+};
 
 @ccclass
 @disallowMultiple
@@ -85,14 +326,7 @@ export class HsvComponent extends cc.Component {
         this.contrastMatrixDirty = true;
     };
 
-    private renderingNode?: _ccsg.Node;
-
-    private program?: cc.GLProgram;
-    private oldProgram?: cc.GLProgram;
-
-    /* For native. */
-    private programState?: cc.GLProgramState;
-    private oldProgramState?: cc.GLProgramState;
+    private renderer: HsvRenderer;
 
     private hueMatrixDirty = true;
     private saturationMatrixDirty = true;
@@ -113,116 +347,26 @@ export class HsvComponent extends cc.Component {
         this.saturationMatrix = gl.mat4.create();
         this.brightnessMatrix = gl.mat4.create();
         this.contrastMatrix = gl.mat4.create();
-
-        if (cc.ENGINE_VERSION >= '2') {
-            // TODO.
-        } else {
-            this.initializeShader();
-        }
+        this.renderer = new NullHsvRenderer();
     };
 
-    private isSupported(): boolean {
-        return 'opengl' in cc.sys.capabilities
-    };
-
-    private initializeShader(): void {
-        if (!this.isSupported()) {
-            return;
-        }
-        this.program = new cc.GLProgram();
-        this.program.initWithString(vertShader, fragShader);
-        if (!cc.sys.isNative) {
-            this.program.addAttribute(<string><any>cc.macro.ATTRIBUTE_NAME_POSITION, cc.macro.VERTEX_ATTRIB_POSITION);
-            this.program.addAttribute(<string><any>cc.macro.ATTRIBUTE_NAME_COLOR, cc.macro.VERTEX_ATTRIB_COLOR);
-            this.program.addAttribute(<string><any>cc.macro.ATTRIBUTE_NAME_TEX_COORD, cc.macro.VERTEX_ATTRIB_TEX_COORDS);
-        }
-        this.program.link();
-        this.program.updateUniforms();
-        if (cc.sys.isNative) {
-            this.programState = cc.GLProgramState.getOrCreateWithGLProgram(this.program);
-        }
+    public onLoad(): void {
+        this.renderer = createRenderer(this.node);
     };
 
     public onEnable(): void {
-        if (!this.isSupported()) {
-            return;
-        }
-        this.setRenderingNode(this.getRenderingNode());
+        this.renderer.setEnabled(true);
     };
 
     public onDisable(): void {
-        if (!this.isSupported()) {
-            return;
-        }
-        this.setRenderingNode(undefined);
+        this.renderer.setEnabled(false);
     };
 
     public update(delta: number): void {
-        if (!this.isSupported()) {
-            return;
+        if (this.updateMatrix()) {
+            this.renderer.updateMatrix(this.matrix);
         }
-        if (this.enabled) {
-            // Constantly update the current rendering node.
-            this.setRenderingNode(this.getRenderingNode());
-        }
-        if (!this.updateMatrix()) {
-            return;
-        }
-        let array: number[] = Array.prototype.slice.call(this.matrix);
-        if (cc.sys.isNative) {
-            this.programState!.setUniformMat4('u_hsv', array);
-        } else {
-            let location = this.program!.getUniformLocationForName('u_hsv');
-            this.program!.use();
-            this.program!.setUniformLocationWithMatrix4fv(location, array);
-        }
-    };
-
-    private getRenderingNode(): _ccsg.Node | undefined {
-        {
-            let component = this.getComponent(cc.Sprite);
-            if (component !== null) {
-                return component._sgNode;
-            }
-        }
-        {
-            let component = this.getComponent(sp.Skeleton);
-            if (component !== null && component._sgNode !== null) {
-                return component._sgNode;
-            }
-        }
-        {
-            let component = this.getComponent(cc.Label);
-            if (component !== null) {
-                return component._sgNode;
-            }
-        }
-        return undefined;
-    };
-
-    private setRenderingNode(node: _ccsg.Node | undefined) {
-        if (node === this.renderingNode) {
-            return;
-        }
-        if (this.renderingNode !== undefined) {
-            // Restore old program.
-            if (cc.sys.isNative) {
-                this.renderingNode.setGLProgramState(this.oldProgramState!);
-            } else {
-                this.renderingNode.setShaderProgram(this.oldProgram!);
-            }
-        }
-        this.renderingNode = node;
-        if (this.renderingNode !== undefined) {
-            // Apply custom program.
-            if (cc.sys.isNative) {
-                this.oldProgramState = this.renderingNode.getGLProgramState();
-                this.renderingNode.setGLProgramState(this.programState!);
-            } else {
-                this.oldProgram = this.renderingNode.getShaderProgram();
-                this.renderingNode.setShaderProgram(this.program!);
-            }
-        }
+        this.renderer.updateMaterial();
     };
 
     private updateMatrix(): boolean {

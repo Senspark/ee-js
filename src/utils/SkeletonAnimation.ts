@@ -38,11 +38,17 @@ export class SkeletonAnimation extends sp.Skeleton {
 
     private updateInternal(delta: number): boolean {
         if (cc.ENGINE_VERSION >= '2') {
+            const skeleton = this._skeleton;
+            if (skeleton === null) {
+                return false;
+            }
+            skeleton.update(delta);
             const state = this.getState();
             if (state === undefined) {
                 return false;
             }
             state.update(delta);
+            state.apply(skeleton);
             return true;
         } else {
             const node = this._sgNode;
