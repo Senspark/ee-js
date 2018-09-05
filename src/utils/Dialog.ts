@@ -2,7 +2,7 @@ import assert = require('assert');
 
 import { DialogManager } from './DialogManager';
 
-const { ccclass, property } = cc._decorator;
+const { ccclass, disallowMultiple, menu, property } = cc._decorator;
 
 type DialogEvent = (dialog: Dialog) => void;
 type Transition = cc.FiniteTimeAction;
@@ -15,6 +15,8 @@ export enum DialogEventType {
 };
 
 @ccclass
+@disallowMultiple
+@menu('ee/Dialog')
 export class Dialog extends cc.Component {
     private active: boolean;
 
