@@ -112,10 +112,12 @@ export class Dialog extends cc.Component {
     private playTransition(actions: Transition[], callback: () => void): void {
         assert(this.actor.getNumberOfRunningActions() === 0);
         this.actor.stopAllActions();
-        this.actor.runAction(cc.sequence([
-            ...actions.map(action => cc.targetedAction(this.node, action)),
-            cc.callFunc(callback)
-        ]));
+        this.actor.runAction(actions.length === 0
+            ? cc.callFunc(callback)
+            : cc.sequence([
+                ...actions.map(action => cc.targetedAction(this.node, action)),
+                cc.callFunc(callback)
+            ]));
     };
 
     public addEvent(type: DialogEventType, event: DialogEvent): this {
