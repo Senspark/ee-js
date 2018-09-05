@@ -66,6 +66,16 @@ export class Dialog extends cc.Component {
         }
     };
 
+    /** Attempts to show the specified dialog using the current dialog manager. */
+    public showDialog(dialog: Dialog): void {
+        const manager = this.manager;
+        if (manager === undefined) {
+            assert(false, 'The current dialog is not active.');
+            return;
+        }
+        dialog.show(manager);
+    };
+
     /** Checks whether this dialog is active. */
     public isActive(): boolean {
         return this.active;
