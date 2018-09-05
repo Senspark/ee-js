@@ -48,6 +48,11 @@ export class Dialog extends cc.Component {
 
     /** Shows this dialog using the specified dialog manager. */
     public show(manager: DialogManager): void {
+        const container = new cc.Node();
+        container.setContentSize(cc.winSize);
+        container.addChild(this.node);
+        container.addComponent(cc.BlockInputEvents);
+
         this.manager = manager;
         manager.pushDialog(this);
     };
