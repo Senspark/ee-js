@@ -1,5 +1,8 @@
-export { NestedPrefab } from './NestedPrefab';
-export { StaticComponent } from './StaticComponent';
-export { HsvComponent } from './HsvComponent';
-export { LanguageComponent } from './LanguageComponent';
-export { LanguageManager } from './LanguageManager';
+export * from './NestedPrefab';
+export * from './StaticComponent';
+export * from './HsvComponent';
+export * from './LanguageComponent';
+export * from './LanguageManager';
+export * from './Dialog';
+export * from './DialogManager';
+export * from './DefaultDialogManager';
