@@ -9,10 +9,10 @@ const { ccclass, disallowMultiple, executeInEditMode, menu, property } = cc._dec
 @menu('ee/NestedPrefab')
 export class NestedPrefab extends cc.Component {
     private instantiated: boolean = false;
-    private view?: cc.Node;
+    private view: cc.Node | null = null;
 
     @property(cc.Prefab)
-    private _prefab?: cc.Prefab = undefined;
+    private _prefab: cc.Prefab | null = null;
 
     @property({ type: cc.Prefab })
     private get prefab() {
@@ -26,23 +26,19 @@ export class NestedPrefab extends cc.Component {
     private synchronize: boolean = true;
 
     private set prefab(value) {
-        if (this._prefab !== undefined) {
-            if (this.view === undefined) {
+        if (this._prefab !== null) {
+            if (this.view === null) {
                 if (CC_EDITOR) {
                     throw new Error('Prefab exist but the view is not present.');
                 }
             } else {
                 this.instantiated = false;
                 this.view.destroy();
-                this.view = undefined;
+                this.view = null;
             }
         }
         this._prefab = value;
-        if (this._prefab === null) {
-            // Change null to undefined.
-            this._prefab = undefined;
-        }
-        if (this._prefab !== undefined) {
+        if (this._prefab !== null) {
             if (this.instantiateView()) {
                 this.instantiated = true;
                 this.setupView();
@@ -50,14 +46,14 @@ export class NestedPrefab extends cc.Component {
         }
     };
 
-    public static createNode(prefab: cc.Prefab): cc.Node | undefined {
+    public static createNode(prefab: cc.Prefab): cc.Node | null {
         const node = new cc.Node();
         const comp = node.addComponent(NestedPrefab);
         comp.prefab = prefab;
         node.name = prefab.name;
         const view = comp.getView();
-        if (view === undefined) {
-            return undefined;
+        if (view === null) {
+            return null;
         }
         node.setContentSize(view.getContentSize());
         node.setAnchorPoint(view.getAnchorPoint());
@@ -76,21 +72,21 @@ export class NestedPrefab extends cc.Component {
     public update(): void {
         if (!CC_EDITOR) {
             if (this.instantiate) {
-                assert(this.view !== undefined, 'View should be present at runtime.');
+                assert(this.view !== null, 'View should be present at runtime.');
             }
             return;
         }
-        if (this.view !== undefined) {
+        if (this.view !== null) {
             if (!this.view.isValid) {
                 // Object is destroyed but remains referenced.
-                this.view = undefined;
+                this.view = null;
             }
         }
         if (this.node.childrenCount > 0 && this.node.children[0] !== this.view) {
             // This node was duplicated.
             this.node.removeAllChildren();
         }
-        if (this.prefab !== undefined && this.view === undefined) {
+        if (this.prefab !== null && this.view === null) {
             if (this.instantiateView()) {
                 this.instantiated = true;
                 this.setupView();
@@ -101,17 +97,17 @@ export class NestedPrefab extends cc.Component {
 
     /** Creates a view using the current prefab. */
     public createView(): cc.Node {
-        assert(this.prefab !== undefined);
+        assert(this.prefab !== null);
         const view = cc.instantiate(this.prefab!);
         return view;
     };
 
-    public getView(): cc.Node | undefined {
+    public getView(): cc.Node | null {
         if (!this.instantiate) {
-            return undefined;
+            return null;
         }
-        if (this.prefab === undefined) {
-            return undefined;
+        if (this.prefab === null) {
+            return null;
         }
         if (!this.instantiated) {
             if (this.instantiateView()) {
@@ -127,11 +123,11 @@ export class NestedPrefab extends cc.Component {
 
     /** Creates a view from the current prefab and add it to this. */
     private instantiateView(): boolean {
-        if (this.view !== undefined) {
+        if (this.view !== null) {
             assert.fail('View already instantiate.');
             return false;
         }
-        if (this.prefab === undefined) {
+        if (this.prefab === null) {
             assert.fail('Prefab is not exist.');
             return false;
         }
@@ -141,7 +137,7 @@ export class NestedPrefab extends cc.Component {
     };
 
     private setupView(): boolean {
-        if (this.view === undefined) {
+        if (this.view === null) {
             assert.fail('View is not present');
             return false;
         }
@@ -165,7 +161,7 @@ export class NestedPrefab extends cc.Component {
 
     private applySync() {
         const view = this.getView();
-        if (view !== undefined && this.synchronize) {
+        if (view !== null && this.synchronize) {
             this.node.setContentSize(view.getContentSize());
             this.node.setAnchorPoint(view.getAnchorPoint());
         }
