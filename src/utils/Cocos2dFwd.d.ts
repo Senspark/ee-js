@@ -523,6 +523,10 @@ declare namespace cc {
         getWorldToNodeTransform(out?: cc.AffineTransform): cc.AffineTransform;
     }
 
+    interface PageView {
+        _updatePageView(): void;
+    }
+
     /** Version >= 2 */
     class RenderFlow {
         static FLAG_DONOTHING: number;

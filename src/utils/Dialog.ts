@@ -27,7 +27,7 @@ export class Dialog extends cc.Component {
     private hidingTransitions: Transition[];
 
     private eventDictionary: { [key: number]: DialogEvent[] };
-    private manager?: DialogManager;
+    protected manager?: DialogManager;
 
     public constructor() {
         super();
