@@ -3,6 +3,46 @@ import { UnselectableComponent } from './UnselectableComponent';
 
 const { ccclass, disallowMultiple, executeInEditMode, menu, property } = cc._decorator;
 
+/** Decorator for nested prefabs. */
+export const nest = (type: { prototype: cc.Component }) => {
+    return function (target: any, propertyKey: string) {
+        const internalProperty = `${propertyKey}_prefab`; // Prefixed with a dash.
+
+        // Let cocos handle with the internal property.
+        property({
+            type: NestedPrefab,
+            displayName: propertyKey,
+            visible: true,
+        })(target, internalProperty, {
+            initializer: () => null,
+        });
+
+        const original = target;
+        const constructor = function (this: any, ...args: any[]) {
+            const instance = original.apply(this, args);
+            return instance;
+        };
+
+        Object.defineProperty(target, propertyKey, {
+            set: function (value: any): void {
+                // No effect.
+            },
+            get: function (this: any): any {
+                const prefab = this[internalProperty];
+                const view = prefab.getView();
+                if (view === null) {
+                    return null;
+                }
+                const component = view.getComponent(type);
+                assert(component !== null);
+                return component;
+            },
+            configurable: false,
+            enumerable: true,
+        });
+    };
+};
+
 @ccclass
 @disallowMultiple
 @executeInEditMode
