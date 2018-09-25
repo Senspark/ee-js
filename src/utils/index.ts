@@ -6,3 +6,4 @@ export * from './LanguageManager';
 export * from './Dialog';
 export * from './DialogManager';
 export * from './DefaultDialogManager';
+export * from './ConditionTouchListener';

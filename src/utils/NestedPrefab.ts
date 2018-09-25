@@ -29,6 +29,9 @@ export const nest = (type: { prototype: cc.Component }) => {
             },
             get: function (this: any): any {
                 const prefab = this[internalProperty];
+                if (prefab === undefined) {
+                    return null;
+                }
                 const view = prefab.getView();
                 if (view === null) {
                     return null;
