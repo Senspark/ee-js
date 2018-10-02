@@ -458,6 +458,9 @@ declare namespace cc {
     }
 
     interface _BaseNode {
+        /** Version 2.0.2 */
+        parent: Node;
+
         _parent: any | null;
         _children: _BaseNode[];
         _tag: number;
