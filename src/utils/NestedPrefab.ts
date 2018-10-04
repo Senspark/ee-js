@@ -66,7 +66,7 @@ export class NestedPrefab extends cc.Component {
     private instantiate: boolean = true;
 
     @property(cc.Boolean)
-    private synchronize: boolean = true;
+    private synchronize: boolean = false;
 
     private set prefab(value) {
         if (this._prefab !== null) {
