@@ -5,7 +5,7 @@ const { ccclass, disallowMultiple, executeInEditMode, menu, property } = cc._dec
 
 /** Decorator for nested prefabs. */
 export const nest = (type: { prototype: cc.Component }) => {
-    return function (target: any, propertyKey: string) {
+    return (target: any, propertyKey: string) => {
         const internalProperty = `${propertyKey}_prefab`; // Prefixed with a dash.
 
         // Let cocos handle with the internal property.
@@ -24,10 +24,10 @@ export const nest = (type: { prototype: cc.Component }) => {
         };
 
         Object.defineProperty(target, propertyKey, {
-            set: function (value: any): void {
+            set(value: any): void {
                 // No effect.
             },
-            get: function (this: any): any {
+            get(this: any): any {
                 const prefab = this[internalProperty];
                 if (prefab === undefined) {
                     return null;
@@ -51,6 +51,20 @@ export const nest = (type: { prototype: cc.Component }) => {
 @executeInEditMode
 @menu('ee/NestedPrefab')
 export class NestedPrefab extends cc.Component {
+    public static createNode(prefab: cc.Prefab): cc.Node | null {
+        const node = new cc.Node();
+        const comp = node.addComponent(NestedPrefab);
+        comp.prefab = prefab;
+        node.name = prefab.name;
+        const view = comp.getView();
+        if (view === null) {
+            return null;
+        }
+        node.setContentSize(view.getContentSize());
+        node.setAnchorPoint(view.getAnchorPoint());
+        return node;
+    }
+
     private instantiated: boolean = false;
     private view: cc.Node | null = null;
 
@@ -60,13 +74,7 @@ export class NestedPrefab extends cc.Component {
     @property({ type: cc.Prefab })
     private get prefab() {
         return this._prefab;
-    };
-
-    @property(cc.Boolean)
-    private instantiate: boolean = true;
-
-    @property(cc.Boolean)
-    private synchronize: boolean = false;
+    }
 
     private set prefab(value) {
         if (this._prefab !== null) {
@@ -87,21 +95,13 @@ export class NestedPrefab extends cc.Component {
                 this.setupView();
             }
         }
-    };
+    }
 
-    public static createNode(prefab: cc.Prefab): cc.Node | null {
-        const node = new cc.Node();
-        const comp = node.addComponent(NestedPrefab);
-        comp.prefab = prefab;
-        node.name = prefab.name;
-        const view = comp.getView();
-        if (view === null) {
-            return null;
-        }
-        node.setContentSize(view.getContentSize());
-        node.setAnchorPoint(view.getAnchorPoint());
-        return node;
-    };
+    @property(cc.Boolean)
+    private instantiate: boolean = true;
+
+    @property(cc.Boolean)
+    private synchronize: boolean = false;
 
     public onLoad(): void {
         if (!CC_EDITOR && !this.instantiated && this.instantiate) {
@@ -110,7 +110,7 @@ export class NestedPrefab extends cc.Component {
                 this.applySync();
             }
         }
-    };
+    }
 
     public update(): void {
         if (!CC_EDITOR) {
@@ -136,14 +136,14 @@ export class NestedPrefab extends cc.Component {
             }
         }
         this.applySync();
-    };
+    }
 
     /** Creates a view using the current prefab. */
     public createView(): cc.Node {
         assert(this.prefab !== null);
         const view = cc.instantiate(this.prefab!);
         return view;
-    };
+    }
 
     public getView(): cc.Node | null {
         if (!this.instantiate) {
@@ -162,7 +162,7 @@ export class NestedPrefab extends cc.Component {
             }
         }
         return this.view;
-    };
+    }
 
     public setPrefab(prefab: cc.Prefab) {
         this.prefab = prefab;
@@ -181,7 +181,7 @@ export class NestedPrefab extends cc.Component {
         this.view = this.createView();
         this.node.addChild(this.view);
         return true;
-    };
+    }
 
     private setupView(): boolean {
         if (this.view === null) {
@@ -191,7 +191,7 @@ export class NestedPrefab extends cc.Component {
         this.freeze(this.view);
         this.view._objFlags |= cc.Object.Flags.DontSave;
         return true;
-    };
+    }
 
     private freeze(node: cc.Node): void {
         if (node.getComponent(UnselectableComponent) === null) {
@@ -204,7 +204,7 @@ export class NestedPrefab extends cc.Component {
             }
         }
         node.children.forEach(child => this.freeze(child));
-    };
+    }
 
     private applySync() {
         const view = this.getView();
@@ -212,5 +212,5 @@ export class NestedPrefab extends cc.Component {
             this.node.setContentSize(view.getContentSize());
             this.node.setAnchorPoint(view.getAnchorPoint());
         }
-    };
-};
+    }
+}

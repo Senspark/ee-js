@@ -18,16 +18,16 @@ class Command {
     public constructor(type: CommandType, dialog: Dialog) {
         this.type = type;
         this.dialog = dialog;
-    };
+    }
 
     public getType(): CommandType {
         return this.type;
-    };
+    }
 
     public getDialog(): Dialog {
         return this.dialog;
-    };
-};
+    }
+}
 
 export class DefaultDialogManager implements DialogManager {
     private root: cc.Node;
@@ -40,38 +40,38 @@ export class DefaultDialogManager implements DialogManager {
         this.lockingDialog = null;
         this.dialogStack = [];
         this.commandQueue = [];
-    };
+    }
 
     public pushDialog(dialog: Dialog): void {
         assert(dialog !== null);
         assert(dialog.getContainer() !== null);
         this.pushCommand(new Command(CommandType.Push, dialog));
         this.processCommandQueue();
-    };
+    }
 
     public popDialog(dialog: Dialog): void {
         assert(dialog !== null);
         assert(dialog.getContainer() !== null);
         this.pushCommand(new Command(CommandType.Pop, dialog));
         this.processCommandQueue();
-    };
+    }
 
     /** Checks whether there is a locking dialog. */
     private isLocked(): boolean {
         return this.lockingDialog !== null;
-    };
+    }
 
     /** Locks all dialog behaviors with the specified dialog. */
     private lock(dialog: Dialog): void {
         assert(this.lockingDialog === null);
         this.lockingDialog = dialog;
-    };
+    }
 
     /** Unlocks all dialog behaviors. */
     private unlock(dialog: Dialog): void {
         assert(this.lockingDialog === dialog);
         this.lockingDialog = null;
-    };
+    }
 
     /** Gets the current (top) dialog. */
     private getCurrentDialog(): Dialog | null {
@@ -82,7 +82,7 @@ export class DefaultDialogManager implements DialogManager {
         const dialog = this.dialogStack[length - 1];
         assert(dialog !== null);
         return dialog;
-    };
+    }
 
     /** Gets the current (top) root node. */
     private getCurrentRoot(): cc.Node {
@@ -91,7 +91,7 @@ export class DefaultDialogManager implements DialogManager {
             return this.root;
         }
         return dialog.getContainer();
-    };
+    }
 
     /** Attempts to process the current command queue. */
     private processCommandQueue(): boolean {
@@ -107,7 +107,7 @@ export class DefaultDialogManager implements DialogManager {
             }
         }
         return false;
-    };
+    }
 
     private processCommand(command: Command): boolean {
         if (command.getType() === CommandType.Push) {
@@ -118,12 +118,12 @@ export class DefaultDialogManager implements DialogManager {
         }
         assert(false);
         return false;
-    };
+    }
 
     private processPushCommand(dialog: Dialog): boolean {
         this.pushDialogImmediately(dialog);
         return true;
-    };
+    }
 
     private processPopCommand(dialog: Dialog): boolean {
         const topDialog = this.getCurrentDialog();
@@ -132,7 +132,7 @@ export class DefaultDialogManager implements DialogManager {
         }
         this.popDialogImmediately(dialog);
         return true;
-    };
+    }
 
     private pushCommand(command: Command): boolean {
         const length = this.commandQueue.length;
@@ -146,7 +146,7 @@ export class DefaultDialogManager implements DialogManager {
         }
         this.commandQueue.push(command);
         return true;
-    };
+    }
 
     /**
      * Immediately pushes the specified dialog:
@@ -182,7 +182,7 @@ export class DefaultDialogManager implements DialogManager {
             this.unlock(dialog);
             this.processCommandQueue();
         });
-    };
+    }
 
     /**
      * Immediately pops the specified dialog:
@@ -218,5 +218,5 @@ export class DefaultDialogManager implements DialogManager {
             this.unlock(dialog);
             this.processCommandQueue();
         });
-    };
-};
+    }
+}

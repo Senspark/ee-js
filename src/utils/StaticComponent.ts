@@ -1,7 +1,7 @@
 const { ccclass, disallowMultiple, executeInEditMode, menu } = cc._decorator;
 
 const Flags = cc.Object.Flags;
-const LockFlags =
+const LOCK_FLAGS =
     Flags.IsPositionLocked |
     Flags.IsRotationLocked |
     Flags.IsScaleLocked |
@@ -22,18 +22,18 @@ export class StaticComponent extends cc.Component {
             this.originalPosition = this.node.position;
 
             // Apply lock flags.
-            this.node._components.forEach(comp => comp._objFlags |= LockFlags);
-            this.node._objFlags |= LockFlags;
+            this.node._components.forEach(comp => comp._objFlags |= LOCK_FLAGS);
+            this.node._objFlags |= LOCK_FLAGS;
         }
-    };
+    }
 
     public onDisable(): void {
         if (CC_EDITOR) {
             // Remove lock flags.
-            this.node._components.forEach(comp => comp._objFlags &= ~LockFlags);
-            this.node._objFlags &= ~LockFlags;
+            this.node._components.forEach(comp => comp._objFlags &= ~LOCK_FLAGS);
+            this.node._objFlags &= ~LOCK_FLAGS;
         }
-    };
+    }
 
     public update(delta: number): void {
         if (CC_EDITOR) {
@@ -42,5 +42,5 @@ export class StaticComponent extends cc.Component {
                 this.node.position = this.originalPosition;
             }
         }
-    };
-};
+    }
+}

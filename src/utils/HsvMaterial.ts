@@ -44,10 +44,10 @@ void main() {
     // Restore the original alpha.
     fragColor.w = alpha;
     gl_FragColor = fragColor; //  * v_color;
-}`
-};
+}
+`};
 
-(<any>cc.game).once(cc.game.EVENT_ENGINE_INITED, () => {
+(cc.game as any).once(cc.game.EVENT_ENGINE_INITED, () => {
     cc.log('register shader: %s', shader.name);
     const lib = cc.renderer._forward._programLib;
     if (lib._templates[shader.name] !== undefined) {
@@ -72,7 +72,7 @@ export class HsvMaterial extends renderEngine.Material {
             gfx.BLEND_FUNC_ADD,
             gfx.BLEND_SRC_ALPHA, gfx.BLEND_ONE_MINUS_SRC_ALPHA,
             gfx.BLEND_FUNC_ADD,
-            gfx.BLEND_SRC_ALPHA, gfx.BLEND_ONE_MINUS_SRC_ALPHA
+            gfx.BLEND_SRC_ALPHA, gfx.BLEND_ONE_MINUS_SRC_ALPHA,
         );
         const mainTech = new renderer.Technique(
             ['transparent'],
@@ -80,10 +80,10 @@ export class HsvMaterial extends renderEngine.Material {
                 { name: 'texture', type: renderer.PARAM_TEXTURE_2D },
                 { name: 'hsvMatrix', type: renderer.PARAM_MAT4 },
             ],
-            [pass]
+            [pass],
         );
         const effect = new renderer.Effect(
-            [mainTech], {}, []
+            [mainTech], {}, [],
         );
         this._texture = null;
         this._mainTech = mainTech;
@@ -91,7 +91,7 @@ export class HsvMaterial extends renderEngine.Material {
 
         // Set default hsv matrix.
         this.setMatrix(gl.mat4.create());
-    };
+    }
 
     public setTexture(texture: cc.Texture2D): void {
         if (this._texture === texture) {
@@ -100,9 +100,9 @@ export class HsvMaterial extends renderEngine.Material {
         this._texture = texture;
         this._effect.setProperty('texture', texture.getImpl());
         this._texIds['texture'] = texture.getId();
-    };
+    }
 
     public setMatrix(matrix: cc.vmath.mat4): void {
         this._effect.setProperty('hsvMatrix', matrix);
-    };
-};
+    }
+}

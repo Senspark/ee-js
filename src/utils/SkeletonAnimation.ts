@@ -20,21 +20,21 @@ export class SkeletonAnimation extends sp.Skeleton {
                 cc.engine.repaintInEditMode();
             });
         }
-    };
+    }
 
     public onDestroy(): void {
         if (CC_EDITOR) {
             UpdateManager.getInstance().removeObserver(this.uuid);
         }
-    };
+    }
 
     public setAnimation(trackIndex: number, name: string, loop: boolean): sp.spine.TrackEntry {
         if (!CC_EDITOR) {
             return super.setAnimation(trackIndex, name, loop);
         }
         super.setAnimation(trackIndex, name, loop);
-        return <sp.spine.TrackEntry>(this.setAnimationInternal(trackIndex, name, loop));
-    };
+        return this.setAnimationInternal(trackIndex, name, loop) as sp.spine.TrackEntry;
+    }
 
     private updateInternal(delta: number): boolean {
         if (cc.ENGINE_VERSION >= '2') {
@@ -58,7 +58,7 @@ export class SkeletonAnimation extends sp.Skeleton {
             node.update(delta);
             return true;
         }
-    };
+    }
 
     private setAnimationInternal(trackIndex: number, name: string, loop: boolean): sp.spine.TrackEntry | null {
         if (cc.ENGINE_VERSION >= '2') {
@@ -76,5 +76,5 @@ export class SkeletonAnimation extends sp.Skeleton {
             const track = node.setAnimation(trackIndex, name, loop);
             return track;
         }
-    };
-};
+    }
+}
