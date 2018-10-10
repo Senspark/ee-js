@@ -4,7 +4,15 @@ import { UnselectableComponent } from './UnselectableComponent';
 const { ccclass, disallowMultiple, executeInEditMode, menu, property } = cc._decorator;
 
 /** Decorator for nested prefabs. */
-export const nest = (type: { prototype: cc.Component }) => {
+export const nest = (type: { prototype: cc.Component } | Array<{ prototype: cc.Component }>) => {
+    if (type instanceof Array) {
+        return nestArray(type[0]);
+    } else {
+        return nestSingle(type);
+    }
+};
+
+export const nestSingle = (type: { prototype: cc.Component }) => {
     return (target: any, propertyKey: string) => {
         const internalProperty = `${propertyKey}_prefab`; // Prefixed with a dash.
 
@@ -14,6 +22,7 @@ export const nest = (type: { prototype: cc.Component }) => {
             displayName: propertyKey,
             visible: true,
         })(target, internalProperty, {
+            /** Default value is null */
             initializer: () => null,
         });
 
@@ -33,6 +42,38 @@ export const nest = (type: { prototype: cc.Component }) => {
                 const component = view.getComponent(type);
                 assert(component !== null);
                 return component;
+            },
+            configurable: false,
+            enumerable: true,
+        });
+    };
+};
+
+export const nestArray = (type: { prototype: cc.Component }) => {
+    return (target: any, propertyKey: string) => {
+        const internalProperty = `${propertyKey}_prefab`;
+
+        property({
+            type: [NestedPrefab],
+            displayName: propertyKey,
+            visible: true,
+        })(target, internalProperty, {
+            /** Default value is an empty array. */
+            initializer: () => [],
+        });
+
+        Object.defineProperty(target, propertyKey, {
+            set(value: any): void {
+                // No effect.
+            },
+            get(this: any): any {
+                const prefabs = this[internalProperty];
+                if (prefabs === undefined) {
+                    return null;
+                }
+                const views = (prefabs as NestedPrefab[]).map(item => item.getView());
+                const components = views.map(item => item === null ? null : item.getComponent(type));
+                return components;
             },
             configurable: false,
             enumerable: true,
