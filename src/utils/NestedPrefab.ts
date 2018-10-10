@@ -17,12 +17,6 @@ export const nest = (type: { prototype: cc.Component }) => {
             initializer: () => null,
         });
 
-        const original = target;
-        const constructor = function (this: any, ...args: any[]) {
-            const instance = original.apply(this, args);
-            return instance;
-        };
-
         Object.defineProperty(target, propertyKey, {
             set(value: any): void {
                 // No effect.
@@ -72,11 +66,11 @@ export class NestedPrefab extends cc.Component {
     private _prefab: cc.Prefab | null = null;
 
     @property({ type: cc.Prefab })
-    private get prefab() {
+    private get prefab(): cc.Prefab | null {
         return this._prefab;
     }
 
-    private set prefab(value) {
+    private set prefab(value: cc.Prefab | null) {
         if (this._prefab !== null) {
             if (this.view === null) {
                 if (CC_EDITOR) {
@@ -164,7 +158,7 @@ export class NestedPrefab extends cc.Component {
         return this.view;
     }
 
-    public setPrefab(prefab: cc.Prefab) {
+    public setPrefab(prefab: cc.Prefab): void {
         this.prefab = prefab;
     }
 
@@ -206,7 +200,7 @@ export class NestedPrefab extends cc.Component {
         node.children.forEach(child => this.freeze(child));
     }
 
-    private applySync() {
+    private applySync(): void {
         const view = this.getView();
         if (view !== null && this.synchronize) {
             this.node.setContentSize(view.getContentSize());

@@ -27,7 +27,7 @@ export class ConditionTouchListener extends cc.Component {
 
     private modifyTouchBegan(listener: cc.TouchOneByOne): void {
         const callback = this.conditionCallback;
-        listener.onTouchBegan = function (touch: cc.Touch, event: cc.Event.EventTouch) {
+        listener.onTouchBegan = function (touch: cc.Touch, event: cc.Event.EventTouch): boolean {
             if (callback(this, touch)) {
                 event.type = cc.Node.EventType.TOUCH_START;
                 event.touch = touch;

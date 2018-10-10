@@ -12,7 +12,7 @@ const settingKey = 'use_nested_prefab';
 
 // tslint:disable-next-line:ban-types
 const cloneFunction = <T extends Function>(f: T) => {
-    const result = function (this: any) {
+    const result = function (this: any): any {
         return f.apply(this, arguments);
     };
     for (const key in f) {
@@ -156,7 +156,7 @@ const overwriteCreateNodeFromAsset = (oldFunction: typeof _Scene.createNodeFromA
 const overwriteGizmoRegisterEvent = (oldFunction: typeof Editor.Gizmo.prototype._registerEvent) => {
     cc.log('overwrite Editor.Gizmo._registerEvent');
 
-    return function (this: Editor.Gizmo) {
+    return function (this: Editor.Gizmo): void {
         const node = this._root.node as SVGPolygonElement;
         const isIgnore = () => {
             const profile = ProfileManager.getInstance();

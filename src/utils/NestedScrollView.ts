@@ -61,7 +61,7 @@ export class NestedScrollView extends cc.Component {
     }
 
     private setupTouchBegan(listener: cc.TouchOneByOne): void {
-        listener.onTouchBegan = function (touch, event) {
+        listener.onTouchBegan = function (touch: cc.Touch, event: cc.Event.EventTouch): boolean {
             const pos = touch.getLocation();
             const node = this.owner;
             if (node._hitTest(pos, this)) {
@@ -84,7 +84,7 @@ export class NestedScrollView extends cc.Component {
     }
 
     private setupTouchMoved(listener: cc.TouchOneByOne): void {
-        listener.onTouchMoved = function (touch, event) {
+        listener.onTouchMoved = function (touch: cc.Touch, event: cc.Event.EventTouch): void {
             const node = this.owner;
             event.type = cc.Node.EventType.TOUCH_MOVE;
             event.touch = touch;
@@ -99,7 +99,7 @@ export class NestedScrollView extends cc.Component {
     }
 
     private setupTouchEnded(listener: cc.TouchOneByOne): void {
-        listener.onTouchEnded = function (touch, event) {
+        listener.onTouchEnded = function (touch: cc.Touch, event: cc.Event.EventTouch): void {
             // Original lines in CCScrollView.js
             const pos = touch.getLocation();
             const node = this.owner;
@@ -119,7 +119,7 @@ export class NestedScrollView extends cc.Component {
     }
 
     private setupTouchCancelled(listener: cc.TouchOneByOne): void {
-        listener.onTouchCancelled = function (touch, event) {
+        listener.onTouchCancelled = function (touch: cc.Touch, event: cc.Event.EventTouch): void {
             // Original lines in CCScrollView.js
             const node = this.owner;
             event.type = cc.Node.EventType.TOUCH_CANCEL;

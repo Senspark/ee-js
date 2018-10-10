@@ -273,11 +273,11 @@ export class HsvComponent extends cc.Component {
         max: 359,
         slide: true,
     })
-    private get hue() {
+    private get hue(): number {
         return this._hue;
     }
 
-    private set hue(value) {
+    private set hue(value: number) {
         if (this._hue === value) {
             return;
         }
@@ -291,11 +291,11 @@ export class HsvComponent extends cc.Component {
         max: +1.0,
         slide: true,
     })
-    private get brightness() {
+    private get brightness(): number {
         return this._brightness;
     }
 
-    private set brightness(value) {
+    private set brightness(value: number) {
         if (this._brightness === value) {
             return;
         }
@@ -304,11 +304,11 @@ export class HsvComponent extends cc.Component {
     }
 
     @property({ type: cc.Float })
-    private get saturation() {
+    private get saturation(): number {
         return this._saturation;
     }
 
-    private set saturation(value) {
+    private set saturation(value: number) {
         if (this._saturation === value) {
             return;
         }
@@ -317,11 +317,11 @@ export class HsvComponent extends cc.Component {
     }
 
     @property({ type: cc.Float })
-    private get contrast() {
+    private get contrast(): number {
         return this._contrast;
     }
 
-    private set contrast(value) {
+    private set contrast(value: number) {
         if (this._contrast === value) {
             return;
         }

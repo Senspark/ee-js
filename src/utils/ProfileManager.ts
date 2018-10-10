@@ -25,7 +25,7 @@ export class ProfileManager {
         }
     }
 
-    public setProfile(profile: Profile) {
+    public setProfile(profile: Profile): void {
         this.profile = profile;
     }
 

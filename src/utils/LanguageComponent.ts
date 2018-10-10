@@ -19,7 +19,7 @@ export class LanguageComponent extends cc.Component {
         return this._key;
     }
 
-    public set key(value) {
+    public set key(value: string) {
         this._key = value;
         this.updateText();
     }
@@ -29,7 +29,7 @@ export class LanguageComponent extends cc.Component {
         type: cc.String,
         readonly: true,
     })
-    public get format() {
+    public get format(): string {
         return this.manager.getFormat(this.key) || '';
     }
 
@@ -44,14 +44,14 @@ export class LanguageComponent extends cc.Component {
 
     /** Gets or sets the multilingual parameter values. */
     @property
-    public get paramValues() {
+    public get paramValues(): string[] {
         while (this._paramValues.length < this.paramKeys.length) {
             this._paramValues.push('');
         }
         return this._paramValues;
     }
 
-    public set paramValues(value) {
+    public set paramValues(value: string[]) {
         this._paramValues = value;
         this.updateText();
     }
@@ -61,7 +61,7 @@ export class LanguageComponent extends cc.Component {
         type: cc.String,
         readonly: true,
     })
-    public get string() {
+    public get string(): string | undefined {
         const options: any = {};
         for (let i = 0; i < this.paramKeys.length; ++i) {
             options[this.paramKeys[i]] = this.paramValues[i];
@@ -70,11 +70,11 @@ export class LanguageComponent extends cc.Component {
     }
 
     @property({ type: cc.String })
-    private get config() {
+    private get config(): string | undefined {
         return this.manager.getConfigDir();
     }
 
-    private set config(value) {
+    private set config(value: string | undefined) {
         if (value !== undefined && value.length > 0 /* May be empty */) {
             this.manager.setConfigDir(value);
         } else {
@@ -82,17 +82,17 @@ export class LanguageComponent extends cc.Component {
         }
     }
 
-    @property
-    private get languages() {
+    @property /** Empty property to silence warning in editor. */
+    private get languages(): string[] {
         return this.manager.getLanguages();
     }
 
     @property({ type: cc.String })
-    private get language() {
+    private get language(): string | undefined {
         return this.manager.getCurrentLanguage();
     }
 
-    private set language(value) {
+    private set language(value: string | undefined) {
         this.manager.setCurrentLanguage(value);
     }
 
@@ -128,7 +128,7 @@ export class LanguageComponent extends cc.Component {
         }
     }
 
-    private updateText() {
+    private updateText(): void {
         if (this.label === null) {
             this.label = this.getComponent(cc.Label);
             if (this.label === null) {
