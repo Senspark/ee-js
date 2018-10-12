@@ -881,12 +881,20 @@ declare namespace cc {
     }
 
     interface RenderComponent {
+        _material: any;
         _renderData: any;
+        __allocedDatas: any[];
+        _vertexFormat: any;
+        _assembler: any;
+        _postAssembler: any;
+        _canRender(): boolean;
         markForUpdateRenderData(enabled: boolean): void;
         markForRender(enabled: boolean): void;
         markForCustomIARender(enabled: boolean): void;
         disableRender(): void;
-        requestRenderData(data: any): void;
+        requestRenderData(): any;
+        destroyRenderData(data: any): void;
+        _updateColor(): void;
         getMaterial(): Material | null;
         _updateMaterial(material: Material): void;
         _updateBlendFunc(updateHash: boolean): void;
