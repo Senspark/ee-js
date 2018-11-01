@@ -1,9 +1,9 @@
 import * as gl from 'gl-matrix';
 
-import vertShader from './HsvShaderVert';
-import fragShader from './HsvShaderFrag';
-import { createHueMatrix, createSaturationMatrix, createBrightnesMatrix, createContrastMatrix } from './HsvUtils';
 import { HsvMaterial } from './HsvMaterial';
+import { shader as fragShader } from './HsvShaderFrag';
+import { shader as vertShader } from './HsvShaderVert';
+import { createBrightnesMatrix, createContrastMatrix, createHueMatrix, createSaturationMatrix } from './HsvUtils';
 
 const { ccclass, disallowMultiple, executeInEditMode, menu, property } = cc._decorator;
 
@@ -63,15 +63,16 @@ interface HsvRenderer {
     setEnabled(enabled: boolean): void;
     updateMatrix(matrix: gl.mat4): void;
     updateMaterial(): void;
-};
+}
 
 class NullHsvRenderer implements HsvRenderer {
-    public initialize(view: cc.Node): boolean { return true; };
-    public setEnabled(enabled: boolean): void { };
-    public updateMatrix(matrix: gl.mat4): void { };
-    public updateMaterial(): void { };
-};
+    public initialize(view: cc.Node): boolean { return true; }
+    public setEnabled(enabled: boolean): void { }
+    public updateMatrix(matrix: gl.mat4): void { }
+    public updateMaterial(): void { }
+}
 
+// tslint:disable-next-line:class-name
 class HsvRenderer_1_9_WebGL implements HsvRenderer {
     private view?: cc.Node;
 
@@ -81,8 +82,8 @@ class HsvRenderer_1_9_WebGL implements HsvRenderer {
     private oldProgram?: cc.GLProgram;
 
     private isSupported(): boolean {
-        return 'opengl' in cc.sys.capabilities
-    };
+        return 'opengl' in cc.sys.capabilities;
+    }
 
     public initialize(view: cc.Node): boolean {
         if (!this.isSupported()) {
@@ -91,14 +92,14 @@ class HsvRenderer_1_9_WebGL implements HsvRenderer {
         this.view = view;
         const program = new cc.GLProgram();
         program.initWithString(vertShader, fragShader);
-        program.addAttribute(<string><any>cc.macro.ATTRIBUTE_NAME_POSITION, cc.macro.VERTEX_ATTRIB_POSITION);
-        program.addAttribute(<string><any>cc.macro.ATTRIBUTE_NAME_COLOR, cc.macro.VERTEX_ATTRIB_COLOR);
-        program.addAttribute(<string><any>cc.macro.ATTRIBUTE_NAME_TEX_COORD, cc.macro.VERTEX_ATTRIB_TEX_COORDS);
+        program.addAttribute(cc.macro.ATTRIBUTE_NAME_POSITION, cc.macro.VERTEX_ATTRIB_POSITION);
+        program.addAttribute(cc.macro.ATTRIBUTE_NAME_COLOR, cc.macro.VERTEX_ATTRIB_COLOR);
+        program.addAttribute(cc.macro.ATTRIBUTE_NAME_TEX_COORD, cc.macro.VERTEX_ATTRIB_TEX_COORDS);
         program.link();
         program.updateUniforms();
         this.program = program;
         return true;
-    };
+    }
 
     private setRenderingNode(node: _ccsg.Node | undefined): void {
         if (node === this.renderingNode) {
@@ -112,7 +113,7 @@ class HsvRenderer_1_9_WebGL implements HsvRenderer {
             this.oldProgram = this.renderingNode.getShaderProgram();
             this.renderingNode.setShaderProgram(this.program!);
         }
-    };
+    }
 
     public setEnabled(enabled: boolean): void {
         if (enabled) {
@@ -120,20 +121,21 @@ class HsvRenderer_1_9_WebGL implements HsvRenderer {
         } else {
             this.setRenderingNode(undefined);
         }
-    };
+    }
 
     public updateMatrix(matrix: gl.mat4): void {
         // Constantly update the current rendering node.
         this.setRenderingNode(getRenderingNode(this.view));
-        let array: number[] = Array.prototype.slice.call(matrix);
-        let location = this.program!.getUniformLocationForName('u_hsv');
+        const array: number[] = Array.prototype.slice.call(matrix);
+        const location = this.program!.getUniformLocationForName('u_hsv');
         this.program!.use();
         this.program!.setUniformLocationWithMatrix4fv(location, array);
-    };
+    }
 
-    public updateMaterial(): void { };
-};
+    public updateMaterial(): void { }
+}
 
+// tslint:disable-next-line:class-name
 class HsvRenderer_1_9_Native implements HsvRenderer {
     private view?: cc.Node;
 
@@ -143,8 +145,8 @@ class HsvRenderer_1_9_Native implements HsvRenderer {
     private oldProgramState?: cc.GLProgramState;
 
     private isSupported(): boolean {
-        return 'opengl' in cc.sys.capabilities
-    };
+        return 'opengl' in cc.sys.capabilities;
+    }
 
     public initialize(view: cc.Node): boolean {
         if (!this.isSupported()) {
@@ -157,7 +159,7 @@ class HsvRenderer_1_9_Native implements HsvRenderer {
         program.updateUniforms();
         this.programState = cc.GLProgramState.getOrCreateWithGLProgram(program);
         return true;
-    };
+    }
 
     private setRenderingNode(node: _ccsg.Node | undefined): void {
         if (node === this.renderingNode) {
@@ -171,7 +173,7 @@ class HsvRenderer_1_9_Native implements HsvRenderer {
             this.oldProgramState = this.renderingNode.getGLProgramState();
             this.renderingNode.setGLProgramState(this.programState!);
         }
-    };
+    }
 
     public setEnabled(enabled: boolean): void {
         if (enabled) {
@@ -179,36 +181,37 @@ class HsvRenderer_1_9_Native implements HsvRenderer {
         } else {
             this.setRenderingNode(undefined);
         }
-    };
+    }
 
     public updateMatrix(matrix: gl.mat4): void {
         // Constantly update the current rendering node.
         this.setRenderingNode(getRenderingNode(this.view));
-        let array: number[] = Array.prototype.slice.call(matrix);
+        const array: number[] = Array.prototype.slice.call(matrix);
         this.programState!.setUniformMat4('u_hsv', array);
-    };
+    }
 
-    public updateMaterial(): void { };
-};
+    public updateMaterial(): void { }
+}
 
+// tslint:disable-next-line:class-name
 class HsvRenderer_2_0_WebGL implements HsvRenderer {
     private view?: cc.Node;
     private material: HsvMaterial | null;
 
     public constructor() {
         this.material = null;
-    };
+    }
 
     public initialize(view: cc.Node): boolean {
         this.view = view;
         const material = new HsvMaterial();
         this.material = material;
         return true;
-    };
+    }
 
     public setEnabled(enabled: boolean): void {
         // Do nothing.
-    };
+    }
 
     public updateMatrix(matrix: gl.mat4): void {
         const material = this.material;
@@ -220,7 +223,7 @@ class HsvRenderer_2_0_WebGL implements HsvRenderer {
         const convertedMatrix = cc.vmath.mat4.create();
         cc.vmath.mat4.set.call(null, convertedMatrix, ...array);
         material.setMatrix(convertedMatrix);
-    };
+    }
 
     public updateMaterial(): void {
         const material = this.material;
@@ -244,8 +247,8 @@ class HsvRenderer_2_0_WebGL implements HsvRenderer {
         }
         sprite.markForUpdateRenderData(true);
         sprite.markForRender(true);
-    };
-};
+    }
+}
 
 @ccclass
 @disallowMultiple
@@ -270,17 +273,17 @@ export class HsvComponent extends cc.Component {
         max: 359,
         slide: true,
     })
-    private get hue() {
+    private get hue(): number {
         return this._hue;
-    };
+    }
 
-    private set hue(value) {
+    private set hue(value: number) {
         if (this._hue === value) {
             return;
         }
         this._hue = value;
         this.hueMatrixDirty = true;
-    };
+    }
 
     @property({
         type: cc.Float,
@@ -288,43 +291,43 @@ export class HsvComponent extends cc.Component {
         max: +1.0,
         slide: true,
     })
-    private get brightness() {
+    private get brightness(): number {
         return this._brightness;
-    };
+    }
 
-    private set brightness(value) {
+    private set brightness(value: number) {
         if (this._brightness === value) {
             return;
         }
         this._brightness = value;
         this.brightnessMatrixDirty = true;
-    };
+    }
 
     @property({ type: cc.Float })
-    private get saturation() {
+    private get saturation(): number {
         return this._saturation;
-    };
+    }
 
-    private set saturation(value) {
+    private set saturation(value: number) {
         if (this._saturation === value) {
             return;
         }
         this._saturation = value;
         this.saturationMatrixDirty = true;
-    };
+    }
 
     @property({ type: cc.Float })
-    private get contrast() {
+    private get contrast(): number {
         return this._contrast;
-    };
+    }
 
-    private set contrast(value) {
+    private set contrast(value: number) {
         if (this._contrast === value) {
             return;
         }
         this._contrast = value;
         this.contrastMatrixDirty = true;
-    };
+    }
 
     private renderer: HsvRenderer;
 
@@ -348,26 +351,26 @@ export class HsvComponent extends cc.Component {
         this.brightnessMatrix = gl.mat4.create();
         this.contrastMatrix = gl.mat4.create();
         this.renderer = new NullHsvRenderer();
-    };
+    }
 
     public onLoad(): void {
         this.renderer = createRenderer(this.node);
-    };
+    }
 
     public onEnable(): void {
         this.renderer.setEnabled(true);
-    };
+    }
 
     public onDisable(): void {
         this.renderer.setEnabled(false);
-    };
+    }
 
     public update(delta: number): void {
         if (this.updateMatrix()) {
             this.renderer.updateMatrix(this.matrix);
         }
         this.renderer.updateMaterial();
-    };
+    }
 
     private updateMatrix(): boolean {
         let dirty = false;
@@ -384,7 +387,7 @@ export class HsvComponent extends cc.Component {
             return true;
         }
         return false;
-    };
+    }
 
     private updateHueMatrix(): boolean {
         if (this.hueMatrixDirty) {
@@ -393,7 +396,7 @@ export class HsvComponent extends cc.Component {
             return true;
         }
         return false;
-    };
+    }
 
     private updateSaturationMatrix(): boolean {
         if (this.saturationMatrixDirty) {
@@ -402,7 +405,7 @@ export class HsvComponent extends cc.Component {
             return true;
         }
         return false;
-    };
+    }
 
     private updateBrightnessMatrix(): boolean {
         if (this.brightnessMatrixDirty) {
@@ -411,7 +414,7 @@ export class HsvComponent extends cc.Component {
             return true;
         }
         return false;
-    };
+    }
 
     private updateContrastMatrix(): boolean {
         if (this.contrastMatrixDirty) {
@@ -420,5 +423,5 @@ export class HsvComponent extends cc.Component {
             return true;
         }
         return false;
-    };
-};
+    }
+}

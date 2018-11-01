@@ -1,12 +1,17 @@
 import assert = require('assert');
 import * as Polyglot from 'node-polyglot';
-import { ProfileManager } from './ProfileManager';
 import { ObserverManager } from './ObserverManager';
+import { ProfileManager } from './ProfileManager';
 
 type Observer = () => void;
 
 export class LanguageManager extends ObserverManager<Observer> {
     private static sharedInstance?: LanguageManager;
+
+    /** Gets the singleton. */
+    public static getInstance(): LanguageManager {
+        return this.sharedInstance || (this.sharedInstance = new this());
+    }
 
     /**
      * Current config directory.
@@ -21,22 +26,17 @@ export class LanguageManager extends ObserverManager<Observer> {
     /** Wrappee i18n manager. */
     private polyglot: Polyglot;
 
-    /** Gets the singleton. */
-    static getInstance(): LanguageManager {
-        return this.sharedInstance || (this.sharedInstance = new this());
-    };
-
     private constructor() {
         super();
         // Hide construction.
         this.configs = {};
         this.polyglot = new Polyglot();
 
-        let profile = ProfileManager.getInstance();
+        const profile = ProfileManager.getInstance();
         this.currentLanguage = profile.loadData('current_language');
         this.configDir = profile.loadData('config_dir');
         this.updateConfigs();
-    };
+    }
 
     /**
      * Gets all available languages.
@@ -44,7 +44,7 @@ export class LanguageManager extends ObserverManager<Observer> {
      */
     public getLanguages(): string[] {
         return Object.keys(this.configs);
-    };
+    }
 
     /**
      * Gets the config dir.
@@ -52,7 +52,7 @@ export class LanguageManager extends ObserverManager<Observer> {
      */
     public getConfigDir(): string | undefined {
         return this.configDir;
-    };
+    }
 
     /**
      * Sets the config directory.
@@ -61,22 +61,22 @@ export class LanguageManager extends ObserverManager<Observer> {
     public setConfigDir(path: string): void {
         this.configDir = path;
         if (CC_EDITOR) {
-            let profile = ProfileManager.getInstance();
+            const profile = ProfileManager.getInstance();
             profile.saveData('config_dir', this.configDir);
         }
         this.updateConfigs();
         this.updateLanguage();
-    };
+    }
 
     /** Clears the language directory. */
     public resetConfigDir(): void {
         this.configDir = undefined;
         if (CC_EDITOR) {
-            let profile = ProfileManager.getInstance();
+            const profile = ProfileManager.getInstance();
             profile.saveData('config_dir', this.configDir);
         }
         this.updateConfigs();
-    };
+    }
 
     private updateConfigs(): void {
         this.configs = {};
@@ -86,12 +86,12 @@ export class LanguageManager extends ObserverManager<Observer> {
         }
         if (CC_EDITOR) {
             Editor.assetdb.queryUrlByUuid(this.configDir, (err, url) => {
-                let pattern = url + '/*.json';
+                const pattern = url + '/*.json';
                 const type = (cc.ENGINE_VERSION >= '2' ? 'json' : 'text');
-                Editor.assetdb.queryAssets(pattern, type, (err, result) => {
+                Editor.assetdb.queryAssets(pattern, type, (err2, result) => {
                     result.forEach((item: any) => {
                         import(item.path).then(config => {
-                            let language = this.parseLanguage(item.path);
+                            const language = this.parseLanguage(item.path);
                             this.configs[language] = config;
                             this.updateLanguage();
                         });
@@ -101,9 +101,9 @@ export class LanguageManager extends ObserverManager<Observer> {
         } else {
             cc.loader.loadResDir(this.configDir, (err: any, results: any[], urls: string[]) => {
                 for (let i = 0; i < urls.length; ++i) {
-                    let path = urls[i] + '.json'; // Suffixed with .json for regex matching.
-                    let content = results[i];
-                    let language = this.parseLanguage(path);
+                    const path = urls[i] + '.json'; // Suffixed with .json for regex matching.
+                    const content = results[i];
+                    const language = this.parseLanguage(path);
                     if (cc.ENGINE_VERSION >= '2') {
                         this.configs[language] = content.json;
                     } else {
@@ -113,60 +113,60 @@ export class LanguageManager extends ObserverManager<Observer> {
                 }
             });
         }
-    };
+    }
 
     private updateLanguage(): void {
         this.polyglot.clear();
         if (this.currentLanguage !== undefined) {
-            let config = this.configs[this.currentLanguage];
+            const config = this.configs[this.currentLanguage];
             if (config !== undefined) {
                 this.polyglot.extend(config);
             }
         }
         this.dispatch(observer => observer());
-    };
+    }
 
     /** Gets the active language. */
     public getCurrentLanguage(): string | undefined {
         return this.currentLanguage;
-    };
+    }
 
     /** Sets the active language. */
     public setCurrentLanguage(language: string | undefined): void {
         this.currentLanguage = language;
         if (CC_EDITOR) {
-            let profile = ProfileManager.getInstance();
+            const profile = ProfileManager.getInstance();
             profile.saveData('current_language', language);
         }
         this.updateLanguage();
-    };
+    }
 
     /** Gets the language format in the current language. */
     public getFormat(key: string): string | undefined {
         if (this.currentLanguage === undefined) {
             return undefined;
         }
-        let config = this.configs[this.currentLanguage];
+        const config = this.configs[this.currentLanguage];
         if (config === undefined) {
             return undefined;
         }
         return config[key];
-    };
+    }
 
     public parseFormat(key: string, options?: Polyglot.InterpolationOptions): string | undefined {
         if (this.polyglot.has(key)) {
             return this.polyglot.t(key, options!);
         }
         return undefined;
-    };
+    }
 
     /** Detects language for the config path. */
     private parseLanguage(path: string): string {
         const regex = /\/(\w+)\.\w+$/g;
-        let match = regex.exec(path);
+        const match = regex.exec(path);
         if (match === null) {
             return '';
         }
         return match[1];
-    };
-};
+    }
+}

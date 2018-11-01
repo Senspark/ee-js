@@ -8,6 +8,8 @@ const { ccclass, disallowMultiple, executeInEditMode, inspector, menu, property 
 @inspector('packages://ee/inspector/LanguageInspector.js')
 @menu('ee/LanguageComponent')
 export class LanguageComponent extends cc.Component {
+    private static counter: number = 0;
+
     /** Gets or sets the multilingual key. */
     @property(cc.String)
     public _key: string = '{null}';
@@ -15,18 +17,19 @@ export class LanguageComponent extends cc.Component {
     @property({ type: cc.String })
     public get key(): string {
         return this._key;
-    };
+    }
 
-    public set key(value) {
+    public set key(value: string) {
         this._key = value;
         this.updateText();
-    };
+    }
 
     /** Gets the multilingual format corresponding to the current key. */
     @property({
         type: cc.String,
-        readonly: true
+        readonly: true,
     })
+
     public get format() {
         return this.getLanguageManager().getFormat(this.key) || '';
     };
@@ -38,29 +41,29 @@ export class LanguageComponent extends cc.Component {
     @property({ readonly: true })
     public get paramKeys(): string[] {
         return this.parseParamKeys(this.format);
-    };
+    }
 
     /** Gets or sets the multilingual parameter values. */
     @property
-    public get paramValues() {
+    public get paramValues(): string[] {
         while (this._paramValues.length < this.paramKeys.length) {
             this._paramValues.push('');
         }
         return this._paramValues;
-    };
+    }
 
-    public set paramValues(value) {
+    public set paramValues(value: string[]) {
         this._paramValues = value;
         this.updateText();
-    };
+    }
 
     /** Gets the translated string. */
     @property({
         type: cc.String,
-        readonly: true
+        readonly: true,
     })
-    public get string() {
-        let options: any = {};
+    public get string(): string | undefined {
+        const options: any = {};
         for (let i = 0; i < this.paramKeys.length; ++i) {
             options[this.paramKeys[i]] = this.paramValues[i];
         }
@@ -72,13 +75,13 @@ export class LanguageComponent extends cc.Component {
         return this.getLanguageManager().getConfigDir();
     };
 
-    private set config(value) {
+    private set config(value: string | undefined) {
         if (value !== undefined && value.length > 0 /* May be empty */) {
             this.getLanguageManager().setConfigDir(value);
         } else {
             this.getLanguageManager().resetConfigDir();
         }
-    };
+    }
 
     @property
     private get languages() {
@@ -118,7 +121,7 @@ export class LanguageComponent extends cc.Component {
             this.updateText();
         });
         this.updateText();
-    };
+    }
 
     public onDisable(): void {
         this.getLanguageManager().removeObserver(this.componentId);
@@ -129,9 +132,9 @@ export class LanguageComponent extends cc.Component {
             // Repeatedly update string when in editor mode.
             this.updateText();
         }
-    };
+    }
 
-    private updateText() {
+    private updateText(): void {
         if (this.label === null) {
             this.label = this.getComponent(cc.Label);
             if (this.label === null) {
@@ -140,16 +143,16 @@ export class LanguageComponent extends cc.Component {
             }
         }
         this.label.string = this.string || '';
-    };
+    }
 
     private parseParamKeys(format: string): string[] {
         const regex = /%{(.*?)}/g;
         let match = regex.exec(format);
-        let params: string[] = [];
+        const params: string[] = [];
         while (match !== null) {
             params.push(match[1]);
             match = regex.exec(format);
         }
         return params;
-    };
-};
+    }
+}

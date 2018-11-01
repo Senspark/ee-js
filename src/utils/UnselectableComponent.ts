@@ -7,27 +7,27 @@ const { ccclass, disallowMultiple, executeInEditMode, menu } = cc._decorator;
 export class UnselectableComponent extends cc.Component {
     public onEnable(): void {
         if (CC_EDITOR) {
-            let component = this.getComponent(cc.PolygonCollider);
+            const component = this.getComponent(cc.PolygonCollider);
             if (component !== null) {
-                let gizmo = component.gizmo;
+                const gizmo = component.gizmo;
                 if (gizmo !== null && gizmo !== undefined) {
-                    let element = <SVGPolygonElement>(gizmo._root.dragArea.node);
+                    const element = gizmo._root.dragArea.node as SVGPolygonElement;
                     element.style.pointerEvents = 'none';
                 }
             }
         }
-    };
+    }
 
     public onDisable(): void {
         if (CC_EDITOR) {
-            let component = this.getComponent(cc.PolygonCollider);
+            const component = this.getComponent(cc.PolygonCollider);
             if (component !== null) {
-                let gizmo = component.gizmo;
+                const gizmo = component.gizmo;
                 if (gizmo !== null && gizmo !== undefined) {
-                    let element = <SVGPolygonElement>(gizmo._root.dragArea.node);
+                    const element = gizmo._root.dragArea.node as SVGPolygonElement;
                     element.style.pointerEvents = 'fill';
                 }
             }
         }
-    };
-};
+    }
+}

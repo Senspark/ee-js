@@ -17,4 +17,4 @@ export interface DialogManager {
      * @param dialog The dialog to be popped.
      */
     popDialog(dialog: Dialog): void;
-};
+}

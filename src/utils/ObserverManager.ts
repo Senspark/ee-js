@@ -4,7 +4,7 @@ export class ObserverManager<T> {
 
     public constructor() {
         this.observers = {};
-    };
+    }
 
     /** Adds an observer whose the specified key. */
     public addObserver(key: string, observer: T): boolean {
@@ -13,7 +13,7 @@ export class ObserverManager<T> {
         }
         this.observers[key] = observer;
         return true;
-    };
+    }
 
     /** Removes an observer whose the specified key. */
     public removeObserver(key: string): boolean {
@@ -22,12 +22,12 @@ export class ObserverManager<T> {
         }
         delete this.observers[key];
         return true;
-    };
+    }
 
     public dispatch(callback: (observer: T) => void): void {
         Object.keys(this.observers).forEach(key => {
-            let observer = this.observers[key];
+            const observer = this.observers[key];
             callback(observer!);
         });
-    };
-};
+    }
+}

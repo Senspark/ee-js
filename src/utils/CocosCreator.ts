@@ -1,35 +1,38 @@
 import assert = require('assert');
 
-import { UnselectableComponent } from './UnselectableComponent';
 import { NestedPrefab } from './NestedPrefab';
 import { ProfileManager } from './ProfileManager';
+import { UnselectableComponent } from './UnselectableComponent';
 
-type Dict = { [key: string]: any };
+interface Dict {
+    [key: string]: any;
+}
 
-const setting_key = 'use_nested_prefab';
+const settingKey = 'use_nested_prefab';
 
+// tslint:disable-next-line:ban-types
 const cloneFunction = <T extends Function>(f: T) => {
-    const result = function (this: any) {
+    const result = function (this: any): any {
         return f.apply(this, arguments);
     };
     for (const key in f) {
         if (f.hasOwnProperty(key)) {
-            (<Dict>result)[key] = (<Dict>f)[key];
+            (result as Dict)[key] = (f as Dict)[key];
         }
     }
-    return <T><any>result;
+    return result as any as T;
 };
 
 const overwriteGetIntersectionList = (oldFunction: typeof cc.engine.getIntersectionList) => {
     cc.log('overwrite cc.engine.getIntersectionList.');
 
     // Clone the original getIntersectionList function.
-    const original = <typeof oldFunction>cloneFunction(oldFunction).bind(cc.engine);
+    const original = cloneFunction(oldFunction).bind(cc.engine) as typeof oldFunction;
 
     // Overwrite the getIntersectionList function.
     return (rect: cc.Rect, t?: boolean) => {
         const profile = ProfileManager.getInstance();
-        if (!profile.loadData(setting_key)) {
+        if (!profile.loadData(settingKey)) {
             return original(rect, t);
         }
         return original(rect, t).filter(entry => {
@@ -49,14 +52,14 @@ const overwriteGetIntersectionList = (oldFunction: typeof cc.engine.getIntersect
 const overwriteDumpHierarchy = (oldFunction: typeof _Scene.dumpHierarchy) => {
     cc.log('overwrite _Scene.dumpHierarchy.');
 
-    const original = <typeof oldFunction>cloneFunction(oldFunction);
+    const original = cloneFunction(oldFunction) as typeof oldFunction;
 
     enum NodeStates {
         Normal = 0,
         Prefab = 1,
         Prefab_AutoSync = 2,
         Prefab_Missing = 3,
-    };
+    }
 
     const getChildren = (node: cc._BaseNode) => {
         if (node.getComponent(UnselectableComponent) !== null) {
@@ -70,8 +73,8 @@ const overwriteDumpHierarchy = (oldFunction: typeof _Scene.dumpHierarchy) => {
             } else {
                 state = NodeStates.Prefab;
             }
-        };
-        const children: {}[] = [];
+        }
+        const children: Array<{}> = [];
         node._children.map(getChildren).forEach(entry => {
             if (entry !== undefined) {
                 children.push(entry);
@@ -81,20 +84,20 @@ const overwriteDumpHierarchy = (oldFunction: typeof _Scene.dumpHierarchy) => {
             name: node.name,
             id: node.uuid,
             children: children.length > 0 ? children : null,
-            state: state,
+            state,
             isActive: node._activeInHierarchy,
         };
     };
 
-    return <typeof oldFunction>((scene?: cc.Scene, includeScene?: boolean) => {
+    return ((scene?: cc.Scene, includeScene?: boolean) => {
         const profile = ProfileManager.getInstance();
-        if (!profile.loadData(setting_key)) {
+        if (!profile.loadData(settingKey)) {
             return original(scene, includeScene);
         }
         scene = scene || cc.director.getScene();
-        const nodes = includeScene ? [<cc._BaseNode>(scene)] : scene._children;
+        const nodes = includeScene ? [scene as cc._BaseNode] : scene._children;
         return nodes.map(getChildren);
-    });
+    }) as typeof oldFunction;
 };
 
 /** Version < 2 */
@@ -102,13 +105,13 @@ const overwriteCreateNodeFromAsset = (oldFunction: typeof _Scene.createNodeFromA
     cc.log('overwrite _Scene.createNodeFromAsset.');
 
     const original = cloneFunction(oldFunction);
-    return <typeof oldFunction>((uuid: string, callback: any) => {
+    return ((uuid: string, callback: any) => {
         const profile = ProfileManager.getInstance();
         if (!profile.loadData('use_nested_prefab')) {
             original(uuid, callback);
             return;
         }
-        cc.AssetLibrary.queryAssetInfo(uuid, (error, url, raw, ctor) => {
+        cc.AssetLibrary.queryAssetInfo(uuid, (err0, url, raw, ctor) => {
             if (ctor === cc.Prefab) {
                 cc.AssetLibrary.loadAsset(uuid, (error, result) => {
                     if (error) {
@@ -147,17 +150,17 @@ const overwriteCreateNodeFromAsset = (oldFunction: typeof _Scene.createNodeFromA
                 original(uuid, callback);
             }
         });
-    });
+    }) as typeof oldFunction;
 };
 
 const overwriteGizmoRegisterEvent = (oldFunction: typeof Editor.Gizmo.prototype._registerEvent) => {
     cc.log('overwrite Editor.Gizmo._registerEvent');
 
-    return function (this: Editor.Gizmo) {
-        const node = <SVGPolygonElement>(this._root.node);
+    return function (this: Editor.Gizmo): void {
+        const node = this._root.node as SVGPolygonElement;
         const isIgnore = () => {
             const profile = ProfileManager.getInstance();
-            if (!profile.loadData(setting_key)) {
+            if (!profile.loadData(settingKey)) {
                 return false;
             }
             assert(this.node !== null);
@@ -168,8 +171,8 @@ const overwriteGizmoRegisterEvent = (oldFunction: typeof Editor.Gizmo.prototype.
             if (isIgnore()) {
                 return;
             }
-            const uuid = this.nodes.map(node => node.uuid);
-            Editor.Selection.select("node", uuid)
+            const uuid = this.nodes.map(item => item.uuid);
+            Editor.Selection.select("node", uuid);
         }, true);
         node.addEventListener("mouseover", (event: MouseEvent) => {
             if (isIgnore()) {
@@ -187,9 +190,9 @@ const overwriteGizmoRegisterEvent = (oldFunction: typeof Editor.Gizmo.prototype.
             if (isIgnore()) {
                 return;
             }
-            const element = <SVGPolygonElement>event.srcElement;
-            (<any>element).instance.ignoreMouseMove || event.stopPropagation();
-        }, false)
+            const element = event.srcElement as SVGPolygonElement;
+            (element as any).instance.ignoreMouseMove || event.stopPropagation();
+        }, false);
     };
 };
 
@@ -207,15 +210,12 @@ const overwriteFunction = (oldFunction: any, callback: any) => {
 // Version >= 2
 // app.asar/editor/page/scene-utils/dump/hierarchy.js
 const dumpHierarchy = (scene?: cc.Scene, includeScene?: boolean) => {
-    const profile = ProfileManager.getInstance();
-    const filter: boolean = profile.loadData(setting_key);
-
     enum NodeStates {
         Normal = 0,
         Prefab = 1,
         Prefab_AutoSync = 2,
         Prefab_Missing = 3,
-    };
+    }
 
     const getChildren = (node: cc._BaseNode, filter: boolean) => {
         if (filter && node.getComponent(UnselectableComponent) !== null) {
@@ -237,9 +237,9 @@ const dumpHierarchy = (scene?: cc.Scene, includeScene?: boolean) => {
             } else {
                 state = NodeStates.Prefab;
             }
-        };
-        const children: {}[] = [];
-        node._children.map(node => getChildren(node, filter)).forEach(entry => {
+        }
+        const children: Array<{}> = [];
+        node._children.map(item => getChildren(item, filter)).forEach(entry => {
             if (entry !== undefined) {
                 children.push(entry);
             }
@@ -251,13 +251,14 @@ const dumpHierarchy = (scene?: cc.Scene, includeScene?: boolean) => {
             prefabState: state,
             locked: !!(node._objFlags & cc.Object.Flags.LockedInEditor),
             isActive: node._activeInHierarchy,
-            hidden: node instanceof cc.PrivateNode
+            hidden: node instanceof cc.PrivateNode,
         };
     };
 
+    const profile = ProfileManager.getInstance();
     scene = scene || cc.director.getScene();
-    const nodes = includeScene ? [<cc._BaseNode>(scene)] : scene._children;
-    return nodes.map(node => getChildren(node, filter));
+    const nodes = includeScene ? [scene as cc._BaseNode] : scene._children;
+    return nodes.map(node => getChildren(node, profile.loadData(settingKey)));
 };
 
 if (CC_EDITOR) {
@@ -285,5 +286,6 @@ if (CC_EDITOR) {
         _Scene.dumpHierarchy = overwriteFunction(_Scene.dumpHierarchy, overwriteDumpHierarchy);
         _Scene.createNodeFromAsset = overwriteFunction(_Scene.createNodeFromAsset, overwriteCreateNodeFromAsset);
     }
-    Editor.Gizmo.prototype._registerEvent = overwriteFunction(Editor.Gizmo.prototype._registerEvent, overwriteGizmoRegisterEvent);
+    Editor.Gizmo.prototype._registerEvent = overwriteFunction(Editor.Gizmo.prototype._registerEvent,
+        overwriteGizmoRegisterEvent);
 }

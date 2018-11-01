@@ -4,8 +4,16 @@ import { UnselectableComponent } from './UnselectableComponent';
 const { ccclass, disallowMultiple, executeInEditMode, menu, property } = cc._decorator;
 
 /** Decorator for nested prefabs. */
-export const nest = (type: { prototype: cc.Component }) => {
-    return function (target: any, propertyKey: string) {
+export const nest = (type: { prototype: cc.Component } | Array<{ prototype: cc.Component }>) => {
+    if (type instanceof Array) {
+        return nestArray(type[0]);
+    } else {
+        return nestSingle(type);
+    }
+};
+
+export const nestSingle = (type: { prototype: cc.Component }) => {
+    return (target: any, propertyKey: string) => {
         const internalProperty = `${propertyKey}_prefab`; // Prefixed with a dash.
 
         // Let cocos handle with the internal property.
@@ -14,20 +22,15 @@ export const nest = (type: { prototype: cc.Component }) => {
             displayName: propertyKey,
             visible: true,
         })(target, internalProperty, {
+            /** Default value is null */
             initializer: () => null,
         });
 
-        const original = target;
-        const constructor = function (this: any, ...args: any[]) {
-            const instance = original.apply(this, args);
-            return instance;
-        };
-
         Object.defineProperty(target, propertyKey, {
-            set: function (value: any): void {
+            set(value: any): void {
                 // No effect.
             },
-            get: function (this: any): any {
+            get(this: any): any {
                 const prefab = this[internalProperty];
                 if (prefab === undefined) {
                     return null;
@@ -46,11 +49,57 @@ export const nest = (type: { prototype: cc.Component }) => {
     };
 };
 
+export const nestArray = (type: { prototype: cc.Component }) => {
+    return (target: any, propertyKey: string) => {
+        const internalProperty = `${propertyKey}_prefab`;
+
+        property({
+            type: [NestedPrefab],
+            displayName: propertyKey,
+            visible: true,
+        })(target, internalProperty, {
+            /** Default value is an empty array. */
+            initializer: () => [],
+        });
+
+        Object.defineProperty(target, propertyKey, {
+            set(value: any): void {
+                // No effect.
+            },
+            get(this: any): any {
+                const prefabs = this[internalProperty];
+                if (prefabs === undefined) {
+                    return null;
+                }
+                const views = (prefabs as NestedPrefab[]).map(item => item.getView());
+                const components = views.map(item => item === null ? null : item.getComponent(type));
+                return components;
+            },
+            configurable: false,
+            enumerable: true,
+        });
+    };
+};
+
 @ccclass
 @disallowMultiple
 @executeInEditMode
 @menu('ee/NestedPrefab')
 export class NestedPrefab extends cc.Component {
+    public static createNode(prefab: cc.Prefab): cc.Node | null {
+        const node = new cc.Node();
+        const comp = node.addComponent(NestedPrefab);
+        comp.prefab = prefab;
+        node.name = prefab.name;
+        const view = comp.getView();
+        if (view === null) {
+            return null;
+        }
+        node.setContentSize(view.getContentSize());
+        node.setAnchorPoint(view.getAnchorPoint());
+        return node;
+    }
+
     private instantiated: boolean = false;
     private view: cc.Node | null = null;
 
@@ -58,17 +107,11 @@ export class NestedPrefab extends cc.Component {
     private _prefab: cc.Prefab | null = null;
 
     @property({ type: cc.Prefab })
-    private get prefab() {
+    private get prefab(): cc.Prefab | null {
         return this._prefab;
-    };
+    }
 
-    @property(cc.Boolean)
-    private instantiate: boolean = true;
-
-    @property(cc.Boolean)
-    private synchronize: boolean = false;
-
-    private set prefab(value) {
+    private set prefab(value: cc.Prefab | null) {
         if (this._prefab !== null) {
             if (this.view === null) {
                 if (CC_EDITOR) {
@@ -87,21 +130,13 @@ export class NestedPrefab extends cc.Component {
                 this.setupView();
             }
         }
-    };
+    }
 
-    public static createNode(prefab: cc.Prefab): cc.Node | null {
-        const node = new cc.Node();
-        const comp = node.addComponent(NestedPrefab);
-        comp.prefab = prefab;
-        node.name = prefab.name;
-        const view = comp.getView();
-        if (view === null) {
-            return null;
-        }
-        node.setContentSize(view.getContentSize());
-        node.setAnchorPoint(view.getAnchorPoint());
-        return node;
-    };
+    @property(cc.Boolean)
+    private instantiate: boolean = true;
+
+    @property(cc.Boolean)
+    private synchronize: boolean = false;
 
     public onLoad(): void {
         if (!CC_EDITOR && !this.instantiated && this.instantiate) {
@@ -110,7 +145,7 @@ export class NestedPrefab extends cc.Component {
                 this.applySync();
             }
         }
-    };
+    }
 
     public update(): void {
         if (!CC_EDITOR) {
@@ -136,14 +171,14 @@ export class NestedPrefab extends cc.Component {
             }
         }
         this.applySync();
-    };
+    }
 
     /** Creates a view using the current prefab. */
     public createView(): cc.Node {
         assert(this.prefab !== null);
         const view = cc.instantiate(this.prefab!);
         return view;
-    };
+    }
 
     public getView(): cc.Node | null {
         if (!this.instantiate) {
@@ -162,9 +197,9 @@ export class NestedPrefab extends cc.Component {
             }
         }
         return this.view;
-    };
+    }
 
-    public setPrefab(prefab: cc.Prefab) {
+    public setPrefab(prefab: cc.Prefab): void {
         this.prefab = prefab;
     }
 
@@ -181,7 +216,7 @@ export class NestedPrefab extends cc.Component {
         this.view = this.createView();
         this.node.addChild(this.view);
         return true;
-    };
+    }
 
     private setupView(): boolean {
         if (this.view === null) {
@@ -191,7 +226,7 @@ export class NestedPrefab extends cc.Component {
         this.freeze(this.view);
         this.view._objFlags |= cc.Object.Flags.DontSave;
         return true;
-    };
+    }
 
     private freeze(node: cc.Node): void {
         if (node.getComponent(UnselectableComponent) === null) {
@@ -204,13 +239,13 @@ export class NestedPrefab extends cc.Component {
             }
         }
         node.children.forEach(child => this.freeze(child));
-    };
+    }
 
-    private applySync() {
+    private applySync(): void {
         const view = this.getView();
         if (view !== null && this.synchronize) {
             this.node.setContentSize(view.getContentSize());
             this.node.setAnchorPoint(view.getAnchorPoint());
         }
-    };
-};
+    }
+}

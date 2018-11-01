@@ -19,7 +19,7 @@ const findBestScrollView = (event: cc.Event.EventTouch, target: cc.Node) => {
     } else {
         const delta = event.touch.getDelta();
         // Check all ancestor scroll views.
-        const ancestors = getAncestors(event, target)
+        const ancestors = getAncestors(event, target);
         if (bestView.vertical && Math.abs(delta.x) > Math.abs(delta.y)) {
             ancestors.some(item => {
                 if (item.horizontal) {
@@ -54,14 +54,14 @@ export class NestedScrollView extends cc.Component {
             this.setupTouchEnded(listener);
             this.setupTouchCancelled(listener);
         }
-    };
+    }
 
     public onDisable(): void {
         // TODO.
-    };
+    }
 
     private setupTouchBegan(listener: cc.TouchOneByOne): void {
-        listener.onTouchBegan = function (touch, event) {
+        listener.onTouchBegan = function (touch: cc.Touch, event: cc.Event.EventTouch): boolean {
             const pos = touch.getLocation();
             const node = this.owner;
             if (node._hitTest(pos, this)) {
@@ -76,30 +76,30 @@ export class NestedScrollView extends cc.Component {
                 views.forEach(view => view.node.dispatchEvent(event));
 
                 // Reset best view.
-                (<any>(this)).__bestView = undefined;
+                (this as any).__bestView = undefined;
                 return true;
             }
             return false;
         };
-    };
+    }
 
     private setupTouchMoved(listener: cc.TouchOneByOne): void {
-        listener.onTouchMoved = function (touch, event) {
+        listener.onTouchMoved = function (touch: cc.Touch, event: cc.Event.EventTouch): void {
             const node = this.owner;
             event.type = cc.Node.EventType.TOUCH_MOVE;
             event.touch = touch;
             event.bubbles = true;
 
-            let bestView: cc.ScrollView = (<any>(this)).__bestView; // Last calculated best view.
+            let bestView: cc.ScrollView = (this as any).__bestView; // Last calculated best view.
             if (bestView === undefined) {
-                bestView = (<any>(this)).__bestView = findBestScrollView(event, node);
+                bestView = (this as any).__bestView = findBestScrollView(event, node);
             }
             bestView.node.dispatchEvent(event);
         };
-    };
+    }
 
     private setupTouchEnded(listener: cc.TouchOneByOne): void {
-        listener.onTouchEnded = function (touch, event) {
+        listener.onTouchEnded = function (touch: cc.Touch, event: cc.Event.EventTouch): void {
             // Original lines in CCScrollView.js
             const pos = touch.getLocation();
             const node = this.owner;
@@ -116,10 +116,10 @@ export class NestedScrollView extends cc.Component {
             const views = getAncestors(event, node);
             views.forEach(view => view.node.dispatchEvent(event));
         };
-    };
+    }
 
     private setupTouchCancelled(listener: cc.TouchOneByOne): void {
-        listener.onTouchCancelled = function (touch, event) {
+        listener.onTouchCancelled = function (touch: cc.Touch, event: cc.Event.EventTouch): void {
             // Original lines in CCScrollView.js
             const node = this.owner;
             event.type = cc.Node.EventType.TOUCH_CANCEL;
@@ -131,5 +131,5 @@ export class NestedScrollView extends cc.Component {
             const views = getAncestors(event, node);
             views.forEach(view => view.node.dispatchEvent(event));
         };
-    };
-};
+    }
+}
