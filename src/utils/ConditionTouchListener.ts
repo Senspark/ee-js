@@ -18,10 +18,11 @@ export class ConditionTouchListener extends cc.Component {
         };
     }
 
-    private updateTouchBegan(): void {
+    private updateTouchEvent(): void {
         const listener = this.node._touchListener;
         if (listener !== null) {
             this.modifyTouchBegan(listener);
+            this.modifyTouchEnd(listener);
         }
     }
 
@@ -39,14 +40,28 @@ export class ConditionTouchListener extends cc.Component {
         };
     }
 
+    private modifyTouchEnd(listener: cc.TouchOneByOne): void {
+        const callback = this.conditionCallback;
+        listener.onTouchEnded = function (touch: cc.Touch, event: cc.Event.EventTouch): void {
+            if (callback(this, touch)) {
+                event.type = cc.Node.EventType.TOUCH_END;
+            } else {
+                event.type = cc.Node.EventType.TOUCH_CANCEL;
+            }
+            event.touch = touch;
+            event.bubbles = true;
+            this.owner.dispatchEvent(event);
+        };
+    }
+
     public update(delta: number): void {
-        this.updateTouchBegan();
+        this.updateTouchEvent();
     }
 
     /** Sets the condition callback used in touch start event. */
     public setConditionCallback(callback: ConditionCallback): this {
         this.conditionCallback = callback;
-        this.updateTouchBegan();
+        this.updateTouchEvent();
         return this;
     }
 }
