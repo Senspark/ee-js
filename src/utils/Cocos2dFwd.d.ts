@@ -1293,3 +1293,74 @@ declare namespace sp {
         getCurrent(trackIndex: number): sp.spine.TrackEntry;
     }
 }
+
+declare namespace ee {
+    namespace core {
+        class LogLevel {
+            constructor(priority: number, desc: string);
+        }
+
+        class Logger {
+            static getSystemLogger(): Logger;
+            static setSystemLogger(logger: Logger): void;
+
+            setEnabled(enabled: boolean): void;
+
+            log(level: LogLevel, formatString: string, ...args: any[]): void;
+            verbose(formatString: string, ...args: any[]): void;
+            debug(formatString: string, ...args: any[]): void;
+            info(formatString: string, ...args: any[]): void;
+            warn(formatString: string, ...args: any[]): void;
+            error(formatString: string, ...args: any[]): void;
+            wtf(formatString: string, ...args: any[]): void;
+        }
+    }
+
+    namespace ads {
+        class IInterstitialAd {
+            constructor();
+            isLoaded(): boolean;
+
+            load(): void;
+
+            show(): boolean;
+
+            setResultCallback(callback): void;
+            setOnClickedCallback(callback): void;
+            doOnClicked(): void;
+        }
+
+        class IRewardedVideo {
+            constructor(logger: Logger);
+
+            isLoaded(): boolean;
+
+            load(): void;
+
+            show(): boolean;
+
+            setResultCallback(callback: (boolean) => void): void;
+            setOnClickedCallback(callback: () => void): void;
+
+            doOnClicked(): void;
+        }
+
+        class MultiRewardedVideo extends IRewardedVideo {
+            constructor();
+            addItem(item: IRewardedVideo): MultiRewardedVideo;
+        }
+    }
+
+    namespace ironsource {
+        class IronSource {
+            constructor();
+            initialize(gameId: string);
+
+            createRewardedVideo(placementId: string): ads.IRewardedVideo;
+
+            createInterstitialAd(placementId: string): ads.IInterstitialAd;
+
+            setCloseTimeout(timeout: number): void;
+        }
+    }
+}
