@@ -1,3 +1,4 @@
+// tslint:disable
 declare module sp {
     declare module spine {
         class Animation {

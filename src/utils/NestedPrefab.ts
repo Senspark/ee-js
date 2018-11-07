@@ -199,10 +199,6 @@ export class NestedPrefab extends cc.Component {
         return this.view;
     }
 
-    public setPrefab(prefab: cc.Prefab): void {
-        this.prefab = prefab;
-    }
-
     /** Creates a view from the current prefab and add it to this. */
     private instantiateView(): boolean {
         if (this.view !== null) {
