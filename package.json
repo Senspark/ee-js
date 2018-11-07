@@ -1,1 +1,38 @@
-{"description":"utility library for cocos creator","version":"1.0.0","author":"senspark","license":"MIT","bugs":{"url":"https://github.com/Senspark/ee-js/issues"},"main":"dist/index.js","homepage":"https://github.com/Senspark/ee-js#readme","keywords":["cocos2d","cocos","creator","utility","utils"],"scripts":{"build":"tsc"},"dependencies":{"@types/gl-matrix":"^2.4.0","@types/node":"^10.5.2","@types/node-polyglot":"^0.4.31"},"types":"dist/index.d.ts","devDependencies":{"gl-matrix":"^2.7.0","node-polyglot":"^2.3.0","hoek":"^5.0.3","typescript":"^2.9.2"},"name":"@senspark/ee","repository":{"type":"git","url":"git+https://github.com/Senspark/ee-js.git"}}
+{
+    "description": "utility library for cocos creator",
+    "version": "1.0.0",
+    "author": "senspark",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/Senspark/ee-js/issues"
+    },
+    "main": "dist/index.js",
+    "homepage": "https://github.com/Senspark/ee-js#readme",
+    "keywords": [
+        "cocos2d",
+        "cocos",
+        "creator",
+        "utility",
+        "utils"
+    ],
+    "scripts": {
+        "build": "tsc"
+    },
+    "dependencies": {
+        "@types/gl-matrix": "^2.4.0",
+        "@types/node": "^10.5.2",
+        "@types/node-polyglot": "^0.4.31"
+    },
+    "types": "dist/index.d.ts",
+    "devDependencies": {
+        "gl-matrix": "^2.7.0",
+        "node-polyglot": "^2.3.0",
+        "hoek": "^5.0.3",
+        "typescript": "^2.9.2"
+    },
+    "name": "@senspark/ee",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Senspark/ee-js.git"
+    }
+}

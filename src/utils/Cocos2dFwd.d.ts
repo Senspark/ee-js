@@ -1,3 +1,10 @@
+// tslint:disable:class-name
+// tslint:disable:member-access
+// tslint:disable:member-ordering
+// tslint:disable:no-empty-interface
+// tslint:disable:no-namespace
+// tslint:disable:variable-name
+
 interface AssetDB {
     queryPathByUuid(uuid: string, callback: (error: string | null, result: string | null) => void): void;
     queryUrlByUuid(uuid: string, callback: (error: string | null, result: string | null) => void): void;
@@ -14,7 +21,7 @@ interface AssetTable {
 
 interface Profile {
     data: any;
-    save();
+    save(): void;
 }
 
 interface ProfileDB {
@@ -39,7 +46,7 @@ declare namespace Editor {
 
         layer(): string;
         createRoot(): void;
-        registerMoveSvg(t: any, e: any, i: any);
+        registerMoveSvg(t: any, e: any, i: any): void;
         createMoveCallbacks(t: any): any;
         onCreateMoveCallbacks(): any;
         recordChanges(): void;
@@ -77,14 +84,14 @@ declare namespace Editor {
 
     class Ipc {
         static sendToAll(event: string, ...args: any[]): void;
-    };
+    }
 
     // app.asar/editor-framework/lib/share
     class IpcListener {
-        on(event: string, callback: any);
-        once(event: string, callback: any);
+        on(event: string, callback: any): void;
+        once(event: string, callback: any): void;
         clear(): void;
-    };
+    }
 
     namespace Selection {
         function hover(e: any, t: any): void;
@@ -109,7 +116,11 @@ interface EditorEngine {
     tickInEditMode(delta: number, updateAnimation: boolean): void;
     repaintInEditMode(): void;
     getInstanceById(id: any): any | null;
-    getIntersectionList(rect: cc.Rect, t?: boolean): { node: cc.Node, aabb?: cc.Rect, obb?: Editor.Utils.Polygon }[];
+    getIntersectionList(rect: cc.Rect, t?: boolean): Array<{
+        node: cc.Node,
+        aabb?: cc.Rect,
+        obb?: Editor.Utils.Polygon,
+    }>;
     setDesignResolutionSize(width: number, height: number): void;
     getDesignResolutionSize(): cc.Size;
     obbApplyAffineTransform(e: any, t: any, i: any, n: any, c: any, r: any): void;
@@ -296,7 +307,10 @@ declare namespace cc {
      * @param transOrY Transform matrix or y.
      * @param t Tranform matrix.
      */
-    function pointApplyAffineTransform(point: Vec2 | number, transOrY: number | AffineTransform, t?: AffineTransform): Vec2;
+    function pointApplyAffineTransform(
+        point: Vec2 | number,
+        transOrY: number | AffineTransform,
+        t?: AffineTransform): Vec2;
 
     /** Applies the affine transformation on a size. */
     function sizeApplyAffineTransform(size: Size, t: AffineTransform): Size;
@@ -341,7 +355,12 @@ declare namespace cc {
     class AssetLibrary {
         static loadAsset(uuid: string, callback: (error: string | null, asset: any | null) => void, options?: {}): void;
         static getLibUrlNoExt(uuid: string): string;
-        static queryAssetInfo(uuid: string, callback: (error: string | null, url?: string, raw?: boolean, ctor?: any) => void): void;
+        static queryAssetInfo(uuid: string, callback: (
+            error: string | null,
+            url?: string,
+            raw?: boolean,
+            ctor?: any,
+        ) => void): void;
 
         /**
          * Gets the exists asset by uuid.
@@ -352,7 +371,8 @@ declare namespace cc {
 
     namespace loader {
         const _resources: AssetTable;
-        function _loadResUuids(uuids: string[],
+        function _loadResUuids(
+            uuids: string[],
             progressCallback?: (completedCount: number, totalCount: number, item: any) => void,
             completeCallback?: (error: Error, resource: any) => void): void;
     }
@@ -545,7 +565,7 @@ declare namespace cc {
         static FLAG_POST_UPDATE_RENDER_DATA: number;
         static FLAG_POST_RENDER: number;
         static FLAG_FINAL: number;
-    };
+    }
 
     namespace renderer {
         const _forward: renderEngine.ForwardRenderer;
@@ -608,7 +628,7 @@ declare namespace cc {
                 clone(): GraySpriteMaterial;
             }
 
-            interface StencilMaterial extends Material {
+            class StencilMaterial extends Material {
                 effect: any;
                 useTexture: boolean;
                 useModel: boolean;
@@ -654,7 +674,7 @@ declare namespace cc {
                 /** Vertex attribute semantic. */
                 const ATTR_POSITION: string;
                 const ATTR_NORMAL: 'a_normal';
-                const ATTR_TANGENT: 'a_tangent'
+                const ATTR_TANGENT: 'a_tangent';
                 const ATTR_BITANGENT: 'a_bitangent';
                 const ATTR_WEIGHTS: 'a_weights';
                 const ATTR_JOINTS: 'a_joints';
@@ -805,11 +825,11 @@ declare namespace cc {
 
                     constructor(
                         stages: string[],
-                        parameters: {
+                        parameters: Array<{
                             name: string,
                             type: number,
                             size?: number,
-                        }[],
+                        }>,
                         passes: Pass[],
                         layer?: any);
 
@@ -820,12 +840,12 @@ declare namespace cc {
                     constructor(
                         techniques: Technique[],
                         properties?: {
-                            [key: string]: any
+                            [key: string]: any,
                         },
-                        defines?: {
+                        defines?: Array<{
                             name: string,
-                            value: any
-                        }[]);
+                            value: any,
+                        }>);
 
                     clear(): void;
                     getTechnique(stage: any): Technique | null;
@@ -1013,7 +1033,7 @@ declare namespace cc {
         setUniformMat4(name: string, value: number[]): void;
         setUniformCallback(name: string, callback: any): void;
         setUniformTexture(name: string, textureId: number): void;
-    };
+    }
 
     class shaderCache {
         /** Reloads the default shaders. */
@@ -1028,7 +1048,7 @@ declare namespace cc {
 
     /** kazmath */
     namespace math {
-        function vec3(x: number | Vec3, y?: number, z?: number);
+        function vec3(x: number | Vec3, y?: number, z?: number): Vec3;
 
         class Vec3 {
             static zero: Vec3;
@@ -1036,7 +1056,7 @@ declare namespace cc {
             y: number;
             z: number;
             constructor(x: number | Vec3, y?: number, z?: number);
-            fill(x: number | Vec3, y?: number, z?: number);
+            fill(x: number | Vec3, y?: number, z?: number): void;
             length(): number;
             lengthSq(): number;
             normalize(): this;
@@ -1134,7 +1154,10 @@ declare namespace cc {
             /** Builds a matrix by a quaternion. */
             static createByQuaternion(quaternion: Quaternion, matrix?: Matrix4): Matrix4;
 
-            /** Builds a 4x4 OpenGL transformation matrix using a 3x3 rotation matrix and a 3d vector representing a translation. */
+            /**
+             * Builds a 4x4 OpenGL transformation matrix using a 3x3 rotation matrix and a 3d vector representing a
+             * translation.
+             */
             static createByRotationTranslation(rotation: Matrix3, translation: Vec3, matrix?: Matrix4): Matrix4;
 
             /** Builds a scaling matrix. */
@@ -1155,7 +1178,7 @@ declare namespace cc {
 
             get(row: number, col: number): number;
             set(row: number, col: number, value: number): void;
-            swap(r1, number, c1: number, r2: number, c2: number): void;
+            swap(r1: number, c1: number, r2: number, c2: number): void;
 
             /**
              * Calculates the inverse of the current matrix.
@@ -1240,7 +1263,8 @@ declare namespace sp {
         setSkeletonData(data: spine.SkeletonData, ownsDat: boolean): void;
 
         /** Returns the renderer of attachment. */
-        getTextureAtlas(regionAttachment: spine.RegionAttachment | spine.BoundingBoxAttachment): spine.TextureAtlasRegion;
+        getTextureAtlas(
+            regionAttachment: spine.RegionAttachment | spine.BoundingBoxAttachment): spine.TextureAtlasRegion;
 
         /** Returns the blend func. */
         getBlendFunc(): cc.BlendFunc;
