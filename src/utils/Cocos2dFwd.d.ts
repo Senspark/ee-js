@@ -1321,12 +1321,24 @@ declare namespace sp {
 declare namespace ee {
     namespace core {
         class LogLevel {
+            static readonly Verbose: LogLevel;
+            static readonly Debug: LogLevel;
+            static readonly Info: LogLevel;
+            static readonly Warn: LogLevel;
+            static readonly Error: LogLevel;
+            static readonly Assert: LogLevel;
             constructor(priority: number, desc: string);
+
+            priority: number;
         }
 
         class Logger {
-            static getSystemLogger(): Logger;
+            static getSystemLogger(): this;
             static setSystemLogger(logger: Logger): void;
+
+            constructor();
+            constructor(tag: string);
+            constructor(tag: string, callback: (level: LogLevel, tag: string, message: string) => void);
 
             setEnabled(enabled: boolean): void;
 
@@ -1342,48 +1354,37 @@ declare namespace ee {
 
     namespace ads {
         class IInterstitialAd {
-            constructor();
             isLoaded(): boolean;
-
             load(): void;
-
             show(): boolean;
-
-            setResultCallback(callback): void;
-            setOnClickedCallback(callback): void;
+            setResultCallback(callback: () => void): void;
+            setOnClickedCallback(callback: () => void): void;
             doOnClicked(): void;
         }
 
         class IRewardedVideo {
-            constructor(logger: Logger);
-
             isLoaded(): boolean;
-
             load(): void;
-
             show(): boolean;
-
             setResultCallback(callback: (boolean) => void): void;
             setOnClickedCallback(callback: () => void): void;
-
             doOnClicked(): void;
         }
 
         class MultiRewardedVideo extends IRewardedVideo {
             constructor();
-            addItem(item: IRewardedVideo): MultiRewardedVideo;
+            addItem(item: IRewardedVideo): this;
         }
     }
 
     namespace ironsource {
         class IronSource {
             constructor();
-            initialize(gameId: string);
+            constructor(logger: ee.core.Logger);
 
+            initialize(gameId: string): void;
             createRewardedVideo(placementId: string): ads.IRewardedVideo;
-
             createInterstitialAd(placementId: string): ads.IInterstitialAd;
-
             setCloseTimeout(timeout: number): void;
         }
     }
