@@ -107,11 +107,11 @@ export class NestedPrefab extends cc.Component {
     private _prefab: cc.Prefab | null = null;
 
     @property({ type: cc.Prefab })
-    private get prefab(): cc.Prefab | null {
+    public get prefab(): cc.Prefab | null {
         return this._prefab;
     }
 
-    private set prefab(value: cc.Prefab | null) {
+    public set prefab(value: cc.Prefab | null) {
         if (this._prefab !== null) {
             if (this.view === null) {
                 if (CC_EDITOR) {
@@ -197,10 +197,6 @@ export class NestedPrefab extends cc.Component {
             }
         }
         return this.view;
-    }
-
-    public setPrefab(prefab: cc.Prefab): void {
-        this.prefab = prefab;
     }
 
     /** Creates a view from the current prefab and add it to this. */
