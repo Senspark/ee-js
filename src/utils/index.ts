@@ -7,3 +7,4 @@ export * from './Dialog';
 export * from './DialogManager';
 export * from './DefaultDialogManager';
 export * from './ConditionTouchListener';
+export * from './SkeletonAnimation';
