@@ -1330,10 +1330,11 @@ declare namespace ee {
             constructor(priority: number, desc: string);
 
             priority: number;
+            desc: string;
         }
 
         class Logger {
-            static getSystemLogger(): this;
+            static getSystemLogger(): Logger;
             static setSystemLogger(logger: Logger): void;
 
             constructor();
@@ -1373,6 +1374,7 @@ declare namespace ee {
 
         class MultiRewardedVideo extends IRewardedVideo {
             constructor();
+            constructor(logger: core.Logger);
             addItem(item: IRewardedVideo): this;
         }
     }
@@ -1380,7 +1382,7 @@ declare namespace ee {
     namespace ironsource {
         class IronSource {
             constructor();
-            constructor(logger: ee.core.Logger);
+            constructor(logger: core.Logger);
 
             initialize(gameId: string): void;
             createRewardedVideo(placementId: string): ads.IRewardedVideo;
