@@ -241,7 +241,7 @@ export class NestedPrefab extends cc.Component {
         node.children.forEach(child => this.freeze(child));
     }
 
-    private applySync(): void {
+    public applySync(): void {
         const view = this.getView();
         if (view !== null && this.synchronize) {
             this.node.setContentSize(view.getContentSize());
