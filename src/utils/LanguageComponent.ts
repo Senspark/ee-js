@@ -29,9 +29,10 @@ export class LanguageComponent extends cc.Component {
         type: cc.String,
         readonly: true,
     })
-    public get format(): string {
-        return this.manager.getFormat(this.key) || '';
-    }
+
+    public get format() {
+        return this.getLanguageManager().getFormat(this.key) || '';
+    };
 
     @property([cc.String])
     private _paramValues: string[] = [];
@@ -66,35 +67,37 @@ export class LanguageComponent extends cc.Component {
         for (let i = 0; i < this.paramKeys.length; ++i) {
             options[this.paramKeys[i]] = this.paramValues[i];
         }
-        return this.manager.parseFormat(this.key, options);
-    }
+        return this.getLanguageManager().parseFormat(this.key, options);
+    };
 
     @property({ type: cc.String })
-    private get config(): string | undefined {
-        return this.manager.getConfigDir();
-    }
+    private get config() {
+        return this.getLanguageManager().getConfigDir();
+    };
 
     private set config(value: string | undefined) {
         if (value !== undefined && value.length > 0 /* May be empty */) {
-            this.manager.setConfigDir(value);
+            this.getLanguageManager().setConfigDir(value);
         } else {
-            this.manager.resetConfigDir();
+            this.getLanguageManager().resetConfigDir();
         }
     }
 
-    @property /** Empty property to silence warning in editor. */
-    private get languages(): string[] {
-        return this.manager.getLanguages();
-    }
+    @property
+    private get languages() {
+        return this.getLanguageManager().getLanguages();
+    };
 
     @property({ type: cc.String })
-    private get language(): string | undefined {
-        return this.manager.getCurrentLanguage();
-    }
+    private get language() {
+        return this.getLanguageManager().getCurrentLanguage();
+    };
 
-    private set language(value: string | undefined) {
-        this.manager.setCurrentLanguage(value);
-    }
+    private set language(value) {
+        this.getLanguageManager().setCurrentLanguage(value);
+    };
+
+    static counter: number = 0;
 
     /** Unique ID for each language component. */
     private componentId: string;
@@ -102,24 +105,27 @@ export class LanguageComponent extends cc.Component {
     /** Associated label component. */
     private label: cc.Label | null = null;
 
-    private manager: LanguageManager;
+    private manager?: LanguageManager;
 
     public constructor() {
         super();
         this.componentId = (LanguageComponent.counter++).toString();
-        this.manager = LanguageManager.getInstance();
-    }
+    };
+
+    private getLanguageManager(): LanguageManager {
+        return this.manager || (this.manager = LanguageManager.getInstance());
+    };
 
     public onEnable(): void {
-        this.manager.addObserver(this.componentId, () => {
+        this.getLanguageManager().addObserver(this.componentId, () => {
             this.updateText();
         });
         this.updateText();
     }
 
     public onDisable(): void {
-        this.manager.removeObserver(this.componentId);
-    }
+        this.getLanguageManager().removeObserver(this.componentId);
+    };
 
     public update(): void {
         if (CC_EDITOR) {
