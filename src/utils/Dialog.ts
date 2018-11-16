@@ -2,7 +2,7 @@ import assert = require('assert');
 
 import { DialogManager } from './DialogManager';
 
-const { ccclass, disallowMultiple, menu, property } = cc._decorator;
+const { ccclass, disallowMultiple, menu } = cc._decorator;
 
 type DialogEvent = (dialog: Dialog) => void;
 type Transition = cc.FiniteTimeAction;
@@ -129,12 +129,16 @@ export class Dialog extends cc.Component {
     private playTransition(actions: Transition[], callback: () => void): void {
         assert(this.actor.getNumberOfRunningActions() === 0);
         this.actor.stopAllActions();
-        this.actor.runAction(actions.length === 0
+
+        const transitions = [] as Transition[];
+        actions.forEach(action => transitions.push(...[
+            cc.delayTime(0), // Add dummy action to prevent callback runs twice.
+            cc.targetedAction(this.node, action),
+        ]));
+        transitions.push(cc.callFunc(callback));
+        this.actor.runAction(transitions.length === 0
             ? cc.callFunc(callback)
-            : cc.sequence([
-                ...actions.map(action => cc.targetedAction(this.node, action)),
-                cc.callFunc(callback),
-            ]));
+            : cc.sequence(transitions));
     }
 
     public addEvent(type: DialogEventType, event: DialogEvent): this {
