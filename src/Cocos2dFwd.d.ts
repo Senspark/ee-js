@@ -1,3 +1,7 @@
+// tslint:disable:member-access
+// tslint:disable:no-namespace
+// tslint:disable:unified-signatures
+// tslint:disable:variable-name
 declare namespace ee {
     namespace core {
         class LogLevel {
@@ -7,10 +11,11 @@ declare namespace ee {
             static readonly Warn: LogLevel;
             static readonly Error: LogLevel;
             static readonly Assert: LogLevel;
-            constructor(priority: number, desc: string);
 
             priority: number;
             desc: string;
+
+            constructor(priority: number, desc: string);
         }
 
         class Logger {
@@ -47,7 +52,7 @@ declare namespace ee {
             isLoaded(): boolean;
             load(): void;
             show(): boolean;
-            setResultCallback(callback: (boolean) => void): void;
+            setResultCallback(callback: (success: boolean) => void): void;
             setOnClickedCallback(callback: () => void): void;
             doOnClicked(): void;
         }

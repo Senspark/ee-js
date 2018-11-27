@@ -30,9 +30,9 @@ export class LanguageComponent extends cc.Component {
         readonly: true,
     })
 
-    public get format() {
+    public get format(): string {
         return this.getLanguageManager().getFormat(this.key) || '';
-    };
+    }
 
     @property([cc.String])
     private _paramValues: string[] = [];
@@ -68,12 +68,12 @@ export class LanguageComponent extends cc.Component {
             options[this.paramKeys[i]] = this.paramValues[i];
         }
         return this.getLanguageManager().parseFormat(this.key, options);
-    };
+    }
 
     @property({ type: cc.String })
-    private get config() {
+    private get config(): string | undefined {
         return this.getLanguageManager().getConfigDir();
-    };
+    }
 
     private set config(value: string | undefined) {
         if (value !== undefined && value.length > 0 /* May be empty */) {
@@ -84,20 +84,18 @@ export class LanguageComponent extends cc.Component {
     }
 
     @property
-    private get languages() {
+    private get languages(): string[] {
         return this.getLanguageManager().getLanguages();
-    };
+    }
 
     @property({ type: cc.String })
-    private get language() {
+    private get language(): string | undefined {
         return this.getLanguageManager().getCurrentLanguage();
-    };
+    }
 
-    private set language(value) {
+    private set language(value: string | undefined) {
         this.getLanguageManager().setCurrentLanguage(value);
-    };
-
-    static counter: number = 0;
+    }
 
     /** Unique ID for each language component. */
     private componentId: string;
@@ -110,11 +108,11 @@ export class LanguageComponent extends cc.Component {
     public constructor() {
         super();
         this.componentId = (LanguageComponent.counter++).toString();
-    };
+    }
 
     private getLanguageManager(): LanguageManager {
         return this.manager || (this.manager = LanguageManager.getInstance());
-    };
+    }
 
     public onEnable(): void {
         this.getLanguageManager().addObserver(this.componentId, () => {
@@ -125,7 +123,7 @@ export class LanguageComponent extends cc.Component {
 
     public onDisable(): void {
         this.getLanguageManager().removeObserver(this.componentId);
-    };
+    }
 
     public update(): void {
         if (CC_EDITOR) {
