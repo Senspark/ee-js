@@ -19,6 +19,7 @@
         "build": "tsc"
     },
     "dependencies": {
+        "@senspark/cocos-api": "^1.0.1",
         "@types/gl-matrix": "^2.4.0",
         "@types/node": "^10.5.2",
         "@types/node-polyglot": "^0.4.31"
