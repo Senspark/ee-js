@@ -136,7 +136,7 @@ export class Dialog extends cc.Component {
             cc.targetedAction(this.node, action),
         ]));
         transitions.push(cc.callFunc(callback));
-        this.actor.runAction(transitions.length === 0
+        this.actor.runAction(actions.length === 0
             ? cc.callFunc(callback)
             : cc.sequence(transitions));
     }
