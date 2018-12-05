@@ -1,14 +1,11 @@
-import { Success } from "../../engine/utils/BehaviorTree";
-
 // tslint:disable:member-access
 // tslint:disable:no-namespace
 // tslint:disable:unified-signatures
 // tslint:disable:variable-name
 declare namespace ee {
-
     namespace core {
         type MessageHandler = (message: string) => string;
-        type Runnable = void;
+        type Runnable = () => void;
 
         function str_tolower(s: string): string;
         function toString(value: number): string;
@@ -34,7 +31,6 @@ declare namespace ee {
         }
 
         class IMessageBridge {
-            constructor();
             call(tag: string): string;
             call(tag: string, message: string): string;
             callCpp(tag: string, message: string): string;
@@ -92,9 +88,9 @@ declare namespace ee {
             static getWinSize(): [number, number];
             static getFrameSize(): [number, number];
             static getDensity(): number;
-            fromPoint(value: number): this;
-            fromPixel(value: number): this;
-            fromDip(value: number): this;
+            static fromPoint(value: number): this;
+            static fromPixel(value: number): this;
+            static fromDip(value: number): this;
             toPoint(): number;
             toPixel(): number;
             toDip(): number;
@@ -118,20 +114,20 @@ declare namespace ee {
         }
 
         class VideoPlayerManager {
-            getInstance(): this;
+            static getInstance(): this;
             createVideoPlayer(): VideoPlayer;
             destroyVideoPlayer(player: VideoPlayer): boolean;
         }
     }
 
     namespace google {
-        type TrackingDict = { [key: number]: string };
+        type TrackingDict = { [key: string]: string };
         class Analytics {
             constructor();
             setDispatchInterval(seconds: number): void;
             setDryRun(enabled: boolean): void;
             setOptOut(enabled: boolean): void;
-            setTrackUncaughtException(enabled: boolean);
+            setTrackUncaughtException(enabled: boolean): void;
             dispatch(): void;
             createTracker(trackingId: string): AnalyticsTracker;
             doTests(): number;
@@ -139,7 +135,7 @@ declare namespace ee {
 
         class Builder {
             constructor();
-            addImpression(product: Product): this;
+            addImpression(product: Product, impressionList: string): this;
             addProduct(product: Product): this;
             setProductAction(action: ProductAction): this;
             set(paramName: string, paramValue: string): this;
@@ -157,20 +153,30 @@ declare namespace ee {
             setValue(value: number): this;
         }
 
-        class ExceptionBuilder {
-            // thieu
+        class ExceptionBuilder extends Builder {
+            constructor();
+            setDescription(description: string): this;
+            setFatal(fatal: boolean): this;
         }
 
-        class ScreenViewBuilder {
-            // thieu
+        class ScreenViewBuilder extends Builder {
+            constructor();
         }
 
-        class SocialBuilder {
-            // thieu
+        class SocialBuilder extends Builder {
+            constructor();
+            setNetWork(netWork: string);
+            setAction(action: string);
+            setTarget(target: string);
         }
 
-        class TimingBuilder {
-            // thieu
+        class TimingBuilder extends Builder {
+            constructor();
+            constructor(category: string, variable: string, value: number);
+            setVariable(variable: string): this;
+            setValue(value: number): this;
+            setCategory(category: string): this;
+            setLabel(label: string): this;
         }
 
         class Product {
@@ -236,6 +242,7 @@ declare namespace ee {
         }
 
         class IInterstitialAd {
+            constructor();
             isLoaded(): boolean;
             load(): void;
             show(): boolean;
@@ -248,7 +255,7 @@ declare namespace ee {
             isLoaded(): boolean;
             load(): void;
             show(): boolean;
-            setResultCallback(callback: (success: boolean) => void): void;
+            setResultCallback(callback: (result: boolean) => void): void;
             setOnClickedCallback(callback: () => void): void;
             doOnClicked(): void;
         }
@@ -292,6 +299,7 @@ declare namespace ee {
             setCloseTimeout(timeout: number): void;
         }
     }
+
 
     namespace admob {
         class AdMob {
@@ -340,13 +348,12 @@ declare namespace ee {
 
     namespace appsflyer {
         class IBridge {
-            constructor();
             initialize(devKey: string, appId: string): void;
             startTracking(): void;
             getDeviceId(): string;
             setDebugEnabled(enabled: boolean): void;
             setStopTracking(enabled: boolean): void;
-            trackEvent(name: string, values: { [key: string]: string });
+            trackEvent(name: string, values: { [key: string]: string }): void;
         }
     }
 
@@ -365,15 +372,12 @@ declare namespace ee {
         class Analytics {
             constructor();
             initialize(): boolean;
-            analyticsCollectionEnabled(enabled: bool): void;
+            analyticsCollectionEnabled(enabled: boolean): void;
             setMinimumSessionDuration(milliseconds: number): void;
             setSessionTimeoutDuration(milliseconds: number): void;
             setUserId(userId: string): void;
             setUserProperty(name: string, property: string): void;
             logEvent(name: string, dict: { [key: string]: string } = {}): void;
-        }
-
-        class Variant {
         }
 
         class RemoteConfig {
@@ -439,14 +443,14 @@ declare namespace ee {
     namespace notification {
         class Notification {
             constructor();
-            schedule(Builder: NotificationBuilder): void;
+            schedule(builder: NotificationBuilder): void;
             unSchedule(tag: number): void;
             clearAll(): void;
         }
 
         class NotificationBuilder {
             constructor();
-            setTicket(ticker: string): this;
+            setTicker(ticker: string): this;
             setTitle(title: string): this;
             setBody(body: string): this;
             setDelay(delay: number): this;
