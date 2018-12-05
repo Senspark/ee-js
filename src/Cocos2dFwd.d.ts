@@ -1,7 +1,9 @@
-// tslint:disable:member-access
+// tslint:disable-next-line:no-namespace
 // tslint:disable:no-namespace
 // tslint:disable:unified-signatures
-// tslint:disable:variable-name
+// tslint:disable:member-access
+// tslint:interface-over-type-literal
+// tslint:member-ordering
 declare namespace ee {
     namespace core {
         type MessageHandler = (message: string) => string;
@@ -12,7 +14,7 @@ declare namespace ee {
         function toString(value: boolean): string;
         function toBool(value: string): boolean;
         function format(formatString: string, ...agrs: any[]): string;
-        function log(level: LogLevel, tag: string, message: string);
+        function log(level: LogLevel, tag: string, message: string): void;
         function isMainThread(): boolean;
         function runOnUiThread(runnable: Runnable): boolean;
         function getSHA1CertificateFingerprint(): string;
@@ -78,12 +80,14 @@ declare namespace ee {
         namespace Metrics {
             enum ResolutionPolicy {
                 FixedWidth,
-                FixedHeight
+                FixedHeight,
             }
         }
 
         class Metrics {
-            static initialize(frameSize: [number, number], winSize: [number, number], policy: Metrics.ResolutionPolicy): void;
+            static initialize(
+                frameSize: [number, number],
+                winSize: [number, number], policy: Metrics.ResolutionPolicy): void;
             static initialize(ratio: number): void;
             static getWinSize(): [number, number];
             static getFrameSize(): [number, number];
@@ -121,6 +125,7 @@ declare namespace ee {
     }
 
     namespace google {
+        // tslint:disable-next-line:interface-over-type-literal
         type TrackingDict = { [key: string]: string };
         class Analytics {
             constructor();
@@ -165,9 +170,9 @@ declare namespace ee {
 
         class SocialBuilder extends Builder {
             constructor();
-            setNetWork(netWork: string);
-            setAction(action: string);
-            setTarget(target: string);
+            setNetWork(netWork: string): this;
+            setAction(action: string): this;
+            setTarget(target: string): this;
         }
 
         class TimingBuilder extends Builder {
@@ -189,12 +194,12 @@ declare namespace ee {
         }
 
         class ProductAction {
-            constructor();
             static ActionAdd(): string;
             static ActionCheckout(): string;
             static ActionClick(): string;
             static ActionDetail(): string;
             static ActionPurchase(): string;
+            constructor();
 
             setProductActionList(value: string): this;
             setProductListSource(value: string): this;
@@ -300,7 +305,6 @@ declare namespace ee {
         }
     }
 
-
     namespace admob {
         class AdMob {
             constructor();
@@ -335,7 +339,7 @@ declare namespace ee {
     }
 
     namespace applovin {
-        class applovin {
+        class AppLovin {
             constructor();
             constructor(logger: core.Logger);
             initialize(key: string): void;
@@ -387,7 +391,7 @@ declare namespace ee {
             fetch(devModeEnabled: boolean, callback: FetchCallback): void;
             setDefaultBool(key: string, value: boolean): void;
             setDefaultLong(key: string, value: number): void;
-            setDefaultDouble(key: string, value: Number): void;
+            setDefaultDouble(key: string, value: number): void;
             setDefaultString(key: string, value: string): void;
             flushDefaults(): void;
             getBool(key: string): boolean;
@@ -410,13 +414,12 @@ declare namespace ee {
         }
 
         class Notification {
-            constructor();
             title: string;
             body: string;
+            constructor();
         }
 
         class Message {
-            constructor();
             from: string;
             to: string;
             rawData: string;
@@ -427,12 +430,13 @@ declare namespace ee {
             messageId: string;
             notification: Notification;
             notificationOpened: boolean;
-        };
+            constructor();
+        }
 
         class Messaging {
             constructor();
             initialize(): boolean;
-            initialize(callback: TokenCallback): boolean
+            initialize(callback: TokenCallback): boolean;
             setMessageCallback(callback: MessageCallback): void;
             setTokenCallback(callback: TokenCallback): void;
             subscribe(topic: string): void;
