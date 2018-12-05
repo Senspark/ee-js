@@ -163,7 +163,7 @@ declare namespace ee {
 
         class SocialBuilder extends Builder {
             constructor();
-            setNetwork(netWork: string): this;
+            setNetwork(network: string): this;
             setAction(action: string): this;
             setTarget(target: string): this;
         }
@@ -367,7 +367,6 @@ declare namespace ee {
         class App {
             static initialize(): void;
             static getWindowText(): any;
-            constructor();
         }
 
         class Analytics {
