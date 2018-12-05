@@ -1,9 +1,7 @@
-// tslint:disable-next-line:no-namespace
 // tslint:disable:no-namespace
 // tslint:disable:unified-signatures
 // tslint:disable:member-access
-// tslint:interface-over-type-literal
-// tslint:member-ordering
+// tslint:disable:variable-name
 declare namespace ee {
     namespace core {
         type MessageHandler = (message: string) => string;
@@ -61,13 +59,10 @@ declare namespace ee {
         class Logger {
             static getSystemLogger(): Logger;
             static setSystemLogger(logger: Logger): void;
-
             constructor();
             constructor(tag: string);
             constructor(tag: string, callback: (level: LogLevel, tag: string, message: string) => void);
-
             setEnabled(enabled: boolean): void;
-
             log(level: LogLevel, formatString: string, ...args: any[]): void;
             verbose(formatString: string, ...args: any[]): void;
             debug(formatString: string, ...args: any[]): void;
@@ -125,8 +120,6 @@ declare namespace ee {
     }
 
     namespace google {
-        // tslint:disable-next-line:interface-over-type-literal
-        type TrackingDict = { [key: string]: string };
         class Analytics {
             constructor();
             setDispatchInterval(seconds: number): void;
@@ -146,7 +139,7 @@ declare namespace ee {
             set(paramName: string, paramValue: string): this;
             setCustomDimension(index: number, dimension: string): this;
             setCustomMetric(index: number, metric: number): this;
-            build(): TrackingDict;
+            build(): { [key: string]: string };
         }
 
         class EventBuilder extends Builder {
@@ -194,11 +187,11 @@ declare namespace ee {
         }
 
         class ProductAction {
-            static ActionAdd(): string;
-            static ActionCheckout(): string;
-            static ActionClick(): string;
-            static ActionDetail(): string;
-            static ActionPurchase(): string;
+            static readonly ActionAdd: string;
+            static readonly ActionCheckout: string;
+            static readonly ActionClick: string;
+            static readonly ActionDetail: string;
+            static readonly ActionPurchase: string;
             constructor();
 
             setProductActionList(value: string): this;
