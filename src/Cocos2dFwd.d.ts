@@ -39,7 +39,7 @@ declare namespace ee {
         }
 
         class MessageBridge extends IMessageBridge {
-            static getInstance(): this;
+            static getInstance(): MessageBridge;
         }
 
         class LogLevel {
@@ -87,9 +87,9 @@ declare namespace ee {
             static getWinSize(): [number, number];
             static getFrameSize(): [number, number];
             static getDensity(): number;
-            static fromPoint(value: number): this;
-            static fromPixel(value: number): this;
-            static fromDip(value: number): this;
+            static fromPoint(value: number): Metrics;
+            static fromPixel(value: number): Metrics;
+            static fromDip(value: number): Metrics;
             toPoint(): number;
             toPixel(): number;
             toDip(): number;
@@ -113,7 +113,7 @@ declare namespace ee {
         }
 
         class VideoPlayerManager {
-            static getInstance(): this;
+            static getInstance(): VideoPlayerManager;
             createVideoPlayer(): VideoPlayer;
             destroyVideoPlayer(player: VideoPlayer): boolean;
         }
@@ -163,7 +163,7 @@ declare namespace ee {
 
         class SocialBuilder extends Builder {
             constructor();
-            setNetWork(netWork: string): this;
+            setNetwork(netWork: string): this;
             setAction(action: string): this;
             setTarget(target: string): this;
         }
@@ -178,6 +178,7 @@ declare namespace ee {
         }
 
         class Product {
+            constructor();
             setCategory(value: string): this;
             setId(value: string): this;
             setName(value: string): this;
@@ -192,7 +193,7 @@ declare namespace ee {
             static readonly ActionClick: string;
             static readonly ActionDetail: string;
             static readonly ActionPurchase: string;
-            constructor();
+            constructor(action: string);
 
             setProductActionList(value: string): this;
             setProductListSource(value: string): this;
@@ -202,7 +203,6 @@ declare namespace ee {
         }
 
         class AnalyticsTracker {
-            constructor();
             setParameter(key: string, value: string): void;
             setAllowIDFACollection(enabled: boolean): void;
             setScreenName(screenName: string): void;
@@ -224,8 +224,7 @@ declare namespace ee {
     namespace ads {
         type AdViewCallback = (result: boolean) => void;
         type OnClickedCallback = () => void;
-        class IAdview {
-            constructor();
+        class IAdView {
             isLoaded(): boolean;
             load(): void;
             getAnchor(): [number, number];
@@ -240,7 +239,6 @@ declare namespace ee {
         }
 
         class IInterstitialAd {
-            constructor();
             isLoaded(): boolean;
             load(): void;
             show(): boolean;
@@ -258,9 +256,9 @@ declare namespace ee {
             doOnClicked(): void;
         }
 
-        class MultiAdView extends IAdview {
+        class MultiAdView extends IAdView {
             constructor();
-            addItem(item: IAdview): this;
+            addItem(item: IAdView): this;
         }
 
         class MultiInterstitialAd extends IInterstitialAd {
@@ -274,11 +272,12 @@ declare namespace ee {
             addItem(item: IRewardedVideo): this;
         }
 
-        class NullAdView extends IAdview {
+        class NullAdView extends IAdView {
             constructor();
         }
 
         class NullInterstitialAd extends IInterstitialAd {
+            constructor()
         }
 
         class NullRewardedVideo extends IRewardedVideo {
@@ -305,10 +304,10 @@ declare namespace ee {
             initialize(applicationId: string): void;
             getEmulatorTestDeviceHash(): string;
             addTestDevice(hash: string): void;
-            createBannerAd(adId: string, adSize: BannerAdSize): IAdView;
-            createNativeAd(adId: string, layoutName: string, identifiers: NativeAdLayout): IAdView;
-            createInterstitialAd(adID: string): ads.IInterstitialAd;
-            createRewardedVideo(adID: string): ads.IRewardedVideo;
+            createBannerAd(adId: string, adSize: BannerAdSize): ads.IAdView;
+            createNativeAd(adId: string, layoutName: string, identifiers: NativeAdLayout): ads.IAdView;
+            createInterstitialAd(adId: string): ads.IInterstitialAd;
+            createRewardedVideo(adId: string): ads.IRewardedVideo;
         }
 
         enum BannerAdSize {
@@ -352,6 +351,10 @@ declare namespace ee {
             setStopTracking(enabled: boolean): void;
             trackEvent(name: string, values: { [key: string]: string }): void;
         }
+
+        class Bridge extends IBridge {
+            constructor();
+        }
     }
 
     namespace firebase {
@@ -364,6 +367,7 @@ declare namespace ee {
         class App {
             static initialize(): void;
             static getWindowText(): any;
+            constructor();
         }
 
         class Analytics {
@@ -441,7 +445,7 @@ declare namespace ee {
         class Notification {
             constructor();
             schedule(builder: NotificationBuilder): void;
-            unSchedule(tag: number): void;
+            unschedule(tag: number): void;
             clearAll(): void;
         }
 
@@ -470,7 +474,7 @@ declare namespace ee {
     namespace vungle {
         class Vungle {
             constructor();
-            constructor(loggle: core.Logger);
+            constructor(logger: core.Logger);
             initialize(gameId: string): void;
             initialize(gameId: string, placementId: string): void;
             createRewardedVideo(placementId: string): ads.IRewardedVideo;
