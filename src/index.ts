@@ -13,3 +13,4 @@ export * from './Scale9';
 export * from './SkeletonAnimation';
 export * from './StaticComponent';
 export * from './UnselectableComponent';
+export * from './ServiceLocator';

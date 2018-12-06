@@ -29,13 +29,14 @@ class Command {
     }
 }
 
-export class DefaultDialogManager implements DialogManager {
+export class DefaultDialogManager extends DialogManager {
     private root: cc.Node;
     private lockingDialog: Dialog | null;
     private dialogStack: Dialog[];
     private commandQueue: Command[];
 
     public constructor(root: cc.Node) {
+        super();
         this.root = root;
         this.lockingDialog = null;
         this.dialogStack = [];
