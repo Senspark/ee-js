@@ -1,3 +1,4 @@
+
 // tslint:disable:no-namespace
 // tslint:disable:unified-signatures
 // tslint:disable:member-access
@@ -477,6 +478,359 @@ declare namespace ee {
             initialize(gameId: string): void;
             initialize(gameId: string, placementId: string): void;
             createRewardedVideo(placementId: string): ads.IRewardedVideo;
+        }
+    }
+
+    namespace soomla {
+        type callback = (value: { [key: string]: any }) => CCDomain;
+        type callback = (value: { [key: string]: any }) => void;
+        type CurrencyBalanceChangedCallback = (itemId: string, balance: number, amountAdded: number) => void;
+        type GoodBalanceChangedCallback = (itemId: string, balance: number, amountAdded: number) => void;
+        type GoodUpgradeCallback = (good: string, upgradeId: string) => void;
+        type ItemPurchasedCallback = (purchasableId: string, payload: string) => void;
+        type MarketPurchaseStartedCallback = (purchasableId: string) => void;
+        type MarketPurchaseCallback = (
+            purchasableId: string, payload: string, extraInfo: { [key: string]: string }) => void;
+        type MarketPurchaseCanceledCallback = (purchasableId: string) => void;
+        type MarketItemsRefreshStaredCallback = () => void;
+        type MarketitemsRefreshedCallback = (marketItemIds: string[]) => void;
+        type MarketItemsRefreshFailedCallback = (errorMessage: string) => void;
+        type RestoreTransactionStartedCallback = () => void;
+        type RestoreTransactionFinishedCallback = (succeeded: boolean) => void;
+        type UnexpectedStoreErrorCallback = (errorCode: number) => void;
+
+        class CCError {
+            static createWithValue(value: { [key: string]: any }): CCError;
+            static tryFillError(error: CCError, value: { [key: string]: any }, tag: string = null): void;
+            getInfo(): string;
+        }
+
+        class CCPurchaseType {
+            constructor();
+            init(): boolean;
+            buy(payload: string, error: CCError = null): void;
+            canAfford(error: CCError): boolean;
+            setAssociatedItemId(mAssociatedItemId: string): void;
+            getAssociatedItemId(): string;
+        }
+
+        class CCVirtualGood extends CCPurchasableVirtualItem {
+            resetBalance(balance: number, notify: boolean, error: CCError = null): number;
+            getBalance(error: CCError = null): number;
+        }
+
+        class CCVirtualCategory extends CCDomain {
+            static create(name: string, goodItemIds: string[]): CCVirtualCategory;
+            init(name: string, goodItemIds: string[]): boolean;
+            setName(mName: string): void;
+            getName(): string;
+            setGoodItemIds(mGoodItemIds: string[]): void;
+            getGoodItemIds(): string[];
+        }
+
+        class CCVirtualCurrencyPack extends CCPurchasableVirtualItem {
+            static create(
+                name: string,
+                description: string,
+                itemId: string,
+                currencyAmount: number,
+                currencyItemId: string,
+                purchaseType: CCPurchaseType): CCVirtualCurrencyPack;
+
+            init(
+                name: string,
+                description: string,
+                itemId: string,
+                currencyAmount: number,
+                currencyItemId: string,
+                purchaseType: CCPurchaseType): boolean;
+
+            setCurrencyAmount(mCurrency: number): void;
+            getCurrencyAmount(): number;
+            setCurrencyItemId(mCurrencyItemId: string): void;
+            getCurrencyItemId(): string;
+        }
+
+        class CCSoomlaEntity extends CCDomain {
+            init(id: string, name: string = "", description: string = ""): boolean;
+            getType(): string;
+            equals(obj: any): boolean;
+            clone(newId: string): CCSoomlaEntity;
+        }
+
+        class CCVirtualItem extends CCSoomlaEntity {
+            getItemId(): string;
+            give(amount: number, error: CCError = null): number;
+            give(amount: number, notify: boolean, error: CCError = null): number;
+            take(amount: number, notify: boolean, error: CCError = null): number;
+            resetBalance(balance: number, error: CCError = null): number;
+            resetBalance(error: CCError = null): number;
+            getBalance(error: CCError = null): number;
+            getBalance(): number;
+            save(saveToDB: boolean = true): void;
+        }
+
+        class CCVirtualCurrency extends CCVirtualItem {
+            static create(name: string, description: string, itemId: string): CCVirtualCurrency;
+        }
+
+        class CCPurchasableVirtualItem {
+            constructor();
+            CCPurchasableVirtualItem(): CCVirtualItem;
+            init(name: string, description: string, itemId: string, purchaseType: CCPurchaseType): boolean;
+            initWithValueMap(map: { [key: string]: any }): boolean;
+            canAfford(error: CCError = null): boolean;
+            buy(payload: string, error: CCError = null): void;
+            canBuy(): boolean;
+            setPurchaseType(mPurchaseType: CCPurchaseType): void;
+        }
+
+        class CCVirtualGood extends CCPurchasableVirtualItem {
+            resetBalance(balance: number, notify: boolean, error: CCError = null): number;
+            getBalance(error: CCError = null): number;
+        }
+
+        class CCLifetimeVG extends CCVirtualGood {
+            static create(
+                name: string,
+                description: string,
+                itemId: string,
+                purchaseType: CCPurchaseType): CCLifetimeVG;
+            canBuy(): boolean;
+            give(amount: number, notify: boolean, error: CCError = null): number;
+            take(amount: number, notify: boolean, error: CCError = null): number;
+            getType(): string;
+        }
+
+        class CCLifetimeVGBuilder {
+            constructor();
+            setPurchaseType(type: CCPurchaseType): this;
+            setName(name: string): this;
+            setDescription(description: string): this;
+            setItemId(itemId: string): this;
+            build(): CCVirtualItem;
+        }
+
+        class CCMarketItem extends CCDomain {
+            static create(productId: string, price: number): CCMarketItem;
+            init(productId: string, price: number): boolean;
+            setProductId(mProductId: string): void;
+            getProductId(): string;
+            setPrice(mPrice: number): number;
+            getPrice(): number;
+            setMarketPriceAndCurrency(mMarketPriceAndCurrency: string): void;
+            getMarketPriceAndCurrency(): string;
+            setMarketTitle(mMarketTitle: string): void;
+            getMarketTitle(): string;
+            setMarketDescription(mMarketCurrencyCode: string): void;
+            getMarketDescription(): string;
+            setMarketCurrencyCode(mMarketCurrencyCode: string): void;
+            getMarketCurrencyCode(): string;
+            setMarketPriceMicros(mMarketPriceMicros: number): void;
+            getMarketPriceMicros(): number;
+        }
+
+        class CCPurchasableVirtualItem {
+            /* using CCVirtualItem::init */
+            init(name: string, description: string, itemId: string, purchaseType: CCPurchaseType): boolean;
+            canAfford(error: CCError = null): boolean;
+            buy(payload: string, error: CCError = null): void;
+            canBuy(): boolean;
+            setPurchaseType(mPurchaseType: CCPurchaseType): void;
+            getPurchaseType(): CCPurchaseType;
+        }
+
+        class CCPurchaseWithMarketBuilder {
+            constructor();
+            setProductId(productId: string): this;
+            setPrice(price: number): this;
+            build(): CCPurchaseType;
+        }
+
+        class CCPurchaseWithMarket extends CCPurchaseType {
+            static create(productId: string, price: number): CCPurchaseType;
+            static createWithMarketItem(marketItem: CCMarketItem): CCPurchaseWithMarket;
+            initWithMarketItem(marketItem: CCMarketItem): boolean;
+        }
+
+        class CCSingleUsePackVG extends CCVirtualGood {
+            static create(
+                itemId: string,
+                goodItemId: string,
+                goodAmount: number,
+                purchaseType: store.PurchaseType): CCSingleUsePackVG;
+
+            init(
+                goodItemId: string,
+                goodAmount: number,
+                name: string,
+                description: string,
+                itemId: string,
+                PurchaseType: CCPurchaseType): boolean;
+
+            setGoodItemId(mGoodItemId: string): void;
+            getGoodItemId(): string;
+            setGoodAmount(mGoodAmount: number): void;
+            getGoodAmount(): number;
+        }
+
+        class CCStoreAssets {
+            getVersion(): number;
+            getCurrencies(): CCVirtualCurrencyBuilder[];
+            getGoods(): CCVirtualGood[];
+            getCurrencyPacks(): CCVirtualCurrencyPack[];
+            getCategories(): CCVirtualCategory[];
+        }
+
+        class CCSoomlaStore {
+            static getInstance(): CCSoomlaStore;
+            static initialize(storeAssets: CCStoreAssets, storeParams: { [key: string]: any }): void;
+            buyMarketItem(productId: string, payload: string, error: CCError = null): void;
+            restoreTransactions(): void;
+            refreshInventory(): void;
+            refreshMarketItemsDetails(error: CCError = null): void;
+        }
+
+        namespace CCStoreAssetsBuilder {
+            class StoreAssets extends CCStoreAssets {
+                currencies_: CCVirtualCurrency[];
+                goods_: CCVirtualGood[];
+                currencyPacks_: CCVirtualCurrencyPack[];
+                categories_: CCVirtualCategory[];
+                version_: number;
+            }
+        }
+
+        class CCStoreAssetsBuilder {
+            constructor();
+            setVersion(version: number): this;
+            addCurrency(currency: CCVirtualCurrency): this;
+            addGood(good: CCVirtualGood): this;
+            addCurrencyPack(pack: CCVirtualCurrencyPack): this;
+            addCategorie(category: CCVirtualCategory): this;
+            build(): CCStoreAssets;
+        }
+
+        class CCStoreInfo {
+            static sharedStoreInfo(): CCStoreInfo;
+            static createShared(storeAssets: CCStoreAssets): void;
+            init(storeAssets: CCStoreAssets): void;
+            initWithValueMap(map: { [key: string]: any }): boolean;
+            saveItem(virtualItem: CCVirtualItem, saveToDB: boolean = true): void;
+            saveItems(virtualItems: CCVirtualItem[], saveToDB: boolean = true): void;
+            save(): void;
+            toValueMap(): { [key: string]: any };
+            setCurrencies(mCurrencies: CCVirtualCurrency[]): void;
+            getCurrencies(): CCVirtualCurrency[];
+            setCurrencyPacks(mCurrencyPacks: CCVirtualCurrencyPack[]): void;
+            getCurrencyPacks(): CCVirtualCurrencyPack[];
+            setGoods(mGoods: CCVirtualGood[]): void;
+            getGoods(): CCVirtualGood[];
+            setCategories(mCategories: CCVirtualCategory[]): void;
+            getCateGories(): CCVirtualCategory[];
+        }
+
+        class CCStoreInventory {
+            static sharedStoreInventory(): CCStoreInventory;
+            init(): boolean;
+            canAfford(itemId: string, error: CCError = null): boolean;
+            buyItem(itemId: string, error: CCError = null): void;
+            buyItem(itemId: string, payload: string, error: CCError = null): void;
+            getItemBalance(itemId: string, error: CCError = null): number;
+            giveItem(itemId: string, amount: number, error: Error = null): void;
+            takeItem(itemId: string, amount: number, error: CCError = null): void;
+            equipVirtualGood(itemId: string, error: CCError = null): void;
+            unEquipVirtualGood(itemId: string, error: CCError = null): void;
+            isVirtualGoodEquipped(itemId: string, error: CCError): boolean;
+            getGoodUpgradeLevel(goodItemId: string, error: CCError = null): number;
+            upgradeGood(goodItemId: string, error: CCError = null): void;
+            removeGoodUpgrades(goodItemId: string, error: CCError = null): void;
+            refreshLocalInventory(): void;
+            refreshOnGoodUpgrade(vg: CCVirtualGood, uvg: CCUpgradeVG): void;
+            refreshOnGoodEquipped(equippable: CCEquippableVG): void;
+            refreshOnGoodUnEquipped(equippable: CCEquippableVG): void;
+            refreshOnGoodBalanceChanged(good: CCVirtualCurrency, balance: number, amountAdded: number): void;
+            refreshOnGoodBalanceChanged(good: CCVirtualGood, balance: number, amountAdded: number): void;
+            updateLocalBalance(itemId: string, balance: number): void;
+        }
+
+        class CCVirtualCurrencyBuilder {
+            constructor();
+            setName(name: string): this;
+            setDescription(description: string): this;
+            setItemId(itemId: string): this;
+            build(): CCVirtualItem;
+        }
+
+        class CCVirtualCurrencyPack extends CCPurchasableVirtualItem {
+            static create(
+                name: string,
+                description: string,
+                itemId: number,
+                currencyAmount: number,
+                currencyItemId: string,
+                purchaseType: CCPurchaseType): CCVirtualCurrencyPack;
+            init(
+                name: string,
+                description: string,
+                itemId: string,
+                currencyAmount: number,
+                currencyItemId: string,
+                purchaseType: CCPurchaseType): boolean;
+            setCurrencyAmount(mCurrencyAmount: number): void;
+            getCurrencyAmount(): number;
+            setCurrencyItemId(mCurrencyItemId: string): string;
+            getCurrencyItemId(): string;
+        }
+
+        class CCVirtualItem extends CCSoomlaEntity {
+            getItemId(): string;
+            give(amount: number, error: CCError = null): number;
+            give(amount: number, notify: boolean, error: CCError = null): number;
+            take(amount: number, error: CCError = null): number;
+            take(amount: number, notify: boolean, error: CCError): number;
+            resetBalance(balance: number, error: CCError = null): number;
+            resetBalance(balance: number, notify: boolean, error: CCError = null): number;
+            getBalance(error: CCError = null): number;
+            getBalance(): number;
+            save(saveToDB: boolean = true): void;
+        }
+
+        class CCVirtualcurrencyPackBuilder {
+            constructor();
+            setName(name: string): this;
+            setDescription(description: string): this;
+            setItemId(itemId: string): this;
+            setCurrencyItemId(setCurrencyItemId: string): this;
+            setPurchaseType(type: CCPurchaseType): this;
+            build(): CCVirtualcurrencyPack;
+        }
+
+        class StoreEventListener {
+            constructor();
+            setCurrencyBalanceChangedCallback(callback: CurrencyBalanceChangedCallback): void;
+            setGoodBalanceChangedCallback(callback: GoodBalanceChangedCallback): void;
+            setGoodUpgradeCallback(callback: GoodUpgradeCallback): void;
+            setItemPurchasedCallback(callback: ItemPurchasedCallback): void;
+            setMarketPurchaseCallback(callback: MarketPurchaseCallback): void;
+            setMarketPurchaseStartedCallback(callback: MarketPurchaseStartedCallback): void;
+            setMarketPurchaseCanceledCallback(callback: MarketPurchaseCanceledCallback): void;
+            setMarketItemsRefreshStartedCallback(callback: MarketItemsRefreshStaredCallback): void;
+            setMarketItemsRefreshCallback(callback: MarketitemsRefreshedCallback): void;
+            setMarketItemsRefreshFailedCallback(callback: MarketItemsRefreshFailedCallback): void;
+            setRestoreTransactionStartedCallback(callback: RestoreTransactionStartedCallback): void;
+            setRestoreTransactionFinishedCallback(callback: RestoreTransactionFinishedCallback): void;
+            setUnexpectedStoreErrorCallback(callback: UnexpectedStoreErrorCallback): void;
+            clear(): void;
+        }
+
+        class CCDomain {
+            initWithValueMap(dict: { [key: string]: any }): boolean;
+            toValueMap(): { [key: string]: any };
+        }
+
+        class CCSoomla {
+            static initialize(soomlaSecret: string): void;
         }
     }
 }
