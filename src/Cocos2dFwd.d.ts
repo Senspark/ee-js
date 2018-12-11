@@ -567,6 +567,7 @@ declare namespace soomla {
         getBalance(error: CCError = null): number;
         getBalance(): number;
         save(saveToDB: boolean = true): void;
+        getPurchaseType(): CCPurchaseType;
     }
 
     class CCVirtualCurrency extends CCVirtualItem {
@@ -720,6 +721,7 @@ declare namespace soomla {
         getGoods(): CCVirtualGood[];
         setCategories(mCategories: CCVirtualCategory[]): void;
         getCateGories(): CCVirtualCategory[];
+        getItemByItemId(itemId: string): CCVirtualItem;
     }
 
     class CCStoreInventory {
@@ -729,7 +731,7 @@ declare namespace soomla {
         buyItem(itemId: string, error: CCError = null): void;
         buyItem(itemId: string, payload: string, error: CCError = null): void;
         getItemBalance(itemId: string, error: CCError = null): number;
-        giveItem(itemId: string, amount: number, error: Error = null): void;
+        giveItem(itemId: string, amount: number, error: CCError = null): void;
         takeItem(itemId: string, amount: number, error: CCError = null): void;
         equipVirtualGood(itemId: string, error: CCError = null): void;
         unEquipVirtualGood(itemId: string, error: CCError = null): void;
