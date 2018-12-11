@@ -498,7 +498,7 @@ declare namespace soomla {
     type UnexpectedStoreErrorCallback = (errorCode: number) => void;
 
     class CCError {
-        static createWithValue(value: { [key: string]: any }): CCError;
+        static createWithValue(value: any): CCError;
         static tryFillError(error: CCError, value: { [key: string]: any }, tag: string = null): void;
         getInfo(): string;
     }
@@ -507,7 +507,7 @@ declare namespace soomla {
         constructor();
         init(): boolean;
         buy(payload: string, error: CCError = null): void;
-        canAfford(error: CCError): boolean;
+        canAfford(error: CCError = null): boolean;
         setAssociatedItemId(mAssociatedItemId: string): void;
         getAssociatedItemId(): string;
     }
@@ -614,7 +614,7 @@ declare namespace soomla {
         init(productId: string, price: number): boolean;
         setProductId(mProductId: string): void;
         getProductId(): string;
-        setPrice(mPrice: number): number;
+        setPrice(mPrice: number): void;
         getPrice(): number;
         setMarketPriceAndCurrency(mMarketPriceAndCurrency: string): void;
         getMarketPriceAndCurrency(): string;
@@ -628,7 +628,7 @@ declare namespace soomla {
         getMarketPriceMicros(): number;
     }
 
-    class CCPurchasableVirtualItem {
+    class CCPurchasableVirtualItem extends CCVirtualItem {
         /* using CCVirtualItem::init */
         init(name: string, description: string, itemId: string, purchaseType: CCPurchaseType): boolean;
         canAfford(error: CCError = null): boolean;
@@ -788,7 +788,7 @@ declare namespace soomla {
         save(saveToDB: boolean = true): void;
     }
 
-    class CCVirtualcurrencyPackBuilder {
+    class CCVirtualCurrencyPackBuilder {
         constructor();
         setName(name: string): this;
         setDescription(description: string): this;
