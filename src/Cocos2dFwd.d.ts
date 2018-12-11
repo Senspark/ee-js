@@ -772,7 +772,7 @@ declare namespace soomla {
             purchaseType: CCPurchaseType): boolean;
         setCurrencyAmount(mCurrencyAmount: number): void;
         getCurrencyAmount(): number;
-        setCurrencyItemId(mCurrencyItemId: string): string;
+        setCurrencyItemId(mCurrencyItemId: string): void;
         getCurrencyItemId(): string;
     }
 
