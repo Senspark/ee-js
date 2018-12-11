@@ -490,8 +490,8 @@ declare namespace soomla {
     type MarketPurchaseCallback = (
         purchasableId: string, payload: string, extraInfo: { [key: string]: string }) => void;
     type MarketPurchaseCanceledCallback = (purchasableId: string) => void;
-    type MarketItemsRefreshStaredCallback = () => void;
-    type MarketitemsRefreshedCallback = (marketItemIds: string[]) => void;
+    type MarketItemsRefreshStartedCallback = () => void;
+    type MarketItemsRefreshedCallback = (marketItemIds: string[]) => void;
     type MarketItemsRefreshFailedCallback = (errorMessage: string) => void;
     type RestoreTransactionStartedCallback = () => void;
     type RestoreTransactionFinishedCallback = (succeeded: boolean) => void;
@@ -560,9 +560,10 @@ declare namespace soomla {
         getItemId(): string;
         give(amount: number, error: CCError = null): number;
         give(amount: number, notify: boolean, error: CCError = null): number;
+        take(amount: number, error: CCError = null): number;
         take(amount: number, notify: boolean, error: CCError = null): number;
         resetBalance(balance: number, error: CCError = null): number;
-        resetBalance(error: CCError = null): number;
+        resetBalance(balance: number, notify: boolean, error: CCError = null): number;
         getBalance(error: CCError = null): number;
         getBalance(): number;
         save(saveToDB: boolean = true): void;
@@ -574,13 +575,12 @@ declare namespace soomla {
 
     class CCPurchasableVirtualItem {
         constructor();
-        CCPurchasableVirtualItem(): CCVirtualItem;
         init(name: string, description: string, itemId: string, purchaseType: CCPurchaseType): boolean;
-        initWithValueMap(map: { [key: string]: any }): boolean;
         canAfford(error: CCError = null): boolean;
         buy(payload: string, error: CCError = null): void;
         canBuy(): boolean;
         setPurchaseType(mPurchaseType: CCPurchaseType): void;
+        getPurchaseType(): CCPurchaseType;
     }
 
     class CCVirtualGood extends CCPurchasableVirtualItem {
@@ -646,17 +646,21 @@ declare namespace soomla {
     }
 
     class CCPurchaseWithMarket extends CCPurchaseType {
-        static create(productId: string, price: number): CCPurchaseType;
+        static create(productId: string, price: number): CCPurchaseWithMarket;
         static createWithMarketItem(marketItem: CCMarketItem): CCPurchaseWithMarket;
         initWithMarketItem(marketItem: CCMarketItem): boolean;
+        setMarketItem(mMarketItem: CCMarketItem): void;
+        getMarketItem(): CCMarketItem;
     }
 
     class CCSingleUsePackVG extends CCVirtualGood {
         static create(
-            itemId: string,
             goodItemId: string,
             goodAmount: number,
-            purchaseType: store.PurchaseType): CCSingleUsePackVG;
+            name: string,
+            description: string,
+            itemId: string,
+            purchaseType: CCPurchaseType): CCSingleUsePackVG;
 
         init(
             goodItemId: string,
@@ -674,7 +678,7 @@ declare namespace soomla {
 
     class CCStoreAssets {
         getVersion(): number;
-        getCurrencies(): CCVirtualCurrencyBuilder[];
+        getCurrencies(): CCVirtualCurrency[];
         getGoods(): CCVirtualGood[];
         getCurrencyPacks(): CCVirtualCurrencyPack[];
         getCategories(): CCVirtualCategory[];
@@ -687,11 +691,6 @@ declare namespace soomla {
         restoreTransactions(): void;
         refreshInventory(): void;
         refreshMarketItemsDetails(error: CCError = null): void;
-    }
-
-    namespace CCStoreAssetsBuilder {
-        class StoreAssets extends CCStoreAssets {
-        }
     }
 
     class CCStoreAssetsBuilder {
@@ -707,7 +706,7 @@ declare namespace soomla {
     class CCStoreInfo {
         static sharedStoreInfo(): CCStoreInfo;
         static createShared(storeAssets: CCStoreAssets): void;
-        init(storeAssets: CCStoreAssets): void;
+        init(storeAssets: CCStoreAssets): boolean;
         initWithValueMap(map: { [key: string]: any }): boolean;
         saveItem(virtualItem: CCVirtualItem, saveToDB: boolean = true): void;
         saveItems(virtualItems: CCVirtualItem[], saveToDB: boolean = true): void;
@@ -742,7 +741,7 @@ declare namespace soomla {
         refreshOnGoodUpgrade(vg: CCVirtualGood, uvg: CCUpgradeVG): void;
         refreshOnGoodEquipped(equippable: CCEquippableVG): void;
         refreshOnGoodUnEquipped(equippable: CCEquippableVG): void;
-        refreshOnGoodBalanceChanged(good: CCVirtualCurrency, balance: number, amountAdded: number): void;
+        refreshOnCurrencyBalanceChanged(good: CCVirtualCurrency, balance: number, amountAdded: number): void;
         refreshOnGoodBalanceChanged(good: CCVirtualGood, balance: number, amountAdded: number): void;
         updateLocalBalance(itemId: string, balance: number): void;
     }
@@ -759,7 +758,7 @@ declare namespace soomla {
         static create(
             name: string,
             description: string,
-            itemId: number,
+            itemId: string,
             currencyAmount: number,
             currencyItemId: string,
             purchaseType: CCPurchaseType): CCVirtualCurrencyPack;
@@ -794,9 +793,10 @@ declare namespace soomla {
         setName(name: string): this;
         setDescription(description: string): this;
         setItemId(itemId: string): this;
-        setCurrencyItemId(setCurrencyItemId: string): this;
+        setCurrencyAmount(currencyAmount: number): this;
+        setCurrencyItemId(currencyItemId: string): this;
         setPurchaseType(type: CCPurchaseType): this;
-        build(): CCVirtualcurrencyPack;
+        build(): CCVirtualCurrencyPack;
     }
 
     class StoreEventListener {
@@ -808,8 +808,8 @@ declare namespace soomla {
         setMarketPurchaseCallback(callback: MarketPurchaseCallback): void;
         setMarketPurchaseStartedCallback(callback: MarketPurchaseStartedCallback): void;
         setMarketPurchaseCanceledCallback(callback: MarketPurchaseCanceledCallback): void;
-        setMarketItemsRefreshStartedCallback(callback: MarketItemsRefreshStaredCallback): void;
-        setMarketItemsRefreshCallback(callback: MarketitemsRefreshedCallback): void;
+        setMarketItemsRefreshStartedCallback(callback: MarketItemsRefreshStartedCallback): void;
+        setMarketItemsRefreshedCallback(callback: MarketItemsRefreshedCallback): void;
         setMarketItemsRefreshFailedCallback(callback: MarketItemsRefreshFailedCallback): void;
         setRestoreTransactionStartedCallback(callback: RestoreTransactionStartedCallback): void;
         setRestoreTransactionFinishedCallback(callback: RestoreTransactionFinishedCallback): void;
