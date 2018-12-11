@@ -573,7 +573,7 @@ declare namespace soomla {
         static create(name: string, description: string, itemId: string): CCVirtualCurrency;
     }
 
-    class CCPurchasableVirtualItem {
+    class CCPurchasableVirtualItem extends CCVirtualItem {
         constructor();
         init(name: string, description: string, itemId: string, purchaseType: CCPurchaseType): boolean;
         canAfford(error: CCError = null): boolean;
@@ -719,7 +719,8 @@ declare namespace soomla {
         setGoods(mGoods: CCVirtualGood[]): void;
         getGoods(): CCVirtualGood[];
         setCategories(mCategories: CCVirtualCategory[]): void;
-        getCateGories(): CCVirtualCategory[];
+        getCategories(): CCVirtualCategory[];
+        getItemByItemId(itemId: string, error: CCError = null): CCVirtualItem;
     }
 
     class CCStoreInventory {
@@ -729,7 +730,7 @@ declare namespace soomla {
         buyItem(itemId: string, error: CCError = null): void;
         buyItem(itemId: string, payload: string, error: CCError = null): void;
         getItemBalance(itemId: string, error: CCError = null): number;
-        giveItem(itemId: string, amount: number, error: Error = null): void;
+        giveItem(itemId: string, amount: number, error: CCError = null): void;
         takeItem(itemId: string, amount: number, error: CCError = null): void;
         equipVirtualGood(itemId: string, error: CCError = null): void;
         unEquipVirtualGood(itemId: string, error: CCError = null): void;
@@ -771,7 +772,7 @@ declare namespace soomla {
             purchaseType: CCPurchaseType): boolean;
         setCurrencyAmount(mCurrencyAmount: number): void;
         getCurrencyAmount(): number;
-        setCurrencyItemId(mCurrencyItemId: string): string;
+        setCurrencyItemId(mCurrencyItemId: string): void;
         getCurrencyItemId(): string;
     }
 
