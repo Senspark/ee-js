@@ -720,7 +720,6 @@ declare namespace soomla {
         getGoods(): CCVirtualGood[];
         setCategories(mCategories: CCVirtualCategory[]): void;
         getCateGories(): CCVirtualCategory[];
-        getItemByItemId(itemId: string): CCVirtualItem;
         getItemByItemId(itemId: string, error: CCError = null): CCVirtualItem;
     }
 
