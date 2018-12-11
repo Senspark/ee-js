@@ -574,7 +574,7 @@ declare namespace soomla {
         static create(name: string, description: string, itemId: string): CCVirtualCurrency;
     }
 
-    class CCPurchasableVirtualItem {
+    class CCPurchasableVirtualItem extends CCVirtualItem {
         constructor();
         init(name: string, description: string, itemId: string, purchaseType: CCPurchaseType): boolean;
         canAfford(error: CCError = null): boolean;
