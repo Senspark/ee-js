@@ -479,6 +479,47 @@ declare namespace ee {
             createRewardedVideo(placementId: string): ads.IRewardedVideo;
         }
     }
+
+    namespace facebook {
+        class IAccessToken {
+            getToken(): string;
+            getApplicationId(): string;
+            getUserId(): string;
+        }
+
+        type LoginSuccessCallback = (token: IAccessToken) => void;
+        type FailedCallback = (message: string) => void;
+        type CancelCallback = () => void;
+
+        class ILoginDelegate {
+            onSuccess(callback: LoginSuccessCallback): ILoginDelegate;
+            onFailure(callback: FailedCallback): ILoginDelegate;
+            onCancel(callback: CancelCallback): ILoginDelegate;
+        }
+
+        type ShareSuccessCallback = (postId: string) => void;
+        class IShareDelegate {
+            onSuccess(callback: ShareSuccessCallback): IShareDelegate;
+            onFailure(callback: FailedCallback): IShareDelegate;
+            onCancel(callback: CancelCallback): IShareDelegate;
+        }
+
+        class IBridge {
+            isLoggedIn(): boolean;
+            logIn(permissions: string[], delegate: ILoginDelegate): void;
+            createLoginDelegate(): ILoginDelegate;
+            logout(): void;
+            getAccessToken(): IAccessToken;
+            shareLinkContent(link: string, IShareDelegate: delegate): void;
+            sharePhotoContent(url: string, IShareDelegate: delegate): void;
+            shareVideoContent(url: string, IShareDelegate: delegate): void;
+            createShareDelegate(): IShareDelegate;
+        }
+
+        class Bridge extends IBridge {
+            constructor();
+        }
+    }
 }
 
 declare namespace soomla {
