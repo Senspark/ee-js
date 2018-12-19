@@ -508,7 +508,7 @@ declare namespace ee {
             isLoggedIn(): boolean;
             logIn(permissions: string[], delegate: ILoginDelegate): void;
             createLoginDelegate(): ILoginDelegate;
-            logout(): void;
+            logOut(): void;
             getAccessToken(): IAccessToken;
             shareLinkContent(link: string, IShareDelegate: delegate): void;
             sharePhotoContent(url: string, IShareDelegate: delegate): void;
