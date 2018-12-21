@@ -83,6 +83,7 @@ const assembler = {
 
         const renderData = sprite._renderData;
         const data = renderData._data;
+        const color = (sprite.node as any)._color._val; // For version 2.1.
 
         const buffer = renderer._meshBuffer;
         let vertexOffset = buffer.byteOffset >> 2;
@@ -130,6 +131,7 @@ const assembler = {
         // buffer data may be realloc, need get reference after request.
         const vbuf = buffer._vData;
         const ibuf = buffer._iData;
+        const uintbuf = buffer._uintVData; // For version 2.1.
 
         for (let i = 4; i < 20; ++i) {
             const vert = data[i];
@@ -139,6 +141,7 @@ const assembler = {
             vbuf[vertexOffset++] = vert.y;
             vbuf[vertexOffset++] = uvs.u;
             vbuf[vertexOffset++] = uvs.v;
+            uintbuf && (uintbuf[vertexOffset++] = color);
         }
 
         for (let r = 0; r < 3; ++r) {
@@ -189,17 +192,37 @@ const assembler = {
 @executeInEditMode
 @menu('ee/Scale9')
 export class Scale9 extends cc.Component {
-    public update(delta: number): void {
+    protected onEnable(): void {
+        this.refreshAssembler();
+    }
+
+    protected onDisable(): void {
+        this.refreshAssembler();
+    }
+
+    protected update(delta: number): void {
+        this.refreshAssembler();
+    }
+
+    private refreshAssembler(): void {
         const component = this.getComponent(cc.Sprite);
-        const type = component.type;
-        if (type === cc.Sprite.Type.SLICED) {
-            if (component._assembler !== assembler) {
-                // Use custom assembler.
-                this.updateAssembler();
+        if (component === null) {
+            return;
+        }
+        if (this.enabled) {
+            const type = component.type;
+            if (type === cc.Sprite.Type.SLICED) {
+                if (component._assembler !== assembler) {
+                    // Use custom assembler.
+                    this.updateAssembler();
+                }
             }
+        } else {
+            (component as any)._updateAssembler();
         }
     }
 
+    /** Updates the current assembler. */
     private updateAssembler(): void {
         const component = this.getComponent(cc.Sprite);
         assert(component !== null);
