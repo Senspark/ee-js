@@ -163,8 +163,10 @@ const overwriteGizmoRegisterEvent = (oldFunction: typeof Editor.Gizmo.prototype.
             if (!profile.loadData(settingKey)) {
                 return false;
             }
-            assert(this.node !== null);
-            const comp = this.node!.getComponent(UnselectableComponent);
+            if (this.node === null) {
+                return true;
+            }
+            const comp = this.node.getComponent(UnselectableComponent);
             return comp !== null && comp.enabled;
         };
         node.addEventListener("mousedown", (event: MouseEvent) => {
