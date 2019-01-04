@@ -330,6 +330,37 @@ declare namespace ee {
         }
     }
 
+    namespace facebookads {
+        class FacebookAds {
+            constructor();
+            constructor(logger: core.Logger);
+            getTestDeviceHash(): string;
+            addTestDevice(hash: string): void;
+            createBannerAd(adId: string, adSize: BannerAdSize): ads.IAdView;
+            createNativeAd(adId: string, layoutName: string, identifiers: NativeAdLayout): ads.IAdView;
+            createInterstitialAd(adId: string): ads.IInterstitialAd;
+            createRewardedVideo(adId: string): ads.IRewardedVideo;
+        }
+
+        enum BannerAdSize {
+            BannerHeight50,
+            BannerHeight90,
+        }
+
+        class NativeAdLayout {
+            constructor();
+            setAdChoices(id: string): this;
+            setBody(id: string): this;
+            setCallToAction(id: string): this;
+            setIcon(id: string): this;
+            setMedia(id: string): this;
+            setSocialContext(id: string): this;
+            setTitle(id: string): this;
+            setCover(id: string): this;
+            setSponsor(id: string): this;
+        }
+    }
+
     namespace applovin {
         class AppLovin {
             constructor();
