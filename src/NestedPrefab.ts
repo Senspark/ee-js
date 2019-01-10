@@ -245,6 +245,7 @@ export class NestedPrefab extends cc.Component {
                     }
                 } else {
                     this.instantiated = false;
+                    this._view.removeFromParent(true);
                     this._view.destroy();
                     this._view = null;
                 }
@@ -252,6 +253,7 @@ export class NestedPrefab extends cc.Component {
         }
         if (this.mode === NestMode.Node) {
             if (this._view !== null) {
+                this._view.removeFromParent(true);
                 this._view.destroy();
                 this._view = null;
             }
