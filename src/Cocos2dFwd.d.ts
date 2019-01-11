@@ -535,16 +535,64 @@ declare namespace ee {
             onCancel(callback: CancelCallback): IShareDelegate;
         }
 
+        type GraphRequestSuccessCallback = (content: string) => void;
+        class IGraphDelegate {
+            onSuccess(callback: GraphRequestSuccessCallback): IGraphDelegate;
+            onFailure(callback: FailedCallback): IGraphDelegate;
+            onCancel(callback: CancelCallback): IGraphDelegate;
+        }
+
+        type RequestContentSuccessCallback = (requestId: string, requestRecipients: string[]) => void;
+        class IRequestDelegate {
+            onSuccess(callback: RequestContentSuccessCallback): IRequestDelegate;
+            onFailure(callback: FailedCallback): IRequestDelegate;
+            onCancel(callback: CancelCallback): IRequestDelegate;
+        }
+
+        class GraphRequest {
+            setPath(path: string): void;
+            setParameter(key: string, value: string): void;
+            toString(): string;
+        }
+
+        enum ActionType {
+            None,
+            Send,
+            AskFor,
+            Turn,
+        }
+
+        enum Filter {
+            None,
+            AppUsers,
+            AppNonUsers,
+        }
+
+        class RequestContent {
+            setActionType(type: ActionType): RequestContent;
+            setFilter(filter: Filter): RequestContent;
+            setRecipients(recipients: string[]): RequestContent;
+            setObjectId(objectId: string): RequestContent;
+            setTitle(title: string): RequestContent;
+            setMessage(title: string): RequestContent;
+            setData(data: string): RequestContent;
+            toString(): string;
+        }
+
         class IBridge {
             isLoggedIn(): boolean;
             logIn(permissions: string[], delegate: ILoginDelegate): void;
             createLoginDelegate(): ILoginDelegate;
             logOut(): void;
             getAccessToken(): IAccessToken;
-            shareLinkContent(link: string, IShareDelegate: delegate): void;
-            sharePhotoContent(url: string, IShareDelegate: delegate): void;
-            shareVideoContent(url: string, IShareDelegate: delegate): void;
+            shareLinkContent(link: string, delegate: IShareDelegate): void;
+            sharePhotoContent(url: string, delegate: IShareDelegate): void;
+            shareVideoContent(url: string, delegate: IShareDelegate): void;
             createShareDelegate(): IShareDelegate;
+            graphRequest(request: GraphRequest, delegate: IGraphDelegate): void;
+            createGraphDelegate(): IGraphDelegate;
+            sendRequest(request: RequestContent, delegate: IRequestDelegate): void;
+            createRequestDelegate(): IRequestDelegate;
         }
 
         class Bridge extends IBridge {
