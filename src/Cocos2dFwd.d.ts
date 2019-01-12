@@ -285,6 +285,19 @@ declare namespace ee {
         }
     }
 
+    namespace recorder {
+        class Recorder {
+            constructor();
+
+            startScreenRecording(): void;
+            stopScreenRecording(): void;
+            cancelScreenRecording(): void;
+
+            getScreenRecordingUrl(): string;
+            checkRecordingPermission(): boolean;
+        }
+    }
+
     namespace ironsource {
         class IronSource {
             constructor();
