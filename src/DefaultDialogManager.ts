@@ -59,8 +59,10 @@ export class DefaultDialogManager extends DialogManager {
 
     public popToLevel(level: number): void {
         assert(level >= 0);
-        while (this.dialogStack.length > level) {
-            this.popDialog(this.dialogStack[this.dialogStack.length - 1]);
+        const stackSize = this.dialogStack.length;
+        const count = stackSize - level;
+        for (let i = 0; i < count; i++) {
+            this.popDialog(this.dialogStack[stackSize - i - 1]);
         }
     }
 
