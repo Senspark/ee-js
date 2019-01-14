@@ -57,6 +57,13 @@ export class DefaultDialogManager extends DialogManager {
         this.processCommandQueue();
     }
 
+    public popToLevel(level: number): void {
+        assert(level >= 0);
+        while (this.dialogStack.length > level) {
+            this.popDialog(this.dialogStack[this.dialogStack.length - 1]);
+        }
+    }
+
     /** Checks whether there is a locking dialog. */
     private isLocked(): boolean {
         return this.lockingDialog !== null;
