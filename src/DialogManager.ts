@@ -19,4 +19,10 @@ export abstract class DialogManager {
      * @param dialog The dialog to be popped.
      */
     public abstract popDialog(dialog: Dialog): void;
+
+    /**
+     * Attempts to pop to a specified number of dialogs remaining.
+     * @param level Number of dialogs remain in stacks
+     */
+    public abstract popToLevel(level: number): void;
 }
