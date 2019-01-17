@@ -5,6 +5,7 @@ const { ccclass, disallowMultiple, executeInEditMode, menu, property } = cc._dec
 
 /** Decorator for nested prefabs. */
 export const nest = (type: { prototype: cc.Component } | Array<{ prototype: cc.Component }>) => {
+    assert(type !== undefined, 'Type is undefined.');
     if (type instanceof Array) {
         return nestArray(type[0]);
     } else {
