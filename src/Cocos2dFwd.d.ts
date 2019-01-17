@@ -525,46 +525,27 @@ declare namespace ee {
     }
 
     namespace facebook {
-        class IAccessToken {
+        interface IAccessToken {
             getToken(): string;
             getApplicationId(): string;
             getUserId(): string;
         }
 
-        type LoginSuccessCallback = (token: IAccessToken) => void;
-        type FailedCallback = (message: string) => void;
-        type CancelCallback = () => void;
-
-        class ILoginDelegate {
-            onSuccess(callback: LoginSuccessCallback): ILoginDelegate;
-            onFailure(callback: FailedCallback): ILoginDelegate;
-            onCancel(callback: CancelCallback): ILoginDelegate;
+        interface IDelegate<T> {
+            onSuccess(callback: T): this;
+            onFailure(callback: (message) => void): this;
+            onCancel(callback: () => void): this;
         }
 
-        type ShareSuccessCallback = (postId: string) => void;
-        class IShareDelegate {
-            onSuccess(callback: ShareSuccessCallback): IShareDelegate;
-            onFailure(callback: FailedCallback): IShareDelegate;
-            onCancel(callback: CancelCallback): IShareDelegate;
-        }
-
-        type GraphRequestSuccessCallback = (content: string) => void;
-        class IGraphDelegate {
-            onSuccess(callback: GraphRequestSuccessCallback): IGraphDelegate;
-            onFailure(callback: FailedCallback): IGraphDelegate;
-            onCancel(callback: CancelCallback): IGraphDelegate;
-        }
-
-        type RequestContentSuccessCallback = (requestId: string, requestRecipients: string[]) => void;
-        class IRequestDelegate {
-            onSuccess(callback: RequestContentSuccessCallback): IRequestDelegate;
-            onFailure(callback: FailedCallback): IRequestDelegate;
-            onCancel(callback: CancelCallback): IRequestDelegate;
-        }
+        type ILoginDelegate = IDelegate<(token: IAccessToken) => void>;
+        type IRequestDelegate = IDelegate<(requestId: string, requestRecipients: string[]) => void>;
+        type IShareDelegate = IDelegate<(postId: string) => void>;
+        type IGraphDelegate = IDelegate<(content: string) => void>;
 
         class GraphRequest {
-            setPath(path: string): void;
-            setParameter(key: string, value: string): void;
+            constructor();
+            setPath(path: string): this;
+            setParameter(key: string, value: string): this;
             toString(): string;
         }
 
@@ -582,13 +563,14 @@ declare namespace ee {
         }
 
         class RequestContent {
-            setActionType(type: ActionType): RequestContent;
-            setFilter(filter: Filter): RequestContent;
-            setRecipients(recipients: string[]): RequestContent;
-            setObjectId(objectId: string): RequestContent;
-            setTitle(title: string): RequestContent;
-            setMessage(title: string): RequestContent;
-            setData(data: string): RequestContent;
+            constructor();
+            setActionType(type: ActionType): this;
+            setFilter(filter: Filter): this;
+            setRecipients(recipients: string[]): this;
+            setObjectId(objectId: string): this;
+            setTitle(title: string): this;
+            setMessage(message: string): this;
+            setData(data: string): this;
             toString(): string;
         }
 
