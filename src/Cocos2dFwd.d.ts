@@ -427,7 +427,6 @@ declare namespace ee {
         class RemoteConfig {
             constructor();
             initialize(): boolean;
-            fetchJS(callback: FetchCallback): void;
             fetch(devModeEnabled: boolean, callback: FetchCallback): void;
             setDefaultBool(key: string, value: boolean): void;
             setDefaultLong(key: string, value: number): void;
