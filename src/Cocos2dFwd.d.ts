@@ -127,9 +127,9 @@ declare namespace ee {
 
             causeException();
 
-            setLogLevel(level: ee.core.LogLevel): void;
+            setLogLevel(level: core.LogLevel): void;
 
-            log(level: ee.core.LogLevel, tag: string, message: string): void;
+            log(level: core.LogLevel, tag: string, message: string): void;
 
             setString(key: string, value: string): void;
 
@@ -143,17 +143,17 @@ declare namespace ee {
 
             setUserEmail(email: string): void;
 
-            trackLevelStart(name: string, attrs: List<string, string>): void;
+            trackLevelStart(name: string, attrs: { [key: string]: string }): void;
 
-            trackLevelEnd(name: string, score: number, success: boolean, attrs: List<string, string>): void;
+            trackLevelEnd(name: string, score: number, success: boolean, attrs: { [key: string]: string }): void;
 
             trackPurchase(price: number, currency: string, success: boolean,
                 itemName: string, itemType: string, itemId: string,
-                attrs: List<string, string>);
+                attrs: { [key: string]: string });
 
-            trackCustomEvent(name: string, attrs: List<string, string>): void;
+            trackCustomEvent(name: string, attrs: { [key: string]: string }): void;
 
-            trackInvite(method: string, attrs: List<string, string>): void;
+            trackInvite(method: string, attrs: { [key: string]: string }): void;
         }
     }
 
