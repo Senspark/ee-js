@@ -119,6 +119,44 @@ declare namespace ee {
         }
     }
 
+    namespace crashlytics {
+        class Crashlytics {
+            constructor();
+
+            causeCrash(): void;
+
+            causeException();
+
+            setLogLevel(level: core.LogLevel): void;
+
+            log(level: core.LogLevel, tag: string, message: string): void;
+
+            setString(key: string, value: string): void;
+
+            setBool(key: string, value: boolean): void;
+
+            setInt(key: string, value: number): void;
+
+            setUserIdentifier(identifier: string): void;
+
+            setUserName(name: string): void;
+
+            setUserEmail(email: string): void;
+
+            trackLevelStart(name: string, attrs: { [key: string]: string }): void;
+
+            trackLevelEnd(name: string, score: number, success: boolean, attrs: { [key: string]: string }): void;
+
+            trackPurchase(price: number, currency: string, success: boolean,
+                itemName: string, itemType: string, itemId: string,
+                attrs: { [key: string]: string });
+
+            trackCustomEvent(name: string, attrs: { [key: string]: string }): void;
+
+            trackInvite(method: string, attrs: { [key: string]: string }): void;
+        }
+    }
+
     namespace google {
         class Analytics {
             constructor();
@@ -207,17 +245,6 @@ declare namespace ee {
             setAllowIDFACollection(enabled: boolean): void;
             setScreenName(screenName: string): void;
             send(dict: TrackingDict): void;
-        }
-    }
-
-    namespace recorder {
-        class Recorder {
-            constructor();
-            startScreenRecording(): void;
-            stopScreenRecording(): void;
-            cancelScreenRecording(): void;
-            getScreenRecordingUrl(): string;
-            checkRecordingPermission(): boolean;
         }
     }
 
