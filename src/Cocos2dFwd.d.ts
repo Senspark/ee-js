@@ -18,6 +18,7 @@ declare namespace ee {
         function getSHA1CertificateFingerprint(): string;
         function getVersionName(): string;
         function getVersionCode(): string;
+        function getLanguageCode(): string;
         function isApplicationInstalled(applicationId: string): boolean;
         function openApplication(applicationId: string): boolean;
         function sendMail(recipient: string, subject: string, body: string): boolean;
