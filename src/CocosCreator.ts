@@ -163,8 +163,10 @@ const overwriteGizmoRegisterEvent = (oldFunction: typeof Editor.Gizmo.prototype.
             if (!profile.loadData(settingKey)) {
                 return false;
             }
-            assert(this.node !== null);
-            const comp = this.node!.getComponent(UnselectableComponent);
+            if (this.node === null) {
+                return true;
+            }
+            const comp = this.node.getComponent(UnselectableComponent);
             return comp !== null && comp.enabled;
         };
         node.addEventListener("mousedown", (event: MouseEvent) => {
@@ -262,30 +264,37 @@ const dumpHierarchy = (scene?: cc.Scene, includeScene?: boolean) => {
 };
 
 if (CC_EDITOR) {
-    cc.engine.getIntersectionList = overwriteFunction(cc.engine.getIntersectionList, overwriteGetIntersectionList);
+    if (cc.engine) {
+        // Fix error when build to web.
+        cc.engine.getIntersectionList = overwriteFunction(cc.engine.getIntersectionList, overwriteGetIntersectionList);
+    }
     if (cc.ENGINE_VERSION >= '2') {
         const panels = Editor.UI.PolymerUtils.panels;
 
-        // app.asar/editor/builtin/scene/panel/scene.js
-        const scene = panels['scene'];
+        if (panels) {
+            // app.asar/editor/builtin/scene/panel/scene.js
+            const scene = panels['scene'];
 
-        // app.asar/editor/builtin/scene/panel/messages/*.js
-        const messages = scene.prototype.messages;
-        messages['scene:query-hierarchy'] = (event: any) => {
-            if (!cc.engine.isInitialized) {
-                event.reply(null, '', []);
-                return;
-            }
-            const nodes = dumpHierarchy();
-            const uuid = _Scene.currentScene().uuid;
-            event.reply(null, uuid, nodes);
-        };
+            // app.asar/editor/builtin/scene/panel/messages/*.js
+            const messages = scene.prototype.messages;
+            messages['scene:query-hierarchy'] = (event: any) => {
+                if (!cc.engine.isInitialized) {
+                    event.reply(null, '', []);
+                    return;
+                }
+                const nodes = dumpHierarchy();
+                const uuid = _Scene.currentScene().uuid;
+                event.reply(null, uuid, nodes);
+            };
 
-        // TODO: createNodeFromAsset for version >= 2.
+            // TODO: createNodeFromAsset for version >= 2.
+        }
     } else {
         _Scene.dumpHierarchy = overwriteFunction(_Scene.dumpHierarchy, overwriteDumpHierarchy);
         _Scene.createNodeFromAsset = overwriteFunction(_Scene.createNodeFromAsset, overwriteCreateNodeFromAsset);
     }
-    Editor.Gizmo.prototype._registerEvent = overwriteFunction(Editor.Gizmo.prototype._registerEvent,
-        overwriteGizmoRegisterEvent);
+    if (Editor.Gizmo) {
+        Editor.Gizmo.prototype._registerEvent = overwriteFunction(Editor.Gizmo.prototype._registerEvent,
+            overwriteGizmoRegisterEvent);
+    }
 }

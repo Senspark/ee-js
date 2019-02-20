@@ -38,7 +38,7 @@ export class Dialog extends cc.Component {
         this.eventDictionary = {};
     }
 
-    public onLoad(): void {
+    protected onLoad(): void {
         this.node.addChild(this.actor);
     }
 

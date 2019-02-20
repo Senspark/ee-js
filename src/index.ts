@@ -1,3 +1,4 @@
+export * from './BackButtonListener';
 export * from './ConditionTouchListener';
 export * from './DefaultDialogManager';
 export * from './Dialog';
@@ -13,3 +14,4 @@ export * from './Scale9';
 export * from './SkeletonAnimation';
 export * from './StaticComponent';
 export * from './UnselectableComponent';
+export * from './ServiceLocator';

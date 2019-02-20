@@ -29,13 +29,14 @@ class Command {
     }
 }
 
-export class DefaultDialogManager implements DialogManager {
+export class DefaultDialogManager extends DialogManager {
     private root: cc.Node;
     private lockingDialog: Dialog | null;
     private dialogStack: Dialog[];
     private commandQueue: Command[];
 
     public constructor(root: cc.Node) {
+        super();
         this.root = root;
         this.lockingDialog = null;
         this.dialogStack = [];
@@ -54,6 +55,15 @@ export class DefaultDialogManager implements DialogManager {
         assert(dialog.getContainer() !== null);
         this.pushCommand(new Command(CommandType.Pop, dialog));
         this.processCommandQueue();
+    }
+
+    public popToLevel(level: number): void {
+        assert(level >= 0);
+        const stackSize = this.dialogStack.length;
+        const count = stackSize - level;
+        for (let i = 0; i < count; i++) {
+            this.popDialog(this.dialogStack[stackSize - i - 1]);
+        }
     }
 
     /** Checks whether there is a locking dialog. */
@@ -165,12 +175,21 @@ export class DefaultDialogManager implements DialogManager {
         // Lock first.
         this.lock(dialog);
 
+        // Deactivate the current top dialog.
+        const currentDialog = this.getCurrentDialog();
+        if (currentDialog !== null) {
+            assert(currentDialog.isActive());
+            currentDialog.setActive(false);
+        }
+
         // Must be called before push + addChild.
         dialog.processEvent(DialogEventType.WillShow);
 
         // Add child + push.
         const root = this.getCurrentRoot();
         root.addChild(dialog.getContainer());
+
+        // Push the desired dialog.
         this.dialogStack.push(dialog);
 
         dialog.playShowingTransition(() => {
@@ -213,6 +232,13 @@ export class DefaultDialogManager implements DialogManager {
 
             // Must be called after pop + remove child.
             dialog.processEvent(DialogEventType.DidHide);
+
+            // Reactivate the current top dialog.
+            const currentDialog = this.getCurrentDialog();
+            if (currentDialog !== null) {
+                assert(!currentDialog.isActive());
+                currentDialog.setActive(true);
+            }
 
             // Unlock and process next commands.
             this.unlock(dialog);

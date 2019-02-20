@@ -103,6 +103,8 @@ export class LanguageComponent extends cc.Component {
     /** Associated label component. */
     private label: cc.Label | null = null;
 
+    private richText: cc.RichText | null = null;
+
     private manager?: LanguageManager;
 
     public constructor() {
@@ -118,6 +120,10 @@ export class LanguageComponent extends cc.Component {
         this.getLanguageManager().addObserver(this.componentId, () => {
             this.updateText();
         });
+
+        this.label = this.getComponent(cc.Label);
+        this.richText = this.getComponent(cc.RichText);
+
         this.updateText();
     }
 
@@ -133,14 +139,13 @@ export class LanguageComponent extends cc.Component {
     }
 
     private updateText(): void {
-        if (this.label === null) {
-            this.label = this.getComponent(cc.Label);
-            if (this.label === null) {
-                // Component not found.
-                return;
-            }
+        if (this.label !== null) {
+            this.label.string = this.string || '';
         }
-        this.label.string = this.string || '';
+
+        if (this.richText !== null) {
+            this.richText.string = this.string || '';
+        }
     }
 
     private parseParamKeys(format: string): string[] {
