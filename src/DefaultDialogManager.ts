@@ -175,12 +175,21 @@ export class DefaultDialogManager extends DialogManager {
         // Lock first.
         this.lock(dialog);
 
+        // Deactivate the current top dialog.
+        const currentDialog = this.getCurrentDialog();
+        if (currentDialog !== null) {
+            assert(currentDialog.isActive());
+            currentDialog.setActive(false);
+        }
+
         // Must be called before push + addChild.
         dialog.processEvent(DialogEventType.WillShow);
 
         // Add child + push.
         const root = this.getCurrentRoot();
         root.addChild(dialog.getContainer());
+
+        // Push the desired dialog.
         this.dialogStack.push(dialog);
 
         dialog.playShowingTransition(() => {
@@ -223,6 +232,13 @@ export class DefaultDialogManager extends DialogManager {
 
             // Must be called after pop + remove child.
             dialog.processEvent(DialogEventType.DidHide);
+
+            // Reactivate the current top dialog.
+            const currentDialog = this.getCurrentDialog();
+            if (currentDialog !== null) {
+                assert(!currentDialog.isActive());
+                currentDialog.setActive(true);
+            }
 
             // Unlock and process next commands.
             this.unlock(dialog);
