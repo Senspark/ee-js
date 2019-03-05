@@ -90,6 +90,13 @@ enum NestMode {
     Node,
 }
 
+enum SyncFlag {
+    Width   /**/ = 1 << 0,
+    Height  /**/ = 1 << 1,
+    AnchorX /**/ = 1 << 2,
+    AnchorY /**/ = 1 << 3,
+}
+
 @ccclass
 @disallowMultiple
 @executeInEditMode
@@ -185,6 +192,61 @@ export class NestedPrefab extends cc.Component {
     /** Whether to synchronize the component size and anchor with the nested view's. */
     @property(cc.Boolean)
     private synchronize: boolean = false;
+
+    @property({ type: cc.Boolean })
+    private get syncWidth(): boolean {
+        return (this._syncFlag & SyncFlag.Width) !== 0;
+    }
+
+    private set syncWidth(enabled: boolean) {
+        if (enabled) {
+            this._syncFlag |= SyncFlag.Width;
+        } else {
+            this._syncFlag &= ~SyncFlag.Width;
+        }
+    }
+
+    @property({ type: cc.Boolean })
+    private get syncHeight(): boolean {
+        return (this._syncFlag & SyncFlag.Height) !== 0;
+    }
+
+    private set syncHeight(enabled: boolean) {
+        if (enabled) {
+            this._syncFlag |= SyncFlag.Height;
+        } else {
+            this._syncFlag &= ~SyncFlag.Height;
+        }
+    }
+
+    @property({ type: cc.Boolean })
+    private get syncAnchorX(): boolean {
+        return (this._syncFlag & SyncFlag.AnchorX) !== 0;
+    }
+
+    private set syncAnchorX(enabled: boolean) {
+        if (enabled) {
+            this._syncFlag |= SyncFlag.AnchorX;
+        } else {
+            this._syncFlag &= ~SyncFlag.AnchorX;
+        }
+    }
+
+    @property({ type: cc.Boolean })
+    private get syncAnchorY(): boolean {
+        return (this._syncFlag & SyncFlag.AnchorY) !== 0;
+    }
+
+    private set syncAnchorY(enabled: boolean) {
+        if (enabled) {
+            this._syncFlag |= SyncFlag.AnchorY;
+        } else {
+            this._syncFlag &= ~SyncFlag.AnchorY;
+        }
+    }
+
+    @property(cc.Integer)
+    private _syncFlag = 0;
 
     public onLoad(): void {
         if (!CC_EDITOR && !this.instantiated && this.instantiate && this.mode === NestMode.Prefab) {
@@ -303,9 +365,20 @@ export class NestedPrefab extends cc.Component {
     /** Synchronizes this node's size and anchor with the nested view's. */
     public applySync(): void {
         const view = this.view;
-        if (view !== null && this.synchronize) {
-            this.node.setContentSize(view.getContentSize());
-            this.node.setAnchorPoint(view.getAnchorPoint());
+        if (view === null) {
+            return;
+        }
+        if (this.synchronize || this.syncWidth) {
+            this.node.width = view.width;
+        }
+        if (this.synchronize || this.syncHeight) {
+            this.node.height = view.height;
+        }
+        if (this.synchronize || this.syncAnchorX) {
+            this.node.anchorX = view.anchorX;
+        }
+        if (this.synchronize || this.syncAnchorY) {
+            this.node.anchorY = view.anchorY;
         }
     }
 }
