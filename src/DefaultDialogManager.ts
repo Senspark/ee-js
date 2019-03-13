@@ -43,6 +43,12 @@ export class DefaultDialogManager extends DialogManager {
         this.commandQueue = [];
     }
 
+    public destroy(): void {
+        this.lockingDialog = null;
+        this.dialogStack = [];
+        this.commandQueue = [];
+    }
+
     public pushDialog(dialog: Dialog): void {
         assert(dialog !== null);
         assert(dialog.getContainer() !== null);

@@ -1,9 +1,11 @@
 import { Dialog } from "./Dialog";
-import { service } from "./ServiceLocator";
+import { service, Service } from "./ServiceLocator";
 
 /** Manages all dialog behaviors. */
 @service("Dialog")
-export abstract class DialogManager {
+export abstract class DialogManager implements Service {
+    public abstract destroy(): void;
+
     /**
      * Attempts to push the specified dialog.
      * The specified dialog may be pushed immediately or
