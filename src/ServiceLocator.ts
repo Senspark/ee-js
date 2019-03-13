@@ -9,25 +9,34 @@ export function service(name: string): any {
     };
 }
 
-export class ServiceLocator {
-    private static services: { [key: string]: any } = {};
+/** Base class for all services. */
+export interface Service {
+    /** Destroys this service. */
+    destroy(): void;
+}
 
-    public static resolve<T>(type: { prototype: T }): T {
+export class ServiceLocator {
+    private static services: { [key: string]: Service | undefined } = {};
+
+    public static resolve<T extends Service>(type: { prototype: T }): T {
         const keys = Object.keys(this.services);
         for (const key of keys) {
-            if (cc.js.isChildClassOf(this.services[key].constructor, type.prototype.constructor)) {
+            const item = this.services[key];
+            if (cc.js.isChildClassOf((item as any).constructor, type.prototype.constructor)) {
                 return this.services[key] as T;
             }
         }
-        throw new Error("Please set first ");
+        throw new Error("Please set first");
     }
 
-    public static register<T>(value: T): void {
+    public static async register<T extends Service>(value: T): Promise<void> {
         const keys = Object.keys(dict);
         let constructor = value.constructor;
         while (constructor !== null) {
             if (keys.some(key => {
                 if (dict[key] === constructor) {
+                    const item = this.services[key];
+                    item && item.destroy();
                     this.services[key] = value;
                     return true;
                 }
