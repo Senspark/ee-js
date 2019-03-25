@@ -23,7 +23,7 @@ export class AsyncManager {
 
     /** Flush the oldest callback. */
     public async flush(): Promise<void> {
-        const callback = this.callbacks.shift();
+        const callback = this.callbacks.pop();
         callback && await callback();
     }
 }
