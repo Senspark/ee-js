@@ -1,5 +1,6 @@
 import assert = require('assert');
 import { UnselectableComponent } from './UnselectableComponent';
+import { AsyncManager } from './AsyncManager';
 
 const { ccclass, disallowMultiple, executeInEditMode, menu, property } = cc._decorator;
 
@@ -136,6 +137,7 @@ export class NestedPrefab extends cc.Component {
                 return null;
             }
             if (!this.instantiated) {
+                assert(!this.async);
                 if (this.instantiateView()) {
                     this.instantiated = true;
                     this.applySync();
@@ -187,7 +189,11 @@ export class NestedPrefab extends cc.Component {
 
     /** Whether to instantiate the nested view using the nested prefab. */
     @property(cc.Boolean)
-    private instantiate: boolean = true;
+    private readonly instantiate: boolean = true;
+
+    /** Whether this nested prefab is asynchronously loaded by async manager. */
+    @property(cc.Boolean)
+    private readonly async: boolean = false;
 
     /** Whether to synchronize the component size and anchor with the nested view's. */
     @property(cc.Boolean)
@@ -248,18 +254,27 @@ export class NestedPrefab extends cc.Component {
     @property(cc.Integer)
     private _syncFlag = 0;
 
-    public onLoad(): void {
+    protected onLoad(): void {
         if (!CC_EDITOR && !this.instantiated && this.instantiate && this.mode === NestMode.Prefab) {
-            if (this.instantiateView()) {
-                this.instantiated = true;
-                this.applySync();
+            if (this.async) {
+                AsyncManager.getInstance().add(async () => {
+                    if (this.instantiateView()) {
+                        this.instantiated = true;
+                        this.applySync();
+                    }
+                });
+            } else {
+                if (this.instantiateView()) {
+                    this.instantiated = true;
+                    this.applySync();
+                }
             }
         }
     }
 
-    public update(): void {
+    protected update(): void {
         if (!CC_EDITOR) {
-            if (this.instantiate && this.mode === NestMode.Prefab) {
+            if (!this.async && this.instantiate && this.mode === NestMode.Prefab) {
                 assert(this._view !== null, 'View should be present at runtime.');
             }
             return;
