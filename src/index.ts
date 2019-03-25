@@ -1,3 +1,4 @@
+export * from './AsyncManager';
 export * from './BackButtonListener';
 export * from './ConditionTouchListener';
 export * from './DefaultDialogManager';
@@ -11,7 +12,7 @@ export * from './NestedPrefab';
 export * from './NestedScrollView';
 export * from './ObserverManager';
 export * from './Scale9';
+export * from './ServiceLocator';
 export * from './SkeletonAnimation';
 export * from './StaticComponent';
 export * from './UnselectableComponent';
-export * from './ServiceLocator';
