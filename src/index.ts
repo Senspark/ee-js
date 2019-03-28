@@ -4,6 +4,7 @@ export * from './ConditionTouchListener';
 export * from './DefaultDialogManager';
 export * from './Dialog';
 export * from './DialogManager';
+export * from './EEUtils';
 export * from './HsvComponent';
 export * from './HsvUtils';
 export * from './LanguageComponent';
