@@ -1,5 +1,5 @@
-import { Dialog } from "./Dialog";
-import { service, Service } from "./ServiceLocator";
+import { Dialog } from "./EEDialog";
+import { service, Service } from "./EEServiceLocator";
 
 /** Manages all dialog behaviors. */
 @service("Dialog")

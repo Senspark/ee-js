@@ -1,4 +1,4 @@
-import { UpdateManager } from './UpdateManager';
+import { UpdateManager } from './EEUpdateManager';
 
 const { ccclass, disallowMultiple, executeInEditMode, menu } = cc._decorator;
 

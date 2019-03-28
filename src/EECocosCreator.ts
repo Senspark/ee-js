@@ -1,8 +1,7 @@
 import assert = require('assert');
-
-import { NestedPrefab } from './NestedPrefab';
-import { ProfileManager } from './ProfileManager';
-import { UnselectableComponent } from './UnselectableComponent';
+import { NestedPrefab } from './EENestedPrefab';
+import { ProfileManager } from './EEProfileManager';
+import { UnselectableComponent } from './EEUnselectableComponent';
 
 interface Dict {
     [key: string]: any;

@@ -1,6 +1,6 @@
 import assert = require('assert');
-import { UnselectableComponent } from './UnselectableComponent';
-import { AsyncManager } from './AsyncManager';
+import { AsyncManager } from './EEAsyncManager';
+import { UnselectableComponent } from './EEUnselectableComponent';
 
 const { ccclass, disallowMultiple, executeInEditMode, menu, property } = cc._decorator;
 

@@ -1,9 +1,8 @@
 import * as gl from 'gl-matrix';
-
-import { HsvMaterial } from './HsvMaterial';
-import { shader as fragShader } from './HsvShaderFrag';
-import { shader as vertShader } from './HsvShaderVert';
-import { createBrightnesMatrix, createContrastMatrix, createHueMatrix, createSaturationMatrix } from './HsvUtils';
+import { HsvMaterial } from './EEHsvMaterial';
+import { shader as fragShader } from './EEHsvShaderFrag';
+import { shader as vertShader } from './EEHsvShaderVert';
+import { createBrightnesMatrix, createContrastMatrix, createHueMatrix, createSaturationMatrix } from './EEHsvUtils';
 
 const { ccclass, disallowMultiple, executeInEditMode, menu, property } = cc._decorator;
 
