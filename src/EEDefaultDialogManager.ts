@@ -1,7 +1,6 @@
 import assert = require('assert');
-
-import { Dialog, DialogEventType } from "./Dialog";
-import { DialogManager } from './DialogManager';
+import { Dialog, DialogEventType } from "./EEDialog";
+import { DialogManager } from './EEDialogManager';
 
 enum CommandType {
     /** Pushes a dialog. */

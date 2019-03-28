@@ -1,4 +1,4 @@
-import { LanguageManager } from "./LanguageManager";
+import { LanguageManager } from "./EELanguageManager";
 
 const { ccclass, disallowMultiple, executeInEditMode, inspector, menu, property } = cc._decorator;
 

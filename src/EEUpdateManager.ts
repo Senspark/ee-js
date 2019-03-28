@@ -1,4 +1,4 @@
-import { ObserverManager } from './ObserverManager';
+import { ObserverManager } from './EEObserverManager';
 
 type Observer = (delta: number) => void;
 

@@ -1,6 +1,5 @@
 import assert = require('assert');
-
-import { DialogManager } from './DialogManager';
+import { DialogManager } from './EEDialogManager';
 
 const { ccclass, disallowMultiple, menu } = cc._decorator;
 

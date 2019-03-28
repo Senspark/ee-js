@@ -1,8 +1,6 @@
 export class ProfileManager {
-    private static sharedInstance?: ProfileManager;
-
     public static getInstance(): ProfileManager {
-        return this.sharedInstance || (this.sharedInstance = new this());
+        return (cc as any).EE_PROFILE_MANAGER || ((cc as any).EE_PROFILE_MANAGER = new this());
     }
 
     /** Current profile, used in editor only. */
@@ -23,6 +21,10 @@ export class ProfileManager {
                     Editor.Ipc.sendToAll(reply, data);
                 });
         }
+    }
+
+    private destroy(): void {
+        this.listener && this.listener.clear();
     }
 
     public setProfile(profile: Profile): void {

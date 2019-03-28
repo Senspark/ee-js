@@ -1,7 +1,7 @@
 import assert = require('assert');
 import * as Polyglot from 'node-polyglot';
-import { ObserverManager } from './ObserverManager';
-import { ProfileManager } from './ProfileManager';
+import { ObserverManager } from './EEObserverManager';
+import { ProfileManager } from './EEProfileManager';
 
 type Observer = () => void;
 
