@@ -43,9 +43,18 @@ export class AsyncManager {
         callback && await callback();
     }
 
-    public async flushAll(delay: number = 0): Promise<void> {
+    public async flushAll(options?: {
+        size?: number,
+        delay?: number,
+    }): Promise<void> {
+        const size = options && options.size !== undefined ? options.size : 1;
+        const delay = options && options.delay !== undefined ? options.delay : 0;
         while (!this.isEmpty()) {
-            await this.flush();
+            const promises: Array<Promise<void>> = [];
+            for (let i = 0; i < size; ++i) {
+                promises.push(this.flush());
+            }
+            await Promise.all(promises);
             delay && await sleep(delay);
         }
     }
