@@ -275,7 +275,8 @@ export class NestedPrefab extends cc.Component {
     protected update(): void {
         if (!CC_EDITOR) {
             if (!this.async && this.instantiate && this.mode === NestMode.Prefab) {
-                assert(this._view !== null, 'View should be present at runtime.');
+                assert(this._view !== null,
+                    `View should be present at runtime: prefab = ${this.prefab && this.prefab.name}`);
             }
             return;
         }
