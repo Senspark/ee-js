@@ -258,6 +258,10 @@ export class NestedPrefab extends cc.Component {
         if (!CC_EDITOR && !this.instantiated && this.instantiate && this.mode === NestMode.Prefab) {
             if (this.async) {
                 AsyncManager.getInstance().add(async () => {
+                    if (!this.isValid) {
+                        // Destroyed before flushing.
+                        return;
+                    }
                     if (this.instantiateView()) {
                         this.instantiated = true;
                         this.applySync();
