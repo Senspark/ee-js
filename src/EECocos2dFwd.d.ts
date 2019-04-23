@@ -452,10 +452,30 @@ declare namespace ee {
             logEvent(name: string, dict: { [key: string]: string } = {}): void;
         }
 
+        enum LastFetchStatus {
+            Success,
+            Failure,
+            Pending,
+        }
+
+        enum FetchFailureReason {
+            Invalid,
+            Throttled,
+            Error,
+        }
+
+        interface RemoteConfigInfo {
+            fetchTime: number;
+            lastFetchStatus: LastFetchStatus;
+            lastFetchFailureReason: FetchFailureReason;
+            throttledEndTime: number;
+        }
+
         class RemoteConfig {
             constructor();
             initialize(): boolean;
             fetch(devModeEnabled: boolean, callback: FetchCallback): void;
+            getInfoJsb(): string;
             setDefaultBool(key: string, value: boolean): void;
             setDefaultLong(key: string, value: number): void;
             setDefaultDouble(key: string, value: number): void;
