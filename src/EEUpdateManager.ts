@@ -20,7 +20,7 @@ export class UpdateManager extends ObserverManager<Observer> {
                 const now = Date.now();
                 const delta = now - last;
                 last = now;
-                this.dispatch(observer => observer(delta / 1000 /* seconds */));
+                this.dispatch(async observer => observer(delta / 1000 /* seconds */));
             }, 1 / 24);
         }
     }

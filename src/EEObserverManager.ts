@@ -24,10 +24,10 @@ export class ObserverManager<T> {
         return true;
     }
 
-    public dispatch(callback: (observer: T) => void): void {
-        Object.keys(this.observers).forEach(key => {
+    public async dispatch(callback: (observer: T) => Promise<void>): Promise<void> {
+        await Promise.all(Object.keys(this.observers).map(async key => {
             const observer = this.observers[key];
-            callback(observer!);
-        });
+            observer && await callback(observer);
+        }));
     }
 }

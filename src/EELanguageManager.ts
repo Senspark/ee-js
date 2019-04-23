@@ -123,7 +123,7 @@ export class LanguageManager extends ObserverManager<Observer> {
                 this.polyglot.extend(config);
             }
         }
-        this.dispatch(observer => observer());
+        this.dispatch(async observer => observer());
     }
 
     /** Gets the active language. */
