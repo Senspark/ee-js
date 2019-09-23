@@ -53,16 +53,21 @@ void main() {
     if (lib._templates[shader.name] !== undefined) {
         delete lib._templates[shader.name];
     }
-    lib.define(shader.name, shader.vert, shader.frag, shader.defines);
+    if (cc.ENGINE_VERSION >= '2.1.3') {
+        lib.define(shader);
+    } else {
+        lib.define(shader.name, shader.vert, shader.frag, shader.defines);
+    }
 });
 
 import * as gl from 'gl-matrix';
 
 const renderEngine = cc.renderer.renderEngine;
 const renderer = renderEngine.renderer;
-const gfx = renderEngine.gfx;
+const materialClass = cc.ENGINE_VERSION >= '2.1.3' ? cc.Material : renderEngine.Material;
+const gfx = cc.ENGINE_VERSION >= '2.1.3' ? cc.gfx : renderEngine.gfx;
 
-export class HsvMaterial extends renderEngine.Material {
+export class HsvMaterial extends materialClass {
     public constructor() {
         super(false);
         const pass = new renderer.Pass('ee_hsv');
