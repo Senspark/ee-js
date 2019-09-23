@@ -263,9 +263,14 @@ const dumpHierarchy = (scene?: cc.Scene, includeScene?: boolean) => {
 };
 
 if (CC_EDITOR) {
-    if (cc.engine) {
-        // Fix error when build to web.
-        cc.engine.getIntersectionList = overwriteFunction(cc.engine.getIntersectionList, overwriteGetIntersectionList);
+    if (cc.ENGINE_VERSION >= '2.1.3') {
+        // FIXME.
+    } else {
+        if (cc.engine) {
+            // Fix error when build to web.
+            cc.engine.getIntersectionList = overwriteFunction(
+                cc.engine.getIntersectionList, overwriteGetIntersectionList);
+        }
     }
     if (cc.ENGINE_VERSION >= '2') {
         const panels = Editor.UI.PolymerUtils.panels;
