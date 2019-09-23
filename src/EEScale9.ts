@@ -2,6 +2,25 @@ import assert = require('assert');
 
 const { ccclass, disallowMultiple, executeInEditMode, menu } = cc._decorator;
 
+// Version >= 2.1.3
+const packToDynamicAtlas = (comp: cc.Sprite, frame: cc.SpriteFrame) => {
+    const dynamicAtlasManager = (cc as any).dynamicAtlasManager;
+
+    // TODO: Material API design and export from editor could affect the material activation process
+    // need to update the logic here
+    if (frame && !CC_TEST) {
+        if (!(frame as any)._original && dynamicAtlasManager) {
+            const packedFrame = dynamicAtlasManager.insertSpriteFrame(frame);
+            if (packedFrame) {
+                (frame as any)._setDynamicAtlasFrame(packedFrame);
+            }
+        }
+        if ((comp as any).sharedMaterials[0].getProperty('texture') !== (frame as any)._texture) {
+            (comp as any)._activateMaterial(true);
+        }
+    }
+};
+
 const assembler = {
     useModel: false,
     createData(sprite: cc.Sprite): any {
@@ -15,7 +34,19 @@ const assembler = {
         return renderData;
     },
 
-    updateRenderData(sprite: cc.Sprite, batchData: any): void {
+    updateRenderData_2_1_3(sprite: cc.Sprite): void {
+        packToDynamicAtlas(sprite, sprite.spriteFrame);
+        const renderData = sprite._renderData;
+        if (!renderData || !sprite.spriteFrame) {
+            return;
+        }
+        if (renderData.vertDirty) {
+            this.updateVerts(sprite);
+            this.updateWorldVerts(sprite);
+        }
+    },
+
+    updateRenderData_Old(sprite: cc.Sprite, batchData: any): void {
         const frame = sprite.spriteFrame;
         const dynamicAtlasManager = (cc as any).dynamicAtlasManager;
 
@@ -38,6 +69,12 @@ const assembler = {
                 this.updateWorldVerts(sprite);
             }
         }
+    },
+
+    updateRenderData(sprite: cc.Sprite, batchData: any): void {
+        cc.ENGINE_VERSION >= '2.1.3'
+            ? this.updateRenderData_2_1_3(sprite)
+            : this.updateRenderData_Old(sprite, batchData);
     },
 
     updateVerts(sprite: cc.Sprite): void {
