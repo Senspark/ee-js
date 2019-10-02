@@ -62,10 +62,9 @@ void main() {
 
 import * as gl from 'gl-matrix';
 
-const renderEngine = cc.renderer.renderEngine;
-const renderer = renderEngine.renderer;
-const materialClass = cc.ENGINE_VERSION >= '2.1.3' ? cc.Material : renderEngine.Material;
-const gfx = cc.ENGINE_VERSION >= '2.1.3' ? cc.gfx : renderEngine.gfx;
+const renderer = cc.ENGINE_VERSION >= '2.1.3' ? null : cc.renderer.renderEngine.renderer;
+const materialClass = cc.ENGINE_VERSION >= '2.1.3' ? cc.Material : cc.renderer.renderEngine.Material;
+const gfx = cc.ENGINE_VERSION >= '2.1.3' ? cc.gfx : cc.renderer.renderEngine.gfx;
 
 export class HsvMaterial extends materialClass {
     public constructor() {
