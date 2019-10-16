@@ -464,17 +464,20 @@ declare namespace ee {
             Error,
         }
 
-        interface RemoteConfigInfo {
-            fetchTime: number;
-            lastFetchStatus: LastFetchStatus;
-            lastFetchFailureReason: FetchFailureReason;
-            throttledEndTime: number;
+        interface ConfigInfo {
+            readonly fetchTime: number;
+            readonly lastFetchStatus: LastFetchStatus;
+            readonly lastFetchFailureReason: FetchFailureReason;
+            readonly throttledEndTime: number;
         }
 
         class RemoteConfig {
             constructor();
             initialize(): boolean;
+            activateFetched(): boolean;
+            fetchOnly(callback: () => void): void;
             fetch(devModeEnabled: boolean, callback: FetchCallback): void;
+            getInfo(): ConfigInfo;
             getInfoJsb(): string;
             setDefaultBool(key: string, value: boolean): void;
             setDefaultLong(key: string, value: number): void;
