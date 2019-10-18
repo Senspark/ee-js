@@ -1,11 +1,13 @@
 import assert = require('assert');
 
-const dict: { [key: string]: any } = {};
+const nameToConstructor: { [key: string]: any } = {};
+const constructorToName: { [key: string]: any } = {};
 
 export function service(name: string): any {
     return (constructor: any) => {
-        assert(dict[name] === undefined);
-        dict[name] = constructor;
+        assert(nameToConstructor[name] === undefined);
+        nameToConstructor[name] = constructor;
+        constructorToName[constructor] = name;
     };
 }
 
@@ -19,29 +21,22 @@ export class ServiceLocator {
     private static services: { [key: string]: Service | undefined } = {};
 
     public static resolve<T extends Service>(type: { prototype: T }): T {
-        const keys = Object.keys(this.services);
-        for (const key of keys) {
-            const item = this.services[key];
-            if (cc.js.isChildClassOf((item as any).constructor, type.prototype.constructor)) {
-                return this.services[key] as T;
-            }
+        const constructor = type.prototype.constructor;
+        const key = constructor.toString();
+        if (this.services[key]) {
+            return this.services[key] as T;
         }
         throw new Error("Please set first");
     }
 
     public static async register<T extends Service>(value: T): Promise<void> {
-        const keys = Object.keys(dict);
         let constructor = value.constructor;
         while (constructor !== null) {
-            if (keys.some(key => {
-                if (dict[key] === constructor) {
-                    const item = this.services[key];
-                    item && item.destroy();
-                    this.services[key] = value;
-                    return true;
-                }
-                return false;
-            })) {
+            const key = constructor.toString();
+            if (constructorToName[key]) {
+                const item = this.services[key];
+                item && item.destroy();
+                this.services[key] = value;
                 break;
             }
             constructor = cc.js.getSuper(constructor);
