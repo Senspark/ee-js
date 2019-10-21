@@ -262,7 +262,11 @@ const dumpHierarchy = (scene?: cc.Scene, includeScene?: boolean) => {
     return nodes.map(node => getChildren(node, profile.loadData(settingKey)));
 };
 
-if (CC_EDITOR) {
+const registerApi = () => {
+    if (cc.ENGINE_VERSION >= '2.2.0') {
+        // FIXME.
+        return;
+    }
     if (cc.ENGINE_VERSION >= '2.1.3') {
         // FIXME.
     } else {
@@ -301,4 +305,8 @@ if (CC_EDITOR) {
         Editor.Gizmo.prototype._registerEvent = overwriteFunction(Editor.Gizmo.prototype._registerEvent,
             overwriteGizmoRegisterEvent);
     }
+};
+
+if (CC_EDITOR) {
+    registerApi();
 }

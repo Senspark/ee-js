@@ -242,6 +242,15 @@ export class Scale9 extends cc.Component {
     }
 
     private refreshAssembler(): void {
+        if (cc.ENGINE_VERSION < '2.2.0') {
+            this.refreshAssemblerOld();
+        } else {
+            // FIXME.
+        }
+    }
+
+    /** Version < 2.2.0 */
+    private refreshAssemblerOld(): void {
         const component = this.getComponent(cc.Sprite);
         if (component === null) {
             return;
