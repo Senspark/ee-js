@@ -50,8 +50,11 @@ void main() {
 (cc.game as any).once(cc.game.EVENT_ENGINE_INITED, () => {
     cc.log('register shader: %s', shader.name);
     const lib = cc.renderer._forward._programLib;
-    if (lib._templates[shader.name] !== undefined) {
-        delete lib._templates[shader.name];
+    if (CC_EDITOR) {
+        // Delete old shader if exist to avoid warning.
+        if (lib._templates[shader.name] !== undefined) {
+            delete lib._templates[shader.name];
+        }
     }
     if (cc.ENGINE_VERSION >= '2.1.3') {
         lib.define(shader);
