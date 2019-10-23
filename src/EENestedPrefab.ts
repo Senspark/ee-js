@@ -186,6 +186,7 @@ export class NestedPrefab extends cc.Component {
             this.mode = NestMode.Prefab;
             if (this.instantiateView()) {
                 this.isInstantiated = true;
+                this.applySync();
                 CC_EDITOR && this.setupView();
             }
         }
