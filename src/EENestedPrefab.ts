@@ -141,9 +141,7 @@ export class NestedPrefab extends cc.Component {
                 if (this.instantiateView()) {
                     this.instantiated = true;
                     this.applySync();
-                    if (CC_EDITOR) {
-                        this.setupView();
-                    }
+                    CC_EDITOR && this.setupView();
                 }
             }
         }
@@ -182,7 +180,7 @@ export class NestedPrefab extends cc.Component {
             this.mode = NestMode.Prefab;
             if (this.instantiateView()) {
                 this.instantiated = true;
-                this.setupView();
+                CC_EDITOR && this.setupView();
             }
         }
     }
@@ -297,7 +295,7 @@ export class NestedPrefab extends cc.Component {
         if (this.prefab !== null && this._view === null) {
             if (this.instantiateView()) {
                 this.instantiated = true;
-                this.setupView();
+                CC_EDITOR && this.setupView();
             }
         }
         this.applySync();
