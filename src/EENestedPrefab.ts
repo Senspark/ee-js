@@ -149,6 +149,9 @@ export class NestedPrefab extends cc.Component {
     }
 
     public set view(value: cc.Node | null) {
+        if (this._view === value) {
+            return;
+        }
         this.destroyView();
         this._view = value;
         if (this._view !== null) {
@@ -173,6 +176,9 @@ export class NestedPrefab extends cc.Component {
     }
 
     public set prefab(value: cc.Prefab | null) {
+        if (this._prefab === value) {
+            return;
+        }
         this.destroyView();
         this._prefab = value;
         if (this._prefab !== null) {
