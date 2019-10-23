@@ -122,7 +122,7 @@ export class NestedPrefab extends cc.Component {
     private mode = NestMode.Prefab;
 
     /** Whether the nested view is instantiated by the nested prefab. */
-    private instantiated: boolean = false;
+    private isInstantiated: boolean = false;
 
     /** The nested view (usually a child of this node). */
     private _view: cc.Node | null = null;
@@ -136,10 +136,10 @@ export class NestedPrefab extends cc.Component {
             if (this.prefab === null) {
                 return null;
             }
-            if (!this.instantiated) {
+            if (!this.isInstantiated) {
                 assert(!this.async);
                 if (this.instantiateView()) {
-                    this.instantiated = true;
+                    this.isInstantiated = true;
                     this.applySync();
                     CC_EDITOR && this.setupView();
                 }
@@ -185,7 +185,7 @@ export class NestedPrefab extends cc.Component {
             // Switch mode.
             this.mode = NestMode.Prefab;
             if (this.instantiateView()) {
-                this.instantiated = true;
+                this.isInstantiated = true;
                 CC_EDITOR && this.setupView();
             }
         }
@@ -259,7 +259,7 @@ export class NestedPrefab extends cc.Component {
     private _syncFlag = 0;
 
     protected onLoad(): void {
-        if (!CC_EDITOR && !this.instantiated && this.instantiate && this.mode === NestMode.Prefab) {
+        if (!CC_EDITOR && !this.isInstantiated && this.instantiate && this.mode === NestMode.Prefab) {
             if (this.async) {
                 AsyncManager.getInstance().add(async () => {
                     if (!this.isValid) {
@@ -267,13 +267,13 @@ export class NestedPrefab extends cc.Component {
                         return;
                     }
                     if (this.instantiateView()) {
-                        this.instantiated = true;
+                        this.isInstantiated = true;
                         this.applySync();
                     }
                 });
             } else {
                 if (this.instantiateView()) {
-                    this.instantiated = true;
+                    this.isInstantiated = true;
                     this.applySync();
                 }
             }
@@ -300,7 +300,7 @@ export class NestedPrefab extends cc.Component {
         }
         if (this.prefab !== null && this._view === null) {
             if (this.instantiateView()) {
-                this.instantiated = true;
+                this.isInstantiated = true;
                 CC_EDITOR && this.setupView();
             }
         }
@@ -331,7 +331,7 @@ export class NestedPrefab extends cc.Component {
                         }
                     }
                 } else {
-                    this.instantiated = false;
+                    this.isInstantiated = false;
                     this._view.removeFromParent(true);
                     this._view.destroy();
                     this._view = null;
