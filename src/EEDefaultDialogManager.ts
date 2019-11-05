@@ -234,6 +234,7 @@ export class DefaultDialogManager extends DialogManager {
             this.dialogStack.pop();
             const container = dialog.getContainer();
             container.removeFromParent(false);
+            container.destroy();
 
             // Must be called after pop + remove child.
             dialog.processEvent(DialogEventType.DidHide);
