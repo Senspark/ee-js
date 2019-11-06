@@ -220,7 +220,8 @@ class HsvRenderer_2_0_WebGL implements HsvRenderer {
         const array: number[] = Array.prototype.slice.call(matrix);
         // Convert gl.mat4 to cc.vmath.mat4.
         const convertedMatrix = cc.vmath.mat4.create();
-        cc.vmath.mat4.set.call(null, convertedMatrix, ...array);
+        // FIXME: for ver >= 2.2.0
+        // cc.vmath.mat4.set.call(null, convertedMatrix, ...array);
         material.setMatrix(convertedMatrix);
     }
 
@@ -234,10 +235,11 @@ class HsvRenderer_2_0_WebGL implements HsvRenderer {
             return;
         }
         const sprite = view.getComponent(cc.Sprite);
-        if (material === sprite.getMaterial()) {
-            return;
-        }
-        sprite._updateMaterial(material);
+        // FIXME: for ver >= 2.2.0
+        // if (material === sprite.getMaterial()) {
+        //     return;
+        // }
+        // sprite._updateMaterial(material);
 
         const texture = sprite.spriteFrame.getTexture();
         material.setTexture(texture);
