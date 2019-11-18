@@ -1,11 +1,11 @@
 import assert = require('assert');
 import * as Polyglot from 'node-polyglot';
-import { ObserverManager } from './EEObserverManager';
+import { DefaultObserverManager } from './EEDefaultObserverManager';
 import { ProfileManager } from './EEProfileManager';
 
 type Observer = () => void;
 
-export class LanguageManager extends ObserverManager<Observer> {
+export class LanguageManager extends DefaultObserverManager<Observer> {
     private static sharedInstance?: LanguageManager;
 
     /** Gets the singleton. */

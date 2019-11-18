@@ -1,8 +1,8 @@
-import { ObserverManager } from './EEObserverManager';
+import { DefaultObserverManager } from './EEDefaultObserverManager';
 
 type Observer = (delta: number) => void;
 
-export class UpdateManager extends ObserverManager<Observer> {
+export class UpdateManager extends DefaultObserverManager<Observer> {
     private static sharedInstance?: UpdateManager;
 
     public static getInstance(): UpdateManager {

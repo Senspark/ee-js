@@ -1,33 +1,10 @@
-export class ObserverManager<T> {
-    /** Observes language changing events. */
-    private observers: { [index: string]: T | undefined };
-
-    public constructor() {
-        this.observers = {};
-    }
-
+export interface ObserverManager<T> {
     /** Adds an observer whose the specified key. */
-    public addObserver(key: string, observer: T): boolean {
-        if (this.observers[key] !== undefined) {
-            return false;
-        }
-        this.observers[key] = observer;
-        return true;
-    }
+    addObserver(key: string, observer: T): boolean;
 
     /** Removes an observer whose the specified key. */
-    public removeObserver(key: string): boolean {
-        if (this.observers[key] === undefined) {
-            return false;
-        }
-        delete this.observers[key];
-        return true;
-    }
+    removeObserver(key: string): boolean;
 
-    public async dispatch(callback: (observer: T) => Promise<void>): Promise<void> {
-        await Promise.all(Object.keys(this.observers).map(async key => {
-            const observer = this.observers[key];
-            observer && await callback(observer);
-        }));
-    }
+    /** Dispatches an event. */
+    dispatch(callback: (observer: T) => Promise<void>): Promise<void>;
 }

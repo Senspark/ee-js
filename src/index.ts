@@ -2,6 +2,7 @@ export * from './EEAsyncManager';
 export * from './EEBackButtonListener';
 export * from './EEConditionTouchListener';
 export * from './EEDefaultDialogManager';
+export * from './EEDefaultObserverManager';
 export * from './EEDialog';
 export * from './EEDialogManager';
 export * from './EEHsvComponent';
