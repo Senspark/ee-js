@@ -1,3 +1,4 @@
+import assert = require('assert');
 const { ccclass, menu, property } = cc._decorator;
 
 /** Get ancestor nodes that contains cc.ScrollView. */
@@ -42,21 +43,120 @@ interface ListenerExtend {
     __touchedViews: cc.ScrollView[];
 }
 
+let isInitialized = false;
+
+const updateScrollView = (instance: cc.ScrollView) => {
+    if (isInitialized) {
+        return;
+    }
+    isInitialized = true;
+    const proto = Object.getPrototypeOf(instance);
+    // tslint:disable-next-line: only-arrow-functions
+    proto._stopPropagationIfTargetIsMe = function (event: cc.Event): void {
+        if ((this as any)._touchMoved /* Fix nested events cause _cachedArray.length be zero */
+            || (event.eventPhase === cc.Event.AT_TARGET && event.target === this.node)) {
+            event.stopPropagation();
+        }
+    };
+    // tslint:disable-next-line: only-arrow-functions
+    proto._hasNestedViewGroup = function (
+        this: cc.ScrollView, event: cc.Event.EventTouch, captureListeners: cc.Node[] | undefined): boolean {
+        interface TargetExtend {
+            __active?: string;
+            __ignored: string[];
+        }
+        interface EventExtend {
+            __initialized?: boolean;
+        }
+        // Use target to store data.
+        const target = event.target as cc.Node;
+        const targetExt = target as unknown as TargetExtend;
+
+        if (event.type === cc.Node.EventType.TOUCH_START) {
+            const eventExt = event as unknown as EventExtend;
+            if (eventExt.__initialized === undefined) {
+                eventExt.__initialized = true;
+                targetExt.__active = undefined;
+                targetExt.__ignored = [];
+            }
+            if ((this as any)._isBouncing) {
+                // Page view.
+                targetExt.__ignored.push(this.uuid);
+                return true;
+            }
+            return false;
+        }
+        if (event.type === cc.Node.EventType.TOUCH_END) {
+            if (targetExt.__ignored.includes(this.uuid)) {
+                return true;
+            }
+            return false;
+        }
+        if (event.type === cc.Node.EventType.TOUCH_CANCEL) {
+            if (targetExt.__ignored.includes(this.uuid)) {
+                return true;
+            }
+            return false;
+        }
+
+        // TOUCH_MOVE events.
+        // Order:
+        // target listener[0] listener[1] ...
+        if (targetExt.__active !== undefined) {
+            return targetExt.__active !== this.uuid;
+        }
+
+        const views: cc.ScrollView[] = [];
+        for (const item of [target, ...captureListeners || []]) {
+            const view = item.getComponent(cc.ScrollView);
+            if (view !== null) {
+                views.push(view);
+            }
+        }
+        const delta = event.touch.getDelta();
+        let activeView = views[0];
+        if (Math.abs(delta.x) > Math.abs(delta.y)) {
+            // Horizontal.
+            for (let i = 0, n = views.length; i < n; ++i) {
+                const view = views[i];
+                if (view.horizontal) {
+                    activeView = view;
+                    break;
+                }
+            }
+        } else if (Math.abs(delta.y) > Math.abs(delta.x)) {
+            // Vertical.
+            for (let i = 0, n = views.length; i < n; ++i) {
+                const view = views[i];
+                if (view.vertical) {
+                    activeView = view;
+                    break;
+                }
+            }
+        }
+        targetExt.__active = activeView.uuid;
+        return targetExt.__active !== this.uuid;
+    };
+};
+
 @ccclass
 @menu('ee/NestedScrollView')
 export class NestedScrollView extends cc.Component {
-    public onEnable(): void {
+    protected onEnable(): void {
         const scrollView = this.getComponent(cc.ScrollView);
         const listener = this.node._touchListener;
         if (listener !== null && scrollView !== null) {
-            this.setupTouchBegan(scrollView, listener);
-            this.setupTouchMoved(scrollView, listener);
-            this.setupTouchEnded(scrollView, listener);
-            this.setupTouchCancelled(scrollView, listener);
+            // Legacy way.
+            // this.setupTouchBegan(scrollView, listener);
+            // this.setupTouchMoved(scrollView, listener);
+            // this.setupTouchEnded(scrollView, listener);
+            // this.setupTouchCancelled(scrollView, listener);
         }
+
+        scrollView && updateScrollView(scrollView);
     }
 
-    public onDisable(): void {
+    protected onDisable(): void {
         // TODO.
     }
 
