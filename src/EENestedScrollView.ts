@@ -37,7 +37,7 @@ const findBestScrollView = (event: cc.Event.EventTouch, sender: cc.ScrollView, v
     return sender;
 };
 
-interface Extend {
+interface ListenerExtend {
     __bestView: cc.ScrollView | null;
     __touchedViews: cc.ScrollView[];
 }
@@ -85,7 +85,7 @@ export class NestedScrollView extends cc.Component {
                     }
                 }
 
-                const item = (this as unknown as Extend);
+                const item = (this as unknown as ListenerExtend);
                 item.__touchedViews = touchedViews;
                 item.__bestView = null;
 
@@ -103,7 +103,7 @@ export class NestedScrollView extends cc.Component {
             event.touch = touch;
             event.bubbles = true;
 
-            const item = (this as unknown as Extend);
+            const item = (this as unknown as ListenerExtend);
             const bestView = item.__bestView = item.__bestView ||
                 findBestScrollView(event, scrollView, item.__touchedViews);
             bestView.node.dispatchEvent(event);
@@ -125,7 +125,7 @@ export class NestedScrollView extends cc.Component {
             node.dispatchEvent(event);
 
             // Additional lines.
-            const item = (this as unknown as Extend);
+            const item = (this as unknown as ListenerExtend);
             item.__touchedViews.forEach(view => view.node.dispatchEvent(event));
         };
     }
@@ -140,7 +140,7 @@ export class NestedScrollView extends cc.Component {
             node.dispatchEvent(event);
 
             // Additional lines.
-            const item = (this as unknown as Extend);
+            const item = (this as unknown as ListenerExtend);
             item.__touchedViews.forEach(view => view.node.dispatchEvent(event));
         };
     }
