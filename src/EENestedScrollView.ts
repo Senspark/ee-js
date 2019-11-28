@@ -72,6 +72,9 @@ const updateScrollView = (instance: cc.ScrollView) => {
         const target = event.target as cc.Node;
         const targetExt = target as unknown as TargetExtend;
 
+        // Target + capturedListeners.
+        const listeners = [target, ...captureListeners || []];
+
         if (event.type === cc.Node.EventType.TOUCH_START) {
             const eventExt = event as unknown as EventExtend;
             if (eventExt.__initialized === undefined) {
@@ -79,7 +82,7 @@ const updateScrollView = (instance: cc.ScrollView) => {
                 targetExt.__active = undefined;
                 targetExt.__ignored = [];
             }
-            if ((this as any)._isBouncing) {
+            if (listeners.length > 1 && (this as any)._isBouncing) {
                 // Page view.
                 targetExt.__ignored.push(this.uuid);
                 return true;
@@ -100,6 +103,10 @@ const updateScrollView = (instance: cc.ScrollView) => {
         }
 
         // TOUCH_MOVE events.
+        if (targetExt.__ignored.includes(this.uuid)) {
+            return true;
+        }
+
         // Order:
         // target listener[0] listener[1] ...
         if (targetExt.__active !== undefined) {
@@ -107,8 +114,8 @@ const updateScrollView = (instance: cc.ScrollView) => {
         }
 
         const views: cc.ScrollView[] = [];
-        for (const item of [target, ...captureListeners || []]) {
-            const view = item.getComponent(cc.ScrollView);
+        for (const listener of listeners) {
+            const view = listener.getComponent(cc.ScrollView);
             if (view !== null) {
                 views.push(view);
             }
