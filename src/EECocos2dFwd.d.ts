@@ -28,6 +28,14 @@ declare namespace ee {
         function dumpBacktrace(count: number): string;
         function runOnUiThreadDelayed(callback: () => void, delay: number): void;
 
+        interface SafeInset {
+            left: number;
+            right: number;
+            top: number;
+            bottom: number;
+        }
+        function getSafeInset(): SafeInset;
+
         class PluginManager {
         }
 
