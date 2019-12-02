@@ -5,16 +5,7 @@
 declare namespace ee {
     namespace core {
         type MessageHandler = (message: string) => string;
-        type Runnable = () => void;
 
-        function str_tolower(s: string): string;
-        function toString(value: number): string;
-        function toString(value: boolean): string;
-        function toBool(value: string): boolean;
-        function format(formatString: string, ...agrs: any[]): string;
-        function log(level: LogLevel, tag: string, message: string): void;
-        function isMainThread(): boolean;
-        function runOnUiThread(runnable: Runnable): boolean;
         function getSHA1CertificateFingerprint(): string;
         function getVersionName(): string;
         function getVersionCode(): string;
@@ -25,8 +16,6 @@ declare namespace ee {
         function isTablet(): boolean;
         function testConnection(): boolean;
         function getDeviceId(callback: (id: string) => void): void;
-        function dumpBacktrace(count: number): string;
-        function runOnUiThreadDelayed(callback: () => void, delay: number): void;
 
         interface SafeInset {
             left: number;
@@ -35,6 +24,7 @@ declare namespace ee {
             bottom: number;
         }
         function getSafeInset(): SafeInset;
+        function getSafeInsetAsync(callback: (inset: SafeInset) => void): void;
 
         class PluginManager {
         }
