@@ -74,6 +74,13 @@ const updateScrollView = (instance: cc.ScrollView) => {
 
         // Target + capturedListeners.
         const listeners = [target, ...captureListeners || []];
+        const scrollViewListeners: cc.ScrollView[] = [];
+        for (const listener of listeners) {
+            const view = listener.getComponent(cc.ScrollView);
+            if (view !== null) {
+                scrollViewListeners.push(view);
+            }
+        }
 
         if (event.type === cc.Node.EventType.TOUCH_START) {
             const eventExt = event as unknown as EventExtend;
@@ -82,7 +89,7 @@ const updateScrollView = (instance: cc.ScrollView) => {
                 targetExt.__active = undefined;
                 targetExt.__ignored = [];
             }
-            if (listeners.length > 1 && (this as any)._isBouncing) {
+            if (scrollViewListeners.length > 1 && (this as any)._isBouncing) {
                 // Page view.
                 targetExt.__ignored.push(this.uuid);
                 return true;
@@ -113,19 +120,12 @@ const updateScrollView = (instance: cc.ScrollView) => {
             return targetExt.__active !== this.uuid;
         }
 
-        const views: cc.ScrollView[] = [];
-        for (const listener of listeners) {
-            const view = listener.getComponent(cc.ScrollView);
-            if (view !== null) {
-                views.push(view);
-            }
-        }
         const delta = event.touch.getDelta();
-        let activeView = views[0];
+        let activeView = scrollViewListeners[0];
         if (Math.abs(delta.x) > Math.abs(delta.y)) {
             // Horizontal.
-            for (let i = 0, n = views.length; i < n; ++i) {
-                const view = views[i];
+            for (let i = 0, n = scrollViewListeners.length; i < n; ++i) {
+                const view = scrollViewListeners[i];
                 if (view.horizontal) {
                     activeView = view;
                     break;
@@ -133,8 +133,8 @@ const updateScrollView = (instance: cc.ScrollView) => {
             }
         } else if (Math.abs(delta.y) > Math.abs(delta.x)) {
             // Vertical.
-            for (let i = 0, n = views.length; i < n; ++i) {
-                const view = views[i];
+            for (let i = 0, n = scrollViewListeners.length; i < n; ++i) {
+                const view = scrollViewListeners[i];
                 if (view.vertical) {
                     activeView = view;
                     break;
