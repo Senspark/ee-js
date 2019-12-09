@@ -427,6 +427,16 @@ declare namespace ee {
         }
     }
 
+    namespace tenjin {
+        class IBridge {
+            initialize(apiKey: string): void;
+        }
+
+        class Bridge extends IBridge {
+            constructor();
+        }
+    }
+
     namespace firebase {
         type FetchCallback = (succeeded: boolean) => void;
         type HashCallback = (succeeded: boolean, hash: string) => void;
