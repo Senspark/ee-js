@@ -545,6 +545,7 @@ declare namespace ee {
         class Notification {
             constructor();
             schedule(builder: NotificationBuilder): void;
+            schedule(message: string, tag: number, delay: number, interval: number): void;
             unschedule(tag: number): void;
             clearAll(): void;
         }
