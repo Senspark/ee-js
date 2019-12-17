@@ -453,7 +453,6 @@ declare namespace ee {
             constructor();
             initialize(): boolean;
             analyticsCollectionEnabled(enabled: boolean): void;
-            setMinimumSessionDuration(milliseconds: number): void;
             setSessionTimeoutDuration(milliseconds: number): void;
             setUserId(userId: string): void;
             setUserProperty(name: string, property: string): void;
