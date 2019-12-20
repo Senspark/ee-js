@@ -1,9 +1,10 @@
-const { ccclass, disallowMultiple, property } = cc._decorator;
+const { ccclass, disallowMultiple, menu, property } = cc._decorator;
 
 type ConditionCallback = (listener: cc.TouchOneByOne, touch: cc.Touch) => boolean;
 
 @ccclass
 @disallowMultiple
+@menu('ee/ConditionTouchListener')
 export class ConditionTouchListener extends cc.Component {
     private conditionCallback: ConditionCallback;
 

@@ -1,4 +1,4 @@
-const { ccclass, disallowMultiple, property } = cc._decorator;
+const { ccclass, disallowMultiple, menu, property } = cc._decorator;
 
 type BackButtonCallback = (sender: BackButtonListener) => void;
 
@@ -41,6 +41,7 @@ class Manager {
 
 @ccclass
 @disallowMultiple
+@menu('ee/BackButtonListener')
 export class BackButtonListener extends cc.Component {
     private callback?: BackButtonCallback;
 
