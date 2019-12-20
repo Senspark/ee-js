@@ -43,108 +43,148 @@ interface ListenerExtend {
     __touchedViews: cc.ScrollView[];
 }
 
-let isInitialized = false;
-
-const updateScrollView = (instance: cc.ScrollView) => {
-    if (isInitialized) {
-        return;
+function _stopPropagationIfTargetIsMe(this: cc.ScrollView, event: cc.Event): void {
+    if ((this as any)._touchMoved /* Fix nested events cause _cachedArray.length be zero */
+        || (event.eventPhase === cc.Event.AT_TARGET && event.target === this.node)) {
+        event.stopPropagation();
     }
-    isInitialized = true;
-    const proto = Object.getPrototypeOf(instance);
-    // tslint:disable-next-line: only-arrow-functions
-    proto._stopPropagationIfTargetIsMe = function (event: cc.Event): void {
-        if ((this as any)._touchMoved /* Fix nested events cause _cachedArray.length be zero */
-            || (event.eventPhase === cc.Event.AT_TARGET && event.target === this.node)) {
-            event.stopPropagation();
-        }
-    };
-    // tslint:disable-next-line: only-arrow-functions
-    proto._hasNestedViewGroup = function (
-        this: cc.ScrollView, event: cc.Event.EventTouch, captureListeners: cc.Node[] | undefined): boolean {
-        interface TargetExtend {
-            __active?: string;
-            __ignored: string[];
-        }
-        interface EventExtend {
-            __initialized?: boolean;
-        }
-        // Use target to store data.
-        const target = event.target as cc.Node;
-        const targetExt = target as unknown as TargetExtend;
+}
 
-        // Target + capturedListeners.
-        const listeners = [target, ...captureListeners || []];
-        const scrollViewListeners: cc.ScrollView[] = [];
-        for (const listener of listeners) {
-            const view = listener.getComponent(cc.ScrollView);
-            if (view !== null) {
-                scrollViewListeners.push(view);
-            }
-        }
+interface ScrollViewExtend {
+    __isActiveView?: boolean;
+}
 
-        if (event.type === cc.Node.EventType.TOUCH_START) {
-            const eventExt = event as unknown as EventExtend;
-            if (eventExt.__initialized === undefined) {
-                eventExt.__initialized = true;
-                targetExt.__active = undefined;
-                targetExt.__ignored = [];
-            }
-            if (scrollViewListeners.length > 1 && (this as any)._isBouncing) {
-                // Page view.
-                targetExt.__ignored.push(this.uuid);
-                return true;
-            }
-            return false;
-        }
-        if (event.type === cc.Node.EventType.TOUCH_END) {
-            if (targetExt.__ignored.includes(this.uuid)) {
-                return true;
-            }
-            return false;
-        }
-        if (event.type === cc.Node.EventType.TOUCH_CANCEL) {
-            if (targetExt.__ignored.includes(this.uuid)) {
-                return true;
-            }
-            return false;
-        }
+function _hasNestedViewGroup(
+    this: cc.ScrollView, event: cc.Event.EventTouch, captureListeners: cc.Node[] | undefined): boolean {
+    interface TargetExtend {
+        __active?: string;
+        // __ignored: string[];
+    }
+    interface EventExtend {
+        __initialized?: boolean;
+    }
+    // Use target to store data.
+    const target = event.target as cc.Node;
+    const targetExt = target as unknown as TargetExtend;
 
-        // TOUCH_MOVE events.
-        if (targetExt.__ignored.includes(this.uuid)) {
-            return true;
+    // Target + capturedListeners.
+    const listeners = [target, ...captureListeners || []];
+    const scrollViewListeners: cc.ScrollView[] = [];
+    for (const listener of listeners) {
+        const view = listener.getComponent(cc.ScrollView);
+        if (view !== null) {
+            scrollViewListeners.push(view);
         }
+    }
 
-        // Order:
-        // target listener[0] listener[1] ...
-        if (targetExt.__active !== undefined) {
-            return targetExt.__active !== this.uuid;
-        }
-
-        const delta = event.touch.getDelta();
-        let activeView = scrollViewListeners[0];
-        if (Math.abs(delta.x) > Math.abs(delta.y)) {
-            // Horizontal.
-            for (let i = 0, n = scrollViewListeners.length; i < n; ++i) {
-                const view = scrollViewListeners[i];
-                if (view.horizontal) {
-                    activeView = view;
-                    break;
-                }
-            }
-        } else if (Math.abs(delta.y) > Math.abs(delta.x)) {
-            // Vertical.
-            for (let i = 0, n = scrollViewListeners.length; i < n; ++i) {
-                const view = scrollViewListeners[i];
-                if (view.vertical) {
-                    activeView = view;
-                    break;
-                }
+    if (event.type === cc.Node.EventType.TOUCH_START) {
+        const eventExt = event as unknown as EventExtend;
+        if (eventExt.__initialized === undefined) {
+            eventExt.__initialized = true;
+            targetExt.__active = undefined;
+            // targetExt.__ignored = [];
+            for (const view of scrollViewListeners) {
+                (view as ScrollViewExtend).__isActiveView = undefined;
             }
         }
-        targetExt.__active = activeView.uuid;
+        // Use this will disable scrolling when bouncing.
+        // if (scrollViewListeners.length > 1 && (this as any)._isBouncing && this instanceof cc.PageView) {
+        //     // Page view.
+        //     targetExt.__ignored.push(this.uuid);
+        //     return true;
+        // }
+        return false;
+    }
+    if (event.type === cc.Node.EventType.TOUCH_END) {
+        // if (targetExt.__ignored.includes(this.uuid)) {
+        //     return true;
+        // }
+        return false;
+    }
+    if (event.type === cc.Node.EventType.TOUCH_CANCEL) {
+        // if (targetExt.__ignored.includes(this.uuid)) {
+        //     return true;
+        // }
+        return false;
+    }
+
+    // TOUCH_MOVE events.
+    // if (targetExt.__ignored.includes(this.uuid)) {
+    //     return true;
+    // }
+
+    // Order:
+    // target listener[0] listener[1] ...
+    if (targetExt.__active !== undefined) {
         return targetExt.__active !== this.uuid;
-    };
+    }
+
+    const delta = event.touch.getDelta();
+    let activeView = scrollViewListeners[0];
+    if (Math.abs(delta.x) > Math.abs(delta.y)) {
+        // Horizontal.
+        for (let i = 0, n = scrollViewListeners.length; i < n; ++i) {
+            const view = scrollViewListeners[i];
+            if (view.horizontal) {
+                activeView = view;
+                break;
+            }
+        }
+    } else if (Math.abs(delta.y) > Math.abs(delta.x)) {
+        // Vertical.
+        for (let i = 0, n = scrollViewListeners.length; i < n; ++i) {
+            const view = scrollViewListeners[i];
+            if (view.vertical) {
+                activeView = view;
+                break;
+            }
+        }
+    }
+    targetExt.__active = activeView.uuid;
+    for (const view of scrollViewListeners) {
+        (view as ScrollViewExtend).__isActiveView = targetExt.__active === view.uuid;
+    }
+    return targetExt.__active !== this.uuid;
+}
+
+function getSign(value: number): number {
+    return value === 0 ? 0 : value > 0 ? +1 : -1;
+}
+
+function _getDragDirection(this: cc.PageView, moveOffset: cc.Vec2): number {
+    if (!(this as ScrollViewExtend).__isActiveView) {
+        return 0;
+    }
+    if (this.isAutoScrolling() && (this as any)._isBouncing) {
+        const delta = (this as any)._autoScrollTargetDelta;
+        if (this.direction === cc.PageView.Direction.Horizontal) {
+            return getSign(delta.x);
+        }
+        if (this.direction === cc.PageView.Direction.Vertical) {
+            return getSign(delta.y);
+        }
+    } else {
+        if (this.direction === cc.PageView.Direction.Horizontal) {
+            return getSign(moveOffset.x);
+        }
+        if (this.direction === cc.PageView.Direction.Vertical) {
+            return getSign(moveOffset.y);
+        }
+    }
+    return 0;
+}
+
+const updatePrototype = () => {
+    Object.assign(cc.ScrollView.prototype, {
+        _stopPropagationIfTargetIsMe,
+        _hasNestedViewGroup,
+    });
+    Object.assign(cc.PageView.prototype, {
+        _getDragDirection,
+    });
 };
+
+updatePrototype();
 
 @ccclass
 @menu('ee/NestedScrollView')
@@ -159,8 +199,6 @@ export class NestedScrollView extends cc.Component {
             // this.setupTouchEnded(scrollView, listener);
             // this.setupTouchCancelled(scrollView, listener);
         }
-
-        scrollView && updateScrollView(scrollView);
     }
 
     protected onDisable(): void {
