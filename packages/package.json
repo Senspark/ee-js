@@ -17,5 +17,8 @@
     },
     "description": "ee packages",
     "version": "0.0.1",
-    "name": "ee"
+    "name": "ee",
+    "dependencies": {
+        "pngquant": "^3.0.0"
+    }
 }
