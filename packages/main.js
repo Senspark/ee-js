@@ -105,7 +105,10 @@ function onBeforeBuildFinish(options, callback) {
                 256,
                 '--force',
                 '--quality', '0-100',
+                '--floyd=0.5',
+                '--posterize', '0',
                 '--speed', '1',
+                '--strip',
                 '-',
             ]);
             await new Promise((resolve, reject) => {
