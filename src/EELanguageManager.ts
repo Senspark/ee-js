@@ -155,7 +155,7 @@ export class LanguageManager extends DefaultObserverManager<Observer> {
 
     public parseFormat(key: string, options?: Polyglot.InterpolationOptions): string | undefined {
         if (this.polyglot.has(key)) {
-            return this.polyglot.t(key, options);
+            return options ? this.polyglot.t(key, options) : this.polyglot.t(key);
         }
         return undefined;
     }
