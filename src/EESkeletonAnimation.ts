@@ -14,7 +14,7 @@ export class SkeletonAnimation extends sp.Skeleton {
                 if (!this.enabled) {
                     return;
                 }
-                if (!this.updateInternal(delta)) {
+                if (!this.updateInternal(delta * this.timeScale)) {
                     return;
                 }
                 cc.engine.repaintInEditMode();
