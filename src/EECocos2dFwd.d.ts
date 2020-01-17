@@ -315,12 +315,13 @@ declare namespace ee {
         class Recorder {
             constructor();
 
-            startScreenRecording(): void;
-            stopScreenRecording(): void;
-            cancelScreenRecording(): void;
+            isSupported(): boolean;
 
-            getScreenRecordingUrl(): string;
-            checkRecordingPermission(): boolean;
+            startRecording(): void;
+            stopRecording(): void;
+            cancelRecording(): void;
+
+            getRecordingUrl(): string;
         }
     }
 
