@@ -3,157 +3,150 @@
 // tslint:disable:member-access
 // tslint:disable:variable-name
 declare namespace ee {
-    namespace core {
-        type MessageHandler = (message: string) => string;
+    type MessageHandler = (message: string) => string;
 
-        function getSHA1CertificateFingerprint(): string;
-        function getVersionName(): string;
-        function getVersionCode(): string;
-        function getLanguageCode(): string;
-        function isApplicationInstalled(applicationId: string): boolean;
-        function openApplication(applicationId: string): boolean;
-        function sendMail(recipient: string, subject: string, body: string): boolean;
-        function isTablet(): boolean;
-        function testConnection(): boolean;
-        function getDeviceId(callback: (id: string) => void): void;
+    function getSHA1CertificateFingerprint(): string;
+    function getVersionName(): string;
+    function getVersionCode(): string;
+    function getLanguageCode(): string;
+    function isApplicationInstalled(applicationId: string): boolean;
+    function openApplication(applicationId: string): boolean;
+    function sendMail(recipient: string, subject: string, body: string): boolean;
+    function isTablet(): boolean;
+    function testConnection(): boolean;
+    function getDeviceId(callback: (id: string) => void): void;
 
-        interface SafeInset {
-            left: number;
-            right: number;
-            top: number;
-            bottom: number;
-        }
-        function getSafeInset(): SafeInset;
-        function getSafeInsetAsync(callback: (inset: SafeInset) => void): void;
+    interface SafeInset {
+        left: number;
+        right: number;
+        top: number;
+        bottom: number;
+    }
+    function getSafeInset(): SafeInset;
+    function getSafeInsetAsync(callback: (inset: SafeInset) => void): void;
 
-        class PluginManager {
-        }
+    class IMessageBridge {
+        call(tag: string): string;
+        call(tag: string, message: string): string;
+        callCpp(tag: string, message: string): string;
+        registerHandler(handler: MessageHandler, tag: string): boolean;
+        deregisterHandler(tag: string): boolean;
+    }
 
-        class IMessageBridge {
-            call(tag: string): string;
-            call(tag: string, message: string): string;
-            callCpp(tag: string, message: string): string;
-            registerHandler(handler: MessageHandler, tag: string): boolean;
-            deregisterHandler(tag: string): boolean;
-        }
+    class MessageBridge extends IMessageBridge {
+        static getInstance(): MessageBridge;
+    }
 
-        class MessageBridge extends IMessageBridge {
-            static getInstance(): MessageBridge;
-        }
+    class LogLevel {
+        static readonly Verbose: LogLevel;
+        static readonly Debug: LogLevel;
+        static readonly Info: LogLevel;
+        static readonly Warn: LogLevel;
+        static readonly Error: LogLevel;
+        static readonly Assert: LogLevel;
 
-        class LogLevel {
-            static readonly Verbose: LogLevel;
-            static readonly Debug: LogLevel;
-            static readonly Info: LogLevel;
-            static readonly Warn: LogLevel;
-            static readonly Error: LogLevel;
-            static readonly Assert: LogLevel;
+        priority: number;
+        desc: string;
 
-            priority: number;
-            desc: string;
+        constructor(priority: number, desc: string);
+    }
 
-            constructor(priority: number, desc: string);
-        }
+    class Logger {
+        static getSystemLogger(): Logger;
+        static setSystemLogger(logger: Logger): void;
+        constructor();
+        constructor(tag: string);
+        constructor(tag: string, callback: (level: LogLevel, tag: string, message: string) => void);
+        setEnabled(enabled: boolean): void;
+        log(level: LogLevel, formatString: string, ...args: any[]): void;
+        verbose(formatString: string, ...args: any[]): void;
+        debug(formatString: string, ...args: any[]): void;
+        info(formatString: string, ...args: any[]): void;
+        warn(formatString: string, ...args: any[]): void;
+        error(formatString: string, ...args: any[]): void;
+        wtf(formatString: string, ...args: any[]): void;
+    }
 
-        class Logger {
-            static getSystemLogger(): Logger;
-            static setSystemLogger(logger: Logger): void;
-            constructor();
-            constructor(tag: string);
-            constructor(tag: string, callback: (level: LogLevel, tag: string, message: string) => void);
-            setEnabled(enabled: boolean): void;
-            log(level: LogLevel, formatString: string, ...args: any[]): void;
-            verbose(formatString: string, ...args: any[]): void;
-            debug(formatString: string, ...args: any[]): void;
-            info(formatString: string, ...args: any[]): void;
-            warn(formatString: string, ...args: any[]): void;
-            error(formatString: string, ...args: any[]): void;
-            wtf(formatString: string, ...args: any[]): void;
-        }
-
-        namespace Metrics {
-            enum ResolutionPolicy {
-                FixedWidth,
-                FixedHeight,
-            }
-        }
-
-        class Metrics {
-            static initialize(
-                frameSize: [number, number],
-                winSize: [number, number], policy: Metrics.ResolutionPolicy): void;
-            static initialize(ratio: number): void;
-            static getWinSize(): [number, number];
-            static getFrameSize(): [number, number];
-            static getDensity(): number;
-            static fromPoint(value: number): Metrics;
-            static fromPixel(value: number): Metrics;
-            static fromDip(value: number): Metrics;
-            toPoint(): number;
-            toPixel(): number;
-            toDip(): number;
-        }
-
-        class VideoPlayer {
-            constructor();
-            loadFile(path: string): void;
-            setPosition(x: number, y: number): void;
-            setSize(width: number, height: number): void;
-            play(): void;
-            pause(): void;
-            resume(): void;
-            stop(): void;
-            isVisible(): boolean;
-            setVisible(visible: boolean): void;
-            isKeepAspectRatioEnabled(): boolean;
-            setKeepAspectRatioEnabled(): void;
-            isFullScreenEnabled(): boolean;
-            setFullScreenEnabled(enabled: boolean): void;
-        }
-
-        class VideoPlayerManager {
-            static getInstance(): VideoPlayerManager;
-            createVideoPlayer(): VideoPlayer;
-            destroyVideoPlayer(player: VideoPlayer): boolean;
+    namespace Metrics {
+        enum ResolutionPolicy {
+            FixedWidth,
+            FixedHeight,
         }
     }
 
-    namespace crashlytics {
-        class Crashlytics {
-            constructor();
+    class Metrics {
+        static initialize(
+            frameSize: [number, number],
+            winSize: [number, number], policy: Metrics.ResolutionPolicy): void;
+        static initialize(ratio: number): void;
+        static getWinSize(): [number, number];
+        static getFrameSize(): [number, number];
+        static getDensity(): number;
+        static fromPoint(value: number): Metrics;
+        static fromPixel(value: number): Metrics;
+        static fromDip(value: number): Metrics;
+        toPoint(): number;
+        toPixel(): number;
+        toDip(): number;
+    }
 
-            causeCrash(): void;
+    class VideoPlayer {
+        constructor();
+        loadFile(path: string): void;
+        setPosition(x: number, y: number): void;
+        setSize(width: number, height: number): void;
+        play(): void;
+        pause(): void;
+        resume(): void;
+        stop(): void;
+        isVisible(): boolean;
+        setVisible(visible: boolean): void;
+        isKeepAspectRatioEnabled(): boolean;
+        setKeepAspectRatioEnabled(): void;
+        isFullScreenEnabled(): boolean;
+        setFullScreenEnabled(enabled: boolean): void;
+    }
 
-            causeException();
+    class VideoPlayerManager {
+        static getInstance(): VideoPlayerManager;
+        createVideoPlayer(): VideoPlayer;
+        destroyVideoPlayer(player: VideoPlayer): boolean;
+    }
 
-            setLogLevel(level: core.LogLevel): void;
+    class Crashlytics {
+        constructor();
 
-            log(level: core.LogLevel, tag: string, message: string): void;
+        causeCrash(): void;
 
-            setString(key: string, value: string): void;
+        causeException();
 
-            setBool(key: string, value: boolean): void;
+        setLogLevel(level: LogLevel): void;
 
-            setInt(key: string, value: number): void;
+        log(level: LogLevel, tag: string, message: string): void;
 
-            setUserIdentifier(identifier: string): void;
+        setString(key: string, value: string): void;
 
-            setUserName(name: string): void;
+        setBool(key: string, value: boolean): void;
 
-            setUserEmail(email: string): void;
+        setInt(key: string, value: number): void;
 
-            trackLevelStart(name: string, attrs: { [key: string]: string }): void;
+        setUserIdentifier(identifier: string): void;
 
-            trackLevelEnd(name: string, score: number, success: boolean, attrs: { [key: string]: string }): void;
+        setUserName(name: string): void;
 
-            trackPurchase(price: number, currency: string, success: boolean,
-                itemName: string, itemType: string, itemId: string,
-                attrs: { [key: string]: string });
+        setUserEmail(email: string): void;
 
-            trackCustomEvent(name: string, attrs: { [key: string]: string }): void;
+        trackLevelStart(name: string, attrs: { [key: string]: string }): void;
 
-            trackInvite(method: string, attrs: { [key: string]: string }): void;
-        }
+        trackLevelEnd(name: string, score: number, success: boolean, attrs: { [key: string]: string }): void;
+
+        trackPurchase(price: number, currency: string, success: boolean,
+            itemName: string, itemType: string, itemId: string,
+            attrs: { [key: string]: string });
+
+        trackCustomEvent(name: string, attrs: { [key: string]: string }): void;
+
+        trackInvite(method: string, attrs: { [key: string]: string }): void;
     }
 
     namespace google {
@@ -247,411 +240,370 @@ declare namespace ee {
         }
     }
 
-    namespace ads {
-        type AdViewCallback = (result: boolean) => void;
-        type OnClickedCallback = () => void;
-        class IAdView {
-            isLoaded(): boolean;
-            load(): void;
-            getAnchor(): [number, number];
-            setAnchor(x: number, y: number): void;
-            getPosition(): [number, number];
-            setPosition(x: number, y: number): void;
-            getSize(): [number, number];
-            setSize(width: number, height: number): void;
-            setVisible(visible: boolean): void;
-            setLoadCallback(callback: AdViewCallback): void;
-            setOnClickedCallback(callback: OnClickedCallback): void;
-        }
-
-        class IInterstitialAd {
-            isLoaded(): boolean;
-            load(): void;
-            show(): boolean;
-            setResultCallback(callback: () => void): void;
-            setOnClickedCallback(callback: () => void): void;
-            doOnClicked(): void;
-        }
-
-        class IRewardedVideo {
-            isLoaded(): boolean;
-            load(): void;
-            show(): boolean;
-            setResultCallback(callback: (result: boolean) => void): void;
-            setOnClickedCallback(callback: () => void): void;
-            doOnClicked(): void;
-        }
-
-        class MultiAdView extends IAdView {
-            constructor();
-            addItem(item: IAdView): this;
-        }
-
-        class MultiInterstitialAd extends IInterstitialAd {
-            constructor();
-            addItem(item: IInterstitialAd): this;
-        }
-
-        class MultiRewardedVideo extends IRewardedVideo {
-            constructor();
-            constructor(logger: core.Logger);
-            addItem(item: IRewardedVideo): this;
-        }
-
-        class NullAdView extends IAdView {
-            constructor();
-        }
-
-        class NullInterstitialAd extends IInterstitialAd {
-            constructor()
-        }
-
-        class NullRewardedVideo extends IRewardedVideo {
-            constructor(logger: core.Logger);
-        }
+    type AdViewCallback = (result: boolean) => void;
+    type OnClickedCallback = () => void;
+    class IAdView {
+        isLoaded(): boolean;
+        load(): void;
+        getAnchor(): [number, number];
+        setAnchor(x: number, y: number): void;
+        getPosition(): [number, number];
+        setPosition(x: number, y: number): void;
+        getSize(): [number, number];
+        setSize(width: number, height: number): void;
+        setVisible(visible: boolean): void;
+        setLoadCallback(callback: AdViewCallback): void;
+        setOnClickedCallback(callback: OnClickedCallback): void;
     }
 
-    namespace recorder {
-        class Recorder {
-            constructor();
-
-            isSupported(): boolean;
-
-            startRecording(): void;
-            stopRecording(): void;
-            cancelRecording(): void;
-
-            getRecordingUrl(): string;
-        }
+    class IInterstitialAd {
+        isLoaded(): boolean;
+        load(): void;
+        show(): boolean;
+        setResultCallback(callback: () => void): void;
+        setOnClickedCallback(callback: () => void): void;
+        doOnClicked(): void;
     }
 
-    namespace ironsource {
-        class IronSource {
-            constructor();
-            constructor(logger: core.Logger);
-
-            initialize(gameId: string): void;
-            createRewardedVideo(placementId: string): ads.IRewardedVideo;
-            createInterstitialAd(placementId: string): ads.IInterstitialAd;
-            setCloseTimeout(timeout: number): void;
-        }
+    class IRewardedVideo {
+        isLoaded(): boolean;
+        load(): void;
+        show(): boolean;
+        setResultCallback(callback: (result: boolean) => void): void;
+        setOnClickedCallback(callback: () => void): void;
+        doOnClicked(): void;
     }
 
-    namespace admob {
-        class AdMob {
-            constructor();
-            constructor(logger: core.Logger);
-            initialize(applicationId: string): void;
-            getEmulatorTestDeviceHash(): string;
-            addTestDevice(hash: string): void;
-            createBannerAd(adId: string, adSize: BannerAdSize): ads.IAdView;
-            createNativeAd(adId: string, layoutName: string, identifiers: NativeAdLayout): ads.IAdView;
-            createInterstitialAd(adId: string): ads.IInterstitialAd;
-            createRewardedVideo(adId: string): ads.IRewardedVideo;
-        }
-
-        enum BannerAdSize {
-            Normal,
-            Large,
-            Smart,
-        }
-
-        class NativeAdLayout {
-            constructor();
-            setBody(id: string): this;
-            setCallToAction(id: string): this;
-            setHeadline(id: string): this;
-            setIcon(id: string): this;
-            setImage(id: string): this;
-            setMedia(id: string): this;
-            setPrice(id: string): this;
-            setStarRating(id: string): this;
-            setStore(id: string): this;
-        }
+    class MultiAdView extends IAdView {
+        constructor();
+        addItem(item: IAdView): this;
     }
 
-    namespace facebookads {
-        class FacebookAds {
-            constructor();
-            constructor(logger: core.Logger);
-            getTestDeviceHash(): string;
-            addTestDevice(hash: string): void;
-            createBannerAd(adId: string, adSize: BannerAdSize): ads.IAdView;
-            createNativeAd(adId: string, layoutName: string, identifiers: NativeAdLayout): ads.IAdView;
-            createInterstitialAd(adId: string): ads.IInterstitialAd;
-            createRewardedVideo(adId: string): ads.IRewardedVideo;
-        }
-
-        enum BannerAdSize {
-            BannerHeight50,
-            BannerHeight90,
-        }
-
-        class NativeAdLayout {
-            constructor();
-            setAdChoices(id: string): this;
-            setBody(id: string): this;
-            setCallToAction(id: string): this;
-            setIcon(id: string): this;
-            setMedia(id: string): this;
-            setSocialContext(id: string): this;
-            setTitle(id: string): this;
-            setCover(id: string): this;
-            setSponsor(id: string): this;
-        }
+    class MultiInterstitialAd extends IInterstitialAd {
+        constructor();
+        addItem(item: IInterstitialAd): this;
     }
 
-    namespace applovin {
-        class AppLovin {
-            constructor();
-            constructor(logger: core.Logger);
-            initialize(key: string): void;
-            setTestAdsEnabled(enabled: boolean): void;
-            setVerboseLogging(enabled: boolean): void;
-            setMuted(enabled: boolean): void;
-            createRewardedVideo(): ads.IRewardedVideo;
-        }
+    class MultiRewardedVideo extends IRewardedVideo {
+        constructor();
+        constructor(logger: Logger);
+        addItem(item: IRewardedVideo): this;
     }
 
-    namespace appsflyer {
-        class IBridge {
-            initialize(devKey: string, appId: string): void;
-            startTracking(): void;
-            getDeviceId(): string;
-            setDebugEnabled(enabled: boolean): void;
-            setStopTracking(enabled: boolean): void;
-            trackEvent(name: string, values: { [key: string]: string }): void;
-        }
-
-        class Bridge extends IBridge {
-            constructor();
-        }
+    class NullAdView extends IAdView {
+        constructor();
     }
 
-    namespace tenjin {
-        class IBridge {
-            initialize(apiKey: string): void;
-        }
-
-        class Bridge extends IBridge {
-            constructor();
-        }
+    class NullInterstitialAd extends IInterstitialAd {
+        constructor()
     }
 
-    namespace firebase {
-        type FetchCallback = (succeeded: boolean) => void;
-        type HashCallback = (succeeded: boolean, hash: string) => void;
-        type DataCallback = (succeeded: boolean, data: string) => void;
-        type MessageCallback = (message: Message) => void;
-        type TokenCallback = (token: string) => void;
-
-        class App {
-            static initialize(): void;
-            static getWindowText(): any;
-        }
-
-        class Analytics {
-            constructor();
-            initialize(): boolean;
-            analyticsCollectionEnabled(enabled: boolean): void;
-            setSessionTimeoutDuration(milliseconds: number): void;
-            setUserId(userId: string): void;
-            setUserProperty(name: string, property: string): void;
-            logEvent(name: string, dict: { [key: string]: string } = {}): void;
-        }
-
-        enum LastFetchStatus {
-            Success,
-            Failure,
-            Pending,
-        }
-
-        enum FetchFailureReason {
-            Invalid,
-            Throttled,
-            Error,
-        }
-
-        interface ConfigInfo {
-            readonly fetchTime: number;
-            readonly lastFetchStatus: LastFetchStatus;
-            readonly lastFetchFailureReason: FetchFailureReason;
-            readonly throttledEndTime: number;
-        }
-
-        class RemoteConfig {
-            constructor();
-            initialize(): boolean;
-            activateFetched(): boolean;
-            fetchOnly(callback: () => void): void;
-            fetch(devModeEnabled: boolean, callback: FetchCallback): void;
-            getInfo(): ConfigInfo;
-            getInfoJsb(): string;
-            setDefaultBool(key: string, value: boolean): void;
-            setDefaultLong(key: string, value: number): void;
-            setDefaultDouble(key: string, value: number): void;
-            setDefaultString(key: string, value: string): void;
-            flushDefaults(): void;
-            getBool(key: string): boolean;
-            getLong(key: string): number;
-            getDouble(key: string): number;
-            getString(key: string): string;
-        }
-
-        class Storage {
-            constructor();
-            initialize(): boolean;
-            getMaxDownloadRetryTime(): number;
-            getMaxUploadRetryTime(): number;
-            getMaxOperationRetryTime(): number;
-            setMaxDownloadRetryTime(seconds: number): void;
-            setMaxOperationRetryTime(seconds: number): void;
-            setMaxUploadRetryTime(seconds: number): void;
-            getHash(filePath: string, callback: HashCallback): void;
-            getData(filePath: string, callback: DataCallback): void;
-        }
-
-        class Notification {
-            title: string;
-            body: string;
-            constructor();
-        }
-
-        class Message {
-            from: string;
-            to: string;
-            rawData: string;
-            messageType: string;
-            error: string;
-            errorDescription: string;
-            data: { [key: string]: string };
-            messageId: string;
-            notification: Notification;
-            notificationOpened: boolean;
-            constructor();
-        }
-
-        class Messaging {
-            constructor();
-            initialize(): boolean;
-            initialize(callback: TokenCallback): boolean;
-            setMessageCallback(callback: MessageCallback): void;
-            setTokenCallback(callback: TokenCallback): void;
-            subscribe(topic: string): void;
-            unsubscribe(topic: string): void;
-        }
+    class NullRewardedVideo extends IRewardedVideo {
+        constructor(logger: Logger);
     }
 
-    namespace notification {
-        class Notification {
-            constructor();
-            schedule(builder: NotificationBuilder): void;
-            schedule(message: string, tag: number, delay: number, interval: number): void;
-            unschedule(tag: number): void;
-            clearAll(): void;
-        }
+    class Recorder {
+        constructor();
 
-        class NotificationBuilder {
-            constructor();
-            setTicker(ticker: string): this;
-            setTitle(title: string): this;
-            setBody(body: string): this;
-            setDelay(delay: number): this;
-            setInterval(interval: number): this;
-            setTag(tag: number): this;
-        }
+        isSupported(): boolean;
+
+        startRecording(): void;
+        stopRecording(): void;
+        cancelRecording(): void;
+
+        getRecordingUrl(): string;
     }
 
-    namespace unityads {
-        class UnityAds {
-            constructor();
-            constructor(logger: core.Logger);
-            initialize(gameId: string, testModeEnabled: boolean): void;
-            setDebugModeEnabled(enabled: boolean): void;
-            createRewardedVideo(placementId: string): ads.IRewardedVideo;
-            createInterstitialAd(placementId: string): ads.IInterstitialAd;
-        }
+    class IronSource {
+        constructor();
+        constructor(logger: Logger);
+
+        initialize(gameId: string): void;
+        createRewardedVideo(placementId: string): IRewardedVideo;
+        createInterstitialAd(placementId: string): IInterstitialAd;
+        setCloseTimeout(timeout: number): void;
     }
 
-    namespace vungle {
-        class Vungle {
-            constructor();
-            constructor(logger: core.Logger);
-            initialize(gameId: string): void;
-            initialize(gameId: string, placementId: string): void;
-            createRewardedVideo(placementId: string): ads.IRewardedVideo;
-        }
+    class AdMob {
+        constructor();
+        constructor(logger: Logger);
+        initialize(applicationId: string): void;
+        getEmulatorTestDeviceHash(): string;
+        addTestDevice(hash: string): void;
+        createBannerAd(adId: string, adSize: AdMobBannerAdSize): IAdView;
+        createNativeAd(adId: string, layoutName: string, identifiers: AdMobNativeAdLayout): IAdView;
+        createInterstitialAd(adId: string): IInterstitialAd;
+        createRewardedVideo(adId: string): IRewardedVideo;
     }
 
-    namespace facebook {
-        interface IAccessToken {
-            getToken(): string;
-            getApplicationId(): string;
-            getUserId(): string;
-        }
+    enum AdMobBannerAdSize {
+        Normal,
+        Large,
+        Smart,
+    }
 
-        interface IDelegate<T> {
-            onSuccess(callback: T): this;
-            onFailure(callback: (message) => void): this;
-            onCancel(callback: () => void): this;
-        }
+    class AdMobNativeAdLayout {
+        constructor();
+        setBody(id: string): this;
+        setCallToAction(id: string): this;
+        setHeadline(id: string): this;
+        setIcon(id: string): this;
+        setImage(id: string): this;
+        setMedia(id: string): this;
+        setPrice(id: string): this;
+        setStarRating(id: string): this;
+        setStore(id: string): this;
+    }
 
-        type ILoginDelegate = IDelegate<(token: IAccessToken) => void>;
-        type IRequestDelegate = IDelegate<(requestId: string, requestRecipients: string[]) => void>;
-        type IShareDelegate = IDelegate<(postId: string) => void>;
-        type IGraphDelegate = IDelegate<(content: string) => void>;
+    class FacebookAds {
+        constructor();
+        constructor(logger: Logger);
+        getTestDeviceHash(): string;
+        addTestDevice(hash: string): void;
+        createBannerAd(adId: string, adSize: FacebookBannerAdSize): IAdView;
+        createNativeAd(adId: string, layoutName: string, identifiers: FacebookNativeAdLayout): IAdView;
+        createInterstitialAd(adId: string): IInterstitialAd;
+        createRewardedVideo(adId: string): IRewardedVideo;
+    }
 
-        class GraphRequest {
-            constructor();
-            setPath(path: string): this;
-            setParameter(key: string, value: string): this;
-            toString(): string;
-        }
+    enum FacebookBannerAdSize {
+        BannerHeight50,
+        BannerHeight90,
+    }
 
-        enum ActionType {
-            None,
-            Send,
-            AskFor,
-            Turn,
-        }
+    class FacebookNativeAdLayout {
+        constructor();
+        setAdChoices(id: string): this;
+        setBody(id: string): this;
+        setCallToAction(id: string): this;
+        setIcon(id: string): this;
+        setMedia(id: string): this;
+        setSocialContext(id: string): this;
+        setTitle(id: string): this;
+        setCover(id: string): this;
+        setSponsor(id: string): this;
+    }
 
-        enum Filter {
-            None,
-            AppUsers,
-            AppNonUsers,
-        }
+    class AppLovin {
+        constructor();
+        constructor(logger: Logger);
+        initialize(key: string): void;
+        setTestAdsEnabled(enabled: boolean): void;
+        setVerboseLogging(enabled: boolean): void;
+        setMuted(enabled: boolean): void;
+        createRewardedVideo(): IRewardedVideo;
+    }
 
-        class RequestContent {
-            constructor();
-            setActionType(type: ActionType): this;
-            setFilter(filter: Filter): this;
-            setRecipients(recipients: string[]): this;
-            setObjectId(objectId: string): this;
-            setTitle(title: string): this;
-            setMessage(message: string): this;
-            setData(data: string): this;
-            toString(): string;
-        }
+    class AppsFlyer {
+        initialize(devKey: string, appId: string): void;
+        startTracking(): void;
+        getDeviceId(): string;
+        setDebugEnabled(enabled: boolean): void;
+        setStopTracking(enabled: boolean): void;
+        trackEvent(name: string, values: { [key: string]: string }): void;
+    }
 
-        class IBridge {
-            isLoggedIn(): boolean;
-            logIn(permissions: string[], delegate: ILoginDelegate): void;
-            createLoginDelegate(): ILoginDelegate;
-            logOut(): void;
-            getAccessToken(): IAccessToken;
-            shareLinkContent(link: string, delegate: IShareDelegate): void;
-            sharePhotoContent(url: string, delegate: IShareDelegate): void;
-            shareVideoContent(url: string, delegate: IShareDelegate): void;
-            createShareDelegate(): IShareDelegate;
-            graphRequest(request: GraphRequest, delegate: IGraphDelegate): void;
-            createGraphDelegate(): IGraphDelegate;
-            sendRequest(request: RequestContent, delegate: IRequestDelegate): void;
-            createRequestDelegate(): IRequestDelegate;
-        }
+    class Tenjin {
+        initialize(apiKey: string): void;
+    }
 
-        class Bridge extends IBridge {
-            constructor();
-        }
+    type FetchCallback = (succeeded: boolean) => void;
+    type HashCallback = (succeeded: boolean, hash: string) => void;
+    type DataCallback = (succeeded: boolean, data: string) => void;
+    type MessageCallback = (message: Message) => void;
+    type TokenCallback = (token: string) => void;
+
+    class FirebaseAnalytics {
+        constructor();
+        initialize(): boolean;
+        analyticsCollectionEnabled(enabled: boolean): void;
+        setSessionTimeoutDuration(milliseconds: number): void;
+        setUserId(userId: string): void;
+        setUserProperty(name: string, property: string): void;
+        logEvent(name: string, dict: { [key: string]: string } = {}): void;
+    }
+
+    enum FirebaseLastFetchStatus {
+        Success,
+        Failure,
+        Pending,
+    }
+
+    enum FirebaseFetchFailureReason {
+        Invalid,
+        Throttled,
+        Error,
+    }
+
+    interface FirebaseConfigInfo {
+        readonly fetchTime: number;
+        readonly lastFetchStatus: FirebaseLastFetchStatus;
+        readonly lastFetchFailureReason: FirebaseFetchFailureReason;
+        readonly throttledEndTime: number;
+    }
+
+    class FirebaseRemoteConfig {
+        constructor();
+        initialize(): boolean;
+        activateFetched(): boolean;
+        fetchOnly(callback: () => void): void;
+        fetch(devModeEnabled: boolean, callback: FetchCallback): void;
+        getInfo(): ConfigInfo;
+        getInfoJsb(): string;
+        setDefaultBool(key: string, value: boolean): void;
+        setDefaultLong(key: string, value: number): void;
+        setDefaultDouble(key: string, value: number): void;
+        setDefaultString(key: string, value: string): void;
+        flushDefaults(): void;
+        getBool(key: string): boolean;
+        getLong(key: string): number;
+        getDouble(key: string): number;
+        getString(key: string): string;
+    }
+
+    class FirebaseStorage {
+        constructor();
+        initialize(): boolean;
+        getMaxDownloadRetryTime(): number;
+        getMaxUploadRetryTime(): number;
+        getMaxOperationRetryTime(): number;
+        setMaxDownloadRetryTime(seconds: number): void;
+        setMaxOperationRetryTime(seconds: number): void;
+        setMaxUploadRetryTime(seconds: number): void;
+        getHash(filePath: string, callback: HashCallback): void;
+        getData(filePath: string, callback: DataCallback): void;
+    }
+
+    /* Not implemented.
+    class Notification {
+        title: string;
+        body: string;
+        constructor();
+    }
+
+    class Message {
+        from: string;
+        to: string;
+        rawData: string;
+        messageType: string;
+        error: string;
+        errorDescription: string;
+        data: { [key: string]: string };
+        messageId: string;
+        notification: Notification;
+        notificationOpened: boolean;
+        constructor();
+    }
+
+    class FirebaseMessaging {
+        constructor();
+        initialize(): boolean;
+        initialize(callback: TokenCallback): boolean;
+        setMessageCallback(callback: MessageCallback): void;
+        setTokenCallback(callback: TokenCallback): void;
+        subscribe(topic: string): void;
+        unsubscribe(topic: string): void;
+    }
+    */
+
+    class Notification {
+        constructor();
+        schedule(builder: NotificationBuilder): void;
+        schedule(message: string, tag: number, delay: number, interval: number): void;
+        unschedule(tag: number): void;
+        clearAll(): void;
+    }
+
+    class NotificationBuilder {
+        constructor();
+        setTicker(ticker: string): this;
+        setTitle(title: string): this;
+        setBody(body: string): this;
+        setDelay(delay: number): this;
+        setInterval(interval: number): this;
+        setTag(tag: number): this;
+    }
+
+    class UnityAds {
+        constructor();
+        constructor(logger: Logger);
+        initialize(gameId: string, testModeEnabled: boolean): void;
+        setDebugModeEnabled(enabled: boolean): void;
+        createRewardedVideo(placementId: string): IRewardedVideo;
+        createInterstitialAd(placementId: string): IInterstitialAd;
+    }
+
+    class Vungle {
+        constructor();
+        constructor(logger: core.Logger);
+        initialize(gameId: string): void;
+        initialize(gameId: string, placementId: string): void;
+        createRewardedVideo(placementId: string): IRewardedVideo;
+    }
+
+    interface IFacebookAccessToken {
+        getToken(): string;
+        getApplicationId(): string;
+        getUserId(): string;
+    }
+
+    interface IFacebookDelegate<T> {
+        onSuccess(callback: T): this;
+        onFailure(callback: (message) => void): this;
+        onCancel(callback: () => void): this;
+    }
+
+    type IFacebookLoginDelegate = IFacebookDelegate<(token: IFacebookAccessToken) => void>;
+    type IFacebookRequestDelegate = IFacebookDelegate<(requestId: string, requestRecipients: string[]) => void>;
+    type IFacebookShareDelegate = IFacebookDelegate<(postId: string) => void>;
+    type IFacebookGraphDelegate = IFacebookDelegate<(content: string) => void>;
+
+    class FacebookGraphRequest {
+        constructor();
+        setPath(path: string): this;
+        setParameter(key: string, value: string): this;
+        toString(): string;
+    }
+
+    enum FacebookActionType {
+        None,
+        Send,
+        AskFor,
+        Turn,
+    }
+
+    enum FacebookFilter {
+        None,
+        AppUsers,
+        AppNonUsers,
+    }
+
+    class FacebookRequestContent {
+        constructor();
+        setActionType(type: ActionType): this;
+        setFilter(filter: Filter): this;
+        setRecipients(recipients: string[]): this;
+        setObjectId(objectId: string): this;
+        setTitle(title: string): this;
+        setMessage(message: string): this;
+        setData(data: string): this;
+        toString(): string;
+    }
+
+    class Facebook {
+        isLoggedIn(): boolean;
+        logIn(permissions: string[], delegate: IFacebookLoginDelegate): void;
+        createLoginDelegate(): IFacebookLoginDelegate;
+        logOut(): void;
+        getAccessToken(): IFacebookAccessToken;
+        shareLinkContent(link: string, delegate: IFacebookShareDelegate): void;
+        sharePhotoContent(url: string, delegate: IFacebookShareDelegate): void;
+        shareVideoContent(url: string, delegate: IFacebookShareDelegate): void;
+        createShareDelegate(): IFacebookShareDelegate;
+        graphRequest(request: FacebookGraphRequest, delegate: IFacebookGraphDelegate): void;
+        createGraphDelegate(): IFacebookGraphDelegate;
+        sendRequest(request: FacebookRequestContent, delegate: IFacebookRequestDelegate): void;
+        createRequestDelegate(): IFacebookRequestDelegate;
     }
 }
 
