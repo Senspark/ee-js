@@ -65,7 +65,7 @@ function _hasNestedViewGroup(
     }
     // Use target to store data.
     const target = event.target as cc.Node;
-    const targetExt = target as unknown as TargetExtend;
+    const targetExt = target as any as TargetExtend;
 
     // Target + capturedListeners.
     const listeners = [target, ...captureListeners || []];
@@ -78,7 +78,7 @@ function _hasNestedViewGroup(
     }
 
     if (event.type === cc.Node.EventType.TOUCH_START) {
-        const eventExt = event as unknown as EventExtend;
+        const eventExt = event as any as EventExtend;
         if (eventExt.__initialized === undefined) {
             eventExt.__initialized = true;
             targetExt.__active = undefined;
@@ -175,11 +175,11 @@ function _getDragDirection(this: cc.PageView, moveOffset: cc.Vec2): number {
 }
 
 const updatePrototype = () => {
-    Object.assign(cc.ScrollView.prototype, {
+    (<any>Object).assign(cc.ScrollView.prototype, {
         _stopPropagationIfTargetIsMe,
         _hasNestedViewGroup,
     });
-    Object.assign(cc.PageView.prototype, {
+    (<any>Object).assign(cc.PageView.prototype, {
         _getDragDirection,
     });
 };
@@ -230,7 +230,7 @@ export class NestedScrollView extends cc.Component {
                     }
                 }
 
-                const item = (this as unknown as ListenerExtend);
+                const item = (this as any as ListenerExtend);
                 item.__touchedViews = touchedViews;
                 item.__bestView = null;
 
@@ -248,7 +248,7 @@ export class NestedScrollView extends cc.Component {
             event.touch = touch;
             event.bubbles = true;
 
-            const item = (this as unknown as ListenerExtend);
+            const item = (this as any as ListenerExtend);
             const bestView = item.__bestView = item.__bestView ||
                 findBestScrollView(event, scrollView, item.__touchedViews);
             bestView.node.dispatchEvent(event);
@@ -270,7 +270,7 @@ export class NestedScrollView extends cc.Component {
             node.dispatchEvent(event);
 
             // Additional lines.
-            const item = (this as unknown as ListenerExtend);
+            const item = (this as any as ListenerExtend);
             item.__touchedViews.forEach(view => view.node.dispatchEvent(event));
         };
     }
@@ -285,7 +285,7 @@ export class NestedScrollView extends cc.Component {
             node.dispatchEvent(event);
 
             // Additional lines.
-            const item = (this as unknown as ListenerExtend);
+            const item = (this as any as ListenerExtend);
             item.__touchedViews.forEach(view => view.node.dispatchEvent(event));
         };
     }

@@ -94,76 +94,83 @@ function onBeforeBuildFinish(options, callback) {
     //   _nativeMd5Map: null
     //   _md5Map: null
     // }
-    Editor.log(`Building ${options.platform} to ${options.dest}`);
 
-    const optimizePng = async path => {
-        const altPath = `${path}.alt`;
-        Editor.log(`Optimize ${path}.`)
-        try {
-            // Don't use the same PngQuant instance for all optimizations (error ERR_STREAM_WRITE_AFTER_END).
-            const quanter = new PngQuant([
-                256,
-                '--force',
-                '--quality', '0-100',
-                '--floyd=0.5',
-                '--posterize', '0',
-                '--speed', '1',
-                '--strip',
-                '-',
-            ]);
-            await new Promise((resolve, reject) => {
-                fs.createReadStream(path)
-                    .pipe(quanter)
-                    .pipe(fs.createWriteStream(altPath))
-                    .on('error', err => reject(err))
-                    .on('finish', () => fs.rename(altPath, path, err => err ? reject(err) : resolve()));
-            });
-        } catch (ex) {
-            Editor.log(`${err}`);
-        }
-    };
-
-    const buildResults = options.buildResults;
-    const uuids = buildResults.getAssetUuids();
-    const textureType = cc.js._getClassId(cc.Texture2D);
-    // Editor.log(`textureType = ${textureType}`);
-    const promises = [];
-    for (let i = 0, n = uuids.length; i < n; ++i) {
-        const uuid = uuids[i];
-        if (buildResults.getAssetType(uuid) !== textureType) {
-            continue;
-        }
-        const asset = buildResults._buildAssets[uuid];
-        if (!asset) {
-            continue;
-        }
-        const nativePaths = asset.nativePaths;
-        if (!nativePaths) {
-            continue;
-        }
-        for (let j = 0, m = nativePaths.length; j < m; ++j) {
-            const path = nativePaths[j];
-            const extension = path.split('.').pop();
-            if (extension !== 'png') {
-                continue;
-            }
-            promises.push(new Promise(resolve =>
-                fs.stat(path, async (err, stats) => {
-                    if (err) {
-                        // File not exist.
-                    } else {
-                        await optimizePng(path);
-                    }
-                    resolve();
-                })));
-            break;
-        }
-    }
-
-    Editor.log(`size = ${promises.length}`);
-    Promise.all(promises).then(() => {
+    // FIXME: 31/5/2023 nhanc18 disable this features
+    {
         callback();
-    });
+        return;
+    }
+    // Editor.log(`Building ${options.platform} to ${options.dest}`);
+
+    // const optimizePng = async path => {
+    //     const altPath = `${path}.alt`;
+    //     Editor.log(`Optimize ${path}.`)
+    //     try {
+    //         // Don't use the same PngQuant instance for all optimizations (error ERR_STREAM_WRITE_AFTER_END).
+    //         const quanter = new PngQuant([
+    //             256,
+    //             '--force',
+    //             '--quality', '0-100',
+    //             '--floyd=0.5',
+    //             '--posterize', '0',
+    //             '--speed', '1',
+    //             '--strip',
+    //             '-',
+    //         ]);
+    //         await new Promise((resolve, reject) => {
+    //             fs.createReadStream(path)
+    //                 .pipe(quanter)
+    //                 .pipe(fs.createWriteStream(altPath))
+    //                 .on('error', err => reject(err))
+    //                 .on('finish', () => fs.rename(altPath, path, err => err ? reject(err) : resolve()));
+    //         });
+    //     } catch (ex) {
+    //         Editor.log(`${err}`);
+    //     }
+    // };
+
+    // const buildResults = options.buildResults;
+
+    // const uuids = buildResults.getAssetUuids();
+    // const textureType = cc.js._getClassId(cc.Texture2D);
+    // // Editor.log(`textureType = ${textureType}`);
+    // const promises = [];
+    // for (let i = 0, n = uuids.length; i < n; ++i) {
+    //     const uuid = uuids[i];
+    //     if (buildResults.getAssetType(uuid) !== textureType) {
+    //         continue;
+    //     }
+    //     const asset = buildResults._buildAssets[uuid];
+    //     if (!asset) {
+    //         continue;
+    //     }
+    //     const nativePaths = asset.nativePaths;
+    //     if (!nativePaths) {
+    //         continue;
+    //     }
+    //     for (let j = 0, m = nativePaths.length; j < m; ++j) {
+    //         const path = nativePaths[j];
+    //         const extension = path.split('.').pop();
+    //         if (extension !== 'png') {
+    //             continue;
+    //         }
+    //         promises.push(new Promise(resolve =>
+    //             fs.stat(path, async (err, stats) => {
+    //                 if (err) {
+    //                     // File not exist.
+    //                 } else {
+    //                     await optimizePng(path);
+    //                 }
+    //                 resolve();
+    //             })));
+    //         break;
+    //     }
+    // }
+
+    // Editor.log(`size = ${promises.length}`);
+    // Promise.all(promises).then(() => {
+    //     callback();
+    // });
 }
 
 let findItem = (array, pred) => {
